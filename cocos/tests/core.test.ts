@@ -27,7 +27,8 @@ test('every story stage builds a full enemy team', () => {
 });
 
 test('every general has a placeholder portrait and a bond reference that exists', () => {
-  for (const h of G.HEROES) assert.match(G.portrait(h.id), /^<svg/);
+  // painted art is an <img>, everyone else (and every mecha form) a drawn <svg>
+  for (const h of G.HEROES) { assert.match(G.portrait(h.id), /^<(svg|img)/); assert.match(G.portrait(h.id, true), /^<svg/) }
   for (const b of G.BONDS) assert.ok(b.ids.every(id => G.HERO[id]), b.name);
 });
 
