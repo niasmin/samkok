@@ -692,6 +692,34 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .grow .gi{overflow:hidden}.grow .gi img{width:100%;height:100%;object-fit:contain;padding:2px;background:radial-gradient(circle,rgba(255,255,255,.35),transparent 70%)}
 .gslot i:has(img){display:block;width:40px;height:40px;margin:0 auto}
 .gslot i img{width:100%;height:100%;object-fit:contain}
+
+/* clean scenes: city, world map, battle, courtyard, study */
+.city.pic.c2{aspect-ratio:720/1218;background-image:url(ui/city2.webp)}
+.c2 .hs{display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px}
+.c2 .lbl{display:flex;flex-direction:column;align-items:center;line-height:1.15;font-weight:700;font-size:clamp(11px,3.4vw,14px);color:#ffe9a8;background:linear-gradient(180deg,#8a1e14,#4a0e08);border:1.5px solid #d4a446;border-radius:6px;padding:3px 8px;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.45)}
+.c2 .lbl small{font-size:10px;font-weight:600;color:#f2d88e}
+.c2 .hs .dot{top:auto;bottom:calc(4px + 1.6em);right:10%}
+.h2-summon{left:0;top:7%;width:31%;height:22%}
+.h2-tower{left:32%;top:5%;width:36%;height:31%}
+.h2-arena{left:69%;top:11%;width:31%;height:20%}
+.h2-shop{left:0;top:36%;width:36%;height:20%}
+.h2-beasts{left:66%;top:37%;width:34%;height:19%}
+.h2-shrine{left:0;top:62%;width:22%;height:18%}
+.h2-guild{left:23%;top:57%;width:44%;height:25%}
+.h2-story{left:68%;top:64%;width:32%;height:22%}
+.wmap.pic2{aspect-ratio:720/1479;background:url(ui/worldmap.webp) center/100% 100% no-repeat;padding:0}
+.pic2 .region b,.pic2 .region small{background:rgba(255,248,232,.92);border-radius:4px;padding:0 4px}
+.pic2 .region small{color:#6e5236}
+.pic2 .region.lock{opacity:.75}
+.bfbg.bpic{background:url(ui/bf-stage.webp) center 30%/cover no-repeat!important}
+.bfbg.bpic.bf-arena,.bfbg.bpic.bf-tower{background-image:url(ui/bf-alt.webp)!important}
+.bfbg.bpic.bf-tower{filter:hue-rotate(220deg) saturate(.6) brightness(.75)}
+.bfbg.bpic::after{background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 15%,transparent 72%,rgba(30,10,6,.6))}
+.tstage{background:url(ui/court2.webp) center 70%/cover no-repeat!important}
+.teamh{aspect-ratio:720/300;background:url(ui/court1-top.webp) center 35%/cover no-repeat;margin-bottom:10px}
+.chath{aspect-ratio:720/250;background:url(ui/study-top.webp) center 60%/cover no-repeat;margin-bottom:10px}
+.o-chat{left:50%;bottom:8%;transform:translateX(-50%);white-space:nowrap;font:clamp(15px,4.5vw,19px) var(--f-display);color:#ffe9a8;background:linear-gradient(180deg,#8a1e14,#4a0e08);border:2px solid #d4a446;border-radius:10px;padding:4px 16px}
+.chatlog.panel{background:url(ui/paper.webp) center/cover;border:3px solid #7a2a18;box-shadow:inset 0 0 0 2px #d4a446}
 </style>
 
 <div id="app">
@@ -1272,17 +1300,16 @@ const REGIONS = [
   {n:'อิเหลง', ch:'夷'}, {n:'ลำเต๋ง', ch:'南'}, {n:'กิสาน', ch:'祁'}, {n:'อู่จั้ง', ch:'五'}, {n:'เตียงอัน', ch:'安'}
 ];
 const regionOf = stage => Math.floor((stage-1)/10);
+const MAP_PINS=[[25,92],[17,79],[78,84],[64,63],[40,51],[80,42],[29,36],[77,18],[18,15]];
 function viewMap(){
-  const cur=regionOf(S.stage), shown=Math.max(cur+3, 6), pts=[];
-  const H=Math.ceil(shown/3)*30+6;
-  for(let i=0;i<shown;i++){ const row=Math.floor(i/3), col=row%2? 2-(i%3) : i%3; pts.push([18+col*32, 16+row*30]) }
-  const path=pts.map((p,i)=>`${i?'L':'M'}${p[0]} ${p[1]}`).join(' ');
+  const cur=regionOf(S.stage), page=Math.floor(cur/9), base=page*9;
+  const path=MAP_PINS.map((p,i)=>`${i?'L':'M'}${p[0]} ${p[1]}`).join(' ');
   return `<button class="back" data-go="camp">‹ กลับพิชิตศึก</button>
-  <h1 class="h">แผนที่โลก <span class="sub">แคว้นที่ ${cur+1} · ${esc(REGIONS[cur%REGIONS.length].n)}</span></h1>
-  <div class="wmap" style="aspect-ratio:100/${H}">
-    <svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" fill="none" stroke="#8a6a3a" stroke-width="1.6" stroke-dasharray="3 2"/></svg>
-    ${pts.map((p,i)=>{const r=REGIONS[i%REGIONS.length], st=i<cur?'done':i===cur?'cur':'lock';
-      return `<button class="region ${st}" style="left:${p[0]}%;top:${p[1]/H*100}%" data-act="region" data-i="${i}" ${st==='lock'?'disabled':''}>
+  <h1 class="h">แผนที่โลก <span class="sub">แคว้นที่ ${cur+1} · ${esc(REGIONS[cur%REGIONS.length].n)}${page?` · ภาคที่ ${page+1}`:''}</span></h1>
+  <div class="wmap pic2">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" fill="none" stroke="#fff3c0" stroke-width=".7" stroke-dasharray="1.6 1.2" vector-effect="non-scaling-stroke" style="stroke-width:3px"/></svg>
+    ${MAP_PINS.map((p,j)=>{const i=base+j, r=REGIONS[i%REGIONS.length], st=i<cur?'done':i===cur?'cur':'lock';
+      return `<button class="region ${st}" style="left:${p[0]}%;top:${p[1]}%" data-act="region" data-i="${i}" ${st==='lock'?'disabled':''}>
         <span class="rch">${r.ch}</span><b>${i+1}. ${esc(r.n)}</b><small>${st==='done'?'พิชิตแล้ว':st==='cur'?`ด่าน ${(S.stage-1)%10+1}/10`:'ล็อก'}</small></button>`}).join('')}
   </div>
   <div class="note">พิชิตครบ 10 ด่านของแคว้นได้หยก 200 และยา EXP 5 ขวด แคว้นถัดไปศัตรูแข็งขึ้น</div>
@@ -1405,7 +1432,7 @@ function viewFormation(){
 }
 function viewTeam(){
   const tm=S.team.filter(Boolean);
-  return `${assistHTML()}
+  return `<div class="pic teamh"></div>${assistHTML()}
   <div class="panel item" style="margin-top:12px"><span class="ic">阵</span><div><b>ทัพตอนนี้ ${tm.length}/6 คน · พลัง ${fmt(teamPower())}</b><p>${tm.map(id=>esc(HERO[id].th)).join(' · ')||'ยังไม่มีขุนพลในทัพ'}</p></div>
     <button class="btn" data-go="formation">จัดทีม</button></div>`;
 }
@@ -1416,6 +1443,7 @@ function eventLeft(){
   const ms=end-d; return `เหลือ ${Math.floor(ms/864e5)}วัน${Math.floor(ms%864e5/36e5)}ชม.`;
 }
 
+const CITY_HS=[['summon','แท่นอัญเชิญ'],['tower','หอท้าขุนพล'],['arena','สนามประลอง'],['shop','ร้านค้า'],['beasts','บ้านสัตว์เทพ'],['shrine','ศาลตื่นจิต'],['guild','กิลด์'],['story','หอพงศาวดาร']];
 const UI={more:false, stab:'hi', shtab:'gen'};
 function viewCity(){
   const goal=Math.ceil(S.tower/10)*10, ev=curEvent();
@@ -1444,15 +1472,8 @@ function viewCity(){
     <button class="evt" data-go="chat"><i>话</i>แชต<small>${NET.room?`ออนไลน์ ${NET.online.length}`:'ออฟไลน์'}</small></button>
     <button class="evt" data-go="guild"><i>盟</i>กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
   </div>
-  <div class="city pic">
-    <button class="hs h-summon" data-go="summon" aria-label="แท่นอัญเชิญ">${dot(S.freeDate!==today())}</button>
-    <button class="hs h-arena" data-go="arena" aria-label="สนามประลอง"></button>
-    <button class="hs h-tower" data-go="tower" aria-label="หอท้าขุนพล"></button>
-    <button class="hs h-shop" data-go="shop" aria-label="ร้านค้า"></button>
-    <button class="hs h-beasts" data-go="beasts" aria-label="บ้านสัตว์เทพ"></button>
-    <button class="hs h-guild" data-go="guild" aria-label="กิลด์">${dot(S.guild.id!==null&&!S.guild.checked)}</button>
-    <button class="hs h-story" data-go="story" aria-label="หอพงศาวดาร"></button>
-    <button class="bld h-shrine" data-go="shrine">ศาลตื่นจิต<small>${eventLeft()}</small></button>
+  <div class="city pic c2">
+    ${CITY_HS.map(([k,l])=>`<button class="hs h2-${k}" data-go="${k}"><span class="lbl">${l}${k==='shrine'?`<small>${eventLeft()}</small>`:''}</span>${dot(k==='summon'?S.freeDate!==today():k==='guild'?S.guild.id!==null&&!S.guild.checked:false)}</button>`).join('')}
   </div>
   <div class="evbanner2">
     <img src="ui/flag.webp" alt="">
@@ -1660,7 +1681,7 @@ function chatLogHTML(){
 function viewChat(){
   const onl=NET.online;
   return `${back()}
-  <h1 class="h">แชต <span class="sub">ออนไลน์ ${onl.length} คน</span></h1>
+  <div class="pic chath"><h1 class="vh">แชต</h1><span class="ov o-chat">แชต · ออนไลน์ ${onl.length} คน</span></div>
   ${NET.on?'':`<div class="note" style="margin-top:0">${netNote()}</div>`}
   <div class="chips"><button class="chip" data-act="chatch" data-c="w" aria-pressed="${chatCh==='w'}">โลก</button>
     <button class="chip" data-act="chatch" data-c="g" aria-pressed="${chatCh==='g'}" ${S.guild.id===null?'disabled':''}>กิลด์${S.guild.id===null?' (ยังไม่เข้า)':''}</button></div>
