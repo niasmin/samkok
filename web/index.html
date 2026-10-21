@@ -532,12 +532,12 @@ nav button[aria-current="page"] .nvi{filter:drop-shadow(0 0 8px rgba(242,216,142
 .u .tok{box-shadow:0 6px 8px -2px rgba(0,0,0,.55)}
 .bpanel{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:10px 8px;border-radius:14px;background:linear-gradient(180deg,#4a140e,#2a0b08);border:2px solid var(--gold)}
 .skr{display:flex;justify-content:center;gap:4px}
-.sk{box-sizing:border-box;--c:#d9a441;width:min(48px,13vw);height:min(48px,13vw);border-radius:50%;padding:4px;background:conic-gradient(var(--c) calc(var(--r)*1%),rgba(255,255,255,.12) 0);position:relative;flex:none}
-.sk{display:block}
-.sk>*{display:block;box-sizing:border-box;min-width:0;max-width:100%;width:100%;height:100%;border-radius:50%;overflow:hidden;display:grid;place-items:center;font:26px/1 var(--f-seal);background:#2a0b08}
-.sk img.art{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.sk.r-war{--c:#f0a23a}.sk.r-cav{--c:#3fa0ff}.sk.r-arch{--c:#e8574a}.sk.r-strat{--c:#b06cff}.sk.r-heal{--c:#47d16a}
-.sk.full{box-shadow:0 0 12px var(--c)}.sk.dead{filter:grayscale(1) brightness(.5)}
+.skb{box-sizing:border-box;--c:#d9a441;width:min(48px,13vw);height:min(48px,13vw);border-radius:50%;padding:4px;background:conic-gradient(var(--c) calc(var(--r)*1%),rgba(255,255,255,.12) 0);position:relative;flex:none}
+.skb{display:block}
+.skb>*{display:block;box-sizing:border-box;min-width:0;max-width:100%;width:100%;height:100%;border-radius:50%;overflow:hidden;display:grid;place-items:center;font:26px/1 var(--f-seal);background:#2a0b08}
+.skb img.art{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.skb.r-war{--c:#f0a23a}.skb.r-cav{--c:#3fa0ff}.skb.r-arch{--c:#e8574a}.skb.r-strat{--c:#b06cff}.skb.r-heal{--c:#47d16a}
+.skb.full{box-shadow:0 0 12px var(--c)}.skb.dead{filter:grayscale(1) brightness(.5)}
 .auto{display:flex;align-items:center;gap:8px;justify-content:center;font-size:13px;font-weight:700;color:#fff3d6}
 .auto b{background:linear-gradient(180deg,#5fe07a,#1f9a3a);color:#fff;border-radius:999px;padding:2px 12px}
 .auto small{font-weight:400;font-size:11px;color:var(--parchment-2)}
@@ -639,7 +639,7 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 #useSk:not(:disabled){animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.06);box-shadow:0 0 16px rgba(255,220,120,.9)}}
 .autohint{display:block;text-align:center;font-size:12px;color:var(--parchment-2)}
-.sk.ready{box-shadow:0 0 0 3px #fff3b0,0 0 18px var(--c);animation:pulse 1s ease-in-out infinite;cursor:pointer}
+.skb.ready{box-shadow:0 0 0 3px #fff3b0,0 0 18px var(--c);animation:pulse 1s ease-in-out infinite;cursor:pointer}
 
 /* mockup pass 4: ranking, formation, bag, tasks, shops, login, fishing */
 .evh{aspect-ratio:852/280;background-image:url(ui/sc-evrank.webp);margin-bottom:10px}
@@ -720,11 +720,43 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .chath{aspect-ratio:720/250;background:url(ui/study-top.webp) center 60%/cover no-repeat;margin-bottom:10px}
 .o-chat{left:50%;bottom:8%;transform:translateX(-50%);white-space:nowrap;font:clamp(15px,4.5vw,19px) var(--f-display);color:#ffe9a8;background:linear-gradient(180deg,#8a1e14,#4a0e08);border:2px solid #d4a446;border-radius:10px;padding:4px 16px}
 .chatlog.panel{background:url(ui/paper.webp) center/cover;border:3px solid #7a2a18;box-shadow:inset 0 0 0 2px #d4a446}
+
+/* hero sheet v2 */
+.sheet.hs2{position:relative;background:linear-gradient(180deg,#fbf3e0,#f2e2bf);padding-top:14px}
+.hs2 .sx{position:sticky;top:0;float:right;z-index:3;width:36px;height:36px;margin:-4px -4px 0 0;border-radius:50%;background:#5a1008;color:#ffe9a8;border:2px solid #d4a446;font-size:16px;font-weight:700}
+.hs2 .head.hb{grid-template-columns:132px 1fr;gap:12px;align-items:center;padding:10px;border-radius:14px;background:linear-gradient(135deg,#5a1008,#8a1e14 60%,#4a0e08);color:#fff3d6;border:2px solid #d4a446;box-shadow:inset 0 0 30px rgba(0,0,0,.35)}
+.hs2 .hb h2{color:#ffe9a8;text-shadow:0 2px 0 #3a0c06;font-size:26px}
+.hs2 .hb .en{color:#f2d88e}
+.hs2 .hb .power{color:#ffe066!important;font:24px var(--f-display)}.hs2 .hb .power small{color:#f2d88e!important;font:13px system-ui;margin-right:6px}
+.hbart{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:2px solid #d4a446;background:radial-gradient(circle at 50% 40%,#fff3c0,#c49a4a 70%,#6a3a12);display:grid;place-items:center;font:56px/1 var(--f-seal);color:#fff}
+.hbart.SP{background:radial-gradient(circle at 50% 40%,#ffd6a0,#e0602a 65%,#7a1a08);box-shadow:0 0 14px rgba(255,140,60,.7)}
+.hbart.A{background:radial-gradient(circle at 50% 40%,#e6dcff,#8a6ac4 70%,#3a2a6a)}
+.hbart img.art{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.hbart .r{position:absolute;left:4px;bottom:20px;font:italic 800 24px/1 var(--f-display);color:#ffe9a8;text-shadow:0 2px 0 #4a1a08,0 0 4px #000}
+.hbart .hst{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:12px;color:#ffd84a;background:rgba(26,8,4,.7);padding:2px 0}
+.hs2 .stats .stat{background:linear-gradient(180deg,#fff8e8,#efdcb4);border:1.5px solid #d4a446;border-radius:10px}
+.hs2 .stats .stat span{font-size:11px}
+.hs2 .skill,.hs2 .bonds,.hs2 .gear,.hs2 .awk{margin-top:12px;padding:10px 12px;border-radius:12px;border:1.5px solid #d4a446;background:#fffaf0}
+.hs2 h4{margin:-10px -12px 8px;padding:6px 12px;border-radius:10px 10px 0 0;background:linear-gradient(90deg,#8a1e14,#5a1008);color:#ffe9a8;font:16px var(--f-display)}
+.hs2 .sk{grid-template-columns:110px 1fr}
+.hs2 .sk span{display:flex;align-items:center;gap:6px;color:#8a1e14;font-size:14px}
+.hs2 .sk span i{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:normal 14px/1 var(--f-seal);color:#ffe9a8;background:#8a1e14;border:1.5px solid #d4a446}
+.hs2 .sk p{font-size:13px}
+.hs2 .gslot{background:linear-gradient(180deg,#fff8e8,#efdcb4);min-height:86px;justify-content:center}
+.hs2 .gslot i{display:block;width:44px;height:44px;margin:0 auto;font-size:26px}
+.hs2 .gslot i.e img{filter:grayscale(1) opacity(.35)}
+.hs2 .mechbox{background:linear-gradient(160deg,#e8fbff,#d6eef6)}
+.hs2 .mechbox h4{background:linear-gradient(90deg,#1a6a8a,#0e3a5a)}
+/* save page */
+.slotrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 12px;margin-bottom:8px}
+.slotrow p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.code{width:100%;box-sizing:border-box;font:12px ui-monospace,monospace;border-radius:8px;border:1.5px solid #d4a446;padding:6px;background:#fffaf0;color:#3a2416;word-break:break-all;resize:vertical}
+.avatar[data-go]{cursor:pointer}
 </style>
 
 <div id="app">
   <header class="top">
-    <div class="avatar" aria-hidden="true"><img src="ui/avatar.webp" alt="" draggable="false"></div>
+    <div class="avatar" data-go="savegame" role="button" aria-label="บันทึกเกม" title="บันทึกเกม"><img src="ui/avatar.webp" alt="" draggable="false"></div>
     <div class="who">
       <b id="pname">ท่านเจ้าเมือง</b>
       <div class="power"><small>พลังทัพ</small><span id="ppower">0</span></div>
@@ -1105,7 +1137,7 @@ function newGear(il, minQ=0){
   const g={uid:S.gearSeq++, slot:SLOTS[Math.floor(rng()*4)].k, q, il:Math.max(1,Math.round(il)), enh:0};
   S.gear.push(g); return g;
 }
-const GEAR_ART={wpn:['wp-0','wp-1','wp-2','wp-3','wp-4','wp-5','wp-6','wp-7','wp-8'], arm:['ar-1','ar-4','ar-7','ar-3'], hlm:['ar-0','ar-8']};
+const GEAR_ART={wpn:['wp-0','wp-1','wp-2','wp-3','wp-4','wp-5','wp-6','wp-7','wp-8'], arm:['ar-1','ar-4','ar-7','ar-3'], hlm:['ar-0','ar-8'], mnt:['horse']};
 const gearIcon = g => { const a=GEAR_ART[g.slot]; return a?`<img src="ui/${a[hashStr(String(g.uid))%a.length]}.webp" alt="">`:SLOTS.find(s=>s.k===g.slot).ch };
 const gearName = g => `${SLOTS.find(s=>s.k===g.slot).th}${QUAL[g.q].th} iLv.${g.il}`;
 const gearText = g => { const s=gearStats(g); return [s.hp?`HP +${fmt(s.hp)}`:'', s.atk?`ATK +${fmt(s.atk)}`:'', s.def?`DEF +${fmt(s.def)}`:'', s.spd?`SPD +${s.spd}`:''].filter(Boolean).join(' · ') };
@@ -1121,7 +1153,35 @@ function placeInTeam(id){
 const POTION_EXP = 500;
 const addEv = n => { S.evw.pts+=n };
 const bagCount = () => Object.values(S.bag).reduce((a,b)=>a+b,0);
-function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){} syncSoon()}
+let SAVED_AT=0;
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));SAVED_AT=Date.now()}catch(e){} syncSoon()}
+const SLOT_KEY=i=>SAVE_KEY+'-slot'+i;
+function slotInfo(i){ try{ const r=localStorage.getItem(SLOT_KEY(i)); return r?JSON.parse(r):null }catch(e){ return null } }
+const encodeSave = d => 'KP1:'+btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+function decodeSave(t){ try{ t=(t||'').trim().replace(/^KP1:/,''); const d=JSON.parse(decodeURIComponent(escape(atob(t)))); return d&&d.v===1?d:null }catch(e){ return null } }
+const saveSummary = d => `ด่าน ${stageLabel(d.stage||1)} · ขุนพล ${Object.keys(d.heroes||{}).length} · หยก ${fmt(d.gems||0)}`;
+function viewSave(){
+  const t=SAVED_AT?new Date(SAVED_AT).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'—';
+  return `${back()}
+  <h1 class="h">บันทึกเกม</h1>
+  <div class="panel item"><span class="ic">存</span><div><b>บันทึกอัตโนมัติ: เปิดอยู่</b><p>เกมบันทึกลงเครื่องทุกครั้งที่ท่านทำอะไร ล่าสุด ${t}</p></div>
+    <button class="btn" data-act="savenow">บันทึกเลย</button></div>
+  <h2 class="h" style="font-size:18px">ช่องบันทึก</h2>
+  ${[0,1,2].map(i=>{const x=slotInfo(i), ask=UI.ask===`load${i}`;
+    return `<div class="panel slotrow"><div><b>ช่อง ${i+1}</b><p>${x?`${new Date(x.ts).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})} · ${saveSummary(x.data)}`:'ว่าง'}</p></div>
+      <button class="btn small" data-act="slotsave" data-i="${i}">บันทึก</button>
+      <button class="btn ${ask?'red':'ghost'} small" data-act="slotload" data-i="${i}" ${x?'':'disabled'}>${ask?'ยืนยันโหลด':'โหลด'}</button></div>`}).join('')}
+  <h2 class="h" style="font-size:18px">ย้ายเครื่อง</h2>
+  <div class="panel">
+    <p style="margin:0 0 6px">คัดลอกรหัสนี้ไปวางในเครื่องอื่น (เช่น จาก Claude ไปเว็บ GitHub) เพื่อเล่นต่อ</p>
+    <textarea id="expcode" class="code" readonly rows="3">${encodeSave(S)}</textarea>
+    <button class="btn small" data-act="copysave" style="margin-top:6px">คัดลอกรหัส</button>
+    <p style="margin:12px 0 6px">วางรหัสบันทึกเพื่อโหลด</p>
+    <textarea id="impcode" class="code" rows="3" placeholder="KP1:..."></textarea>
+    <button class="btn red small" data-act="importsave" style="margin-top:6px">${UI.ask==='import'?'ยืนยัน แทนที่เกมตอนนี้':'โหลดจากรหัส'}</button>
+  </div>
+  <div class="note">ช่องบันทึกเก็บไว้ในเบราว์เซอร์เครื่องนี้ ถ้าล้างข้อมูลเว็บจะหายไป ควรคัดลอกรหัสเก็บไว้ด้วย</div>`;
+}
 function checkDaily(){
   const d=today();
   if(S.daily.date!==d) S.daily={date:d, afk:0, win:0, pull:0, lvl:0, got:{}};
@@ -1470,6 +1530,7 @@ function viewCity(){
     <button class="evt" data-go="evrank"><i>榜</i>อันดับ<small>${fmt(S.evw.pts)} แต้ม</small></button>
     <button class="evt" data-go="story"><i>史</i>เนื้อเรื่อง<small>${Object.keys(S.story).length}/${STORY.length*3}</small></button>
     <button class="evt" data-go="chat"><i>话</i>แชต<small>${NET.room?`ออนไลน์ ${NET.online.length}`:'ออฟไลน์'}</small></button>
+    <button class="evt" data-go="savegame"><i>存</i>บันทึก<small>อัตโนมัติ</small></button>
     <button class="evt" data-go="guild"><i>盟</i>กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
   </div>
   <div class="city pic c2">
@@ -2194,7 +2255,7 @@ function viewTasks(){
 function render(){
   checkDaily();
   if(tab!=='fish' && fishG){ cancelAnimationFrame(fishG.raf); fishG=null; fishMsg='ปลาหลุดไปตอนออกจากบ่อ' }
-  const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
+  const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, savegame:viewSave, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
     arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap, train:viewTrain, evrank:viewEvRank}[tab]();
   sendTab();
   $('#view').innerHTML=v; renderTop(); tutorial();
@@ -2238,9 +2299,10 @@ function openHero(id){
   const teamIds=S.team.filter(Boolean), myBonds=BONDS.filter(b=>b.ids.includes(id));
   $('#layer').innerHTML=`
   <div class="veil" data-act="close">
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(h.th)}" data-stop>
-      <div class="head">
-        ${cardHTML(id,{team:false,force:true,lv,star:st,aw})}
+    <div class="sheet hs2 ${h.fac}" role="dialog" aria-modal="true" aria-label="${esc(h.th)}" data-stop>
+      <button class="sx" data-act="close" aria-label="ปิด">✕</button>
+      <div class="head hb">
+        <div class="hbart ${h.rar}">${portrait(id,own?isMech(id):false)}<em class="r ${h.rar}">${RAR[h.rar].label}</em><span class="hst">${aw?'☾'.repeat(aw):stars(st)}</span></div>
         <div>
           <h2>${esc(h.th)}</h2>
           <div class="en">${esc(h.en)} · ${own?`Lv.${lv}/${cap} · สำเนา ${own.copies}`:'ยังไม่มีในทัพ อัญเชิญเพื่อรับ'}</div>
@@ -2249,23 +2311,23 @@ function openHero(id){
         </div>
       </div>
       <div class="stats">
-        <div class="stat"><span>พลังชีวิต</span><b>${fmt(s.hp)}</b></div>
-        <div class="stat"><span>โจมตี</span><b>${fmt(s.atk)}</b></div>
+        <div class="stat"><span>❤ พลังชีวิต</span><b>${fmt(s.hp)}</b></div>
+        <div class="stat"><span>⚔ โจมตี</span><b>${fmt(s.atk)}</b></div>
         <div class="stat"><span>ป้องกันกาย</span><b>${fmt(s.def)}</b></div>
         <div class="stat"><span>ป้องกันเวท</span><b>${fmt(s.mdef)}</b></div>
         <div class="stat"><span>ความเร็ว</span><b>${s.spd}</b></div>
       </div>
-      <div class="skill"><div class="sk5">${[
+      <div class="skill"><h4>สกิลและความสามารถ</h4><div class="sk5">${[
         ['โจมตีทั่วไป', `โจมตีศัตรู${h.role==='arch'?'คนใดก็ได้':'แถวหน้า'} 100% แบบ${r.mag?'เวท (ศัตรูใช้ป้องกันเวท)':'กายภาพ (ศัตรูใช้ป้องกันกาย)'} และสะสมโทสะ`],
         ['พรสวรรค์', TALENT[h.role]],
         ['สกิล', `<b>${esc(h.sk)}</b> ${r.desc(Math.round(skillMult(id,aw)*(h.role==='strat'?1.2:1)*100))} ใช้เมื่อโทสะเต็ม`],
         ['คอมโบ', `หลังโจมตีทั่วไป มีโอกาส ${comboChance(h.role)*100}% ตีซ้ำอีก 60%`],
         ['ฐานเทวะ', aw?`ครั้งแรกที่เลือดต่ำกว่า 30% ฟื้นทันที ${20+aw*4}% ของ HP และพลังโจมตี +${aw*5}%`:'ปลดล็อกเมื่อตื่นจิตขั้น 1']
-      ].map(([t,d],i)=>`<div class="sk ${i===4&&!aw?'lock':''}"><span>${t}</span><p>${d}</p></div>`).join('')}</div></div>
+      ].map(([t,d],i)=>`<div class="sk ${i===4&&!aw?'lock':''}"><span><i>${['攻','天','技','连','神'][i]}</i>${t}</span><p>${d}</p></div>`).join('')}</div></div>
       ${myBonds.length?`<div class="bonds"><h4>มิตรภาพ</h4>${myBonds.map(b=>{const on=b.ids.every(i=>teamIds.includes(i));
         return `<div class="bond ${on?'on':''}"><span>${b.name}: ${b.ids.map(i=>HERO[i].th).join(' ')}</span><em>${on?'✓ ':''}${bondText(b)}</em></div>`}).join('')}</div>`:''}
       ${own?`<div class="gear"><h4>อุปกรณ์</h4><div class="gslots">${SLOTS.map(sl=>{const g=own.eq[sl.k]?gearById(own.eq[sl.k]):null;
-          return `<button class="gslot" data-act="gearslot" data-id="${id}" data-slot="${sl.k}" style="--q:${g?QUAL[g.q].c:'#b9a57a'}"><i class="${g?'':'e'}">${g?gearIcon(g):sl.ch}</i><small>${g?`+${g.enh} iLv.${g.il}`:'ว่าง'}</small><span>${sl.th}</span></button>`}).join('')}</div>
+          return `<button class="gslot" data-act="gearslot" data-id="${id}" data-slot="${sl.k}" style="--q:${g?QUAL[g.q].c:'#b9a57a'}"><i class="${g?'':'e'}">${g?gearIcon(g):`<img src="ui/${GEAR_ART[sl.k][0]}.webp" alt="">`}</i><small>${g?`+${g.enh} iLv.${g.il}`:'ว่าง'}</small><span>${sl.th}</span></button>`}).join('')}</div>
         <div class="actions" style="margin-top:8px"><button class="btn small" data-act="autogear" data-id="${id}">สวมอัตโนมัติ</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="ungear" data-id="${id}">ถอดทั้งหมด</button></div></div>`:''}
       ${own?`<div class="awk mechbox"><h4>ร่างจักรกล</h4>
         <p>${aw>=3?'สวมเกราะจักรกลแห่งสามก๊ก ค่า HP และ ATK +12% เปลี่ยนรูปลักษณ์ทั้งในการ์ดและสนามรบ':'ปลดล็อกเมื่อตื่นจิตขั้น 3 แปลงร่างเป็นขุนพลจักรกล HP และ ATK +12%'}</p>
@@ -2375,7 +2437,7 @@ function fight(mode='stage', bot=null){
       <div class="side"><div class="line">${by('e',[3,4,5])}</div><div class="line">${by('e',[0,1,2])}</div></div>
       <div class="vs" aria-hidden="true">战</div>
       <div class="side"><div class="line">${by('p',[0,1,2])}</div><div class="line">${by('p',[3,4,5])}</div></div>
-      <div class="bpanel"><div class="skr">${res.start.filter(u=>u.side==='p').sort((x,y)=>x.slot-y.slot).map(u=>`<span class="sk r-${HERO[u.id].role}" id="sk-${u.uid}" data-act="useskill" style="--r:0">${portrait(u.id,isMech(u.id))}</span>`).join('')}</div>
+      <div class="bpanel"><div class="skr">${res.start.filter(u=>u.side==='p').sort((x,y)=>x.slot-y.slot).map(u=>`<span class="skb r-${HERO[u.id].role}" id="sk-${u.uid}" data-act="useskill" style="--r:0">${portrait(u.id,isMech(u.id))}</span>`).join('')}</div>
         <div class="auto"><button class="tgl" data-act="autosk" aria-pressed="${S.autoSkill!==false}">อัตโนมัติ <b>${S.autoSkill!==false?'ON':'OFF'}</b></button><button class="gbtn" id="useSk" data-act="useskill" disabled>ใช้สกิล</button></div>
         <small class="autohint" id="skHint">${S.autoSkill!==false?'ขุนพลใช้สกิลเองเมื่อพลังโกรธเต็ม':'พลังโกรธเต็มแล้วแตะ "ใช้สกิล" หรือแตะรูปขุนพลที่เรืองแสง'}</small></div>
     </div></div>`;
@@ -2537,6 +2599,14 @@ document.addEventListener('click',e=>{
       case 'more': UI.more=!UI.more; render(); return;
       case 'stab': UI.stab=act.dataset.k; render(); return;
       case 'shtab': UI.shtab=act.dataset.k; render(); return;
+      case 'savenow': save(); toast('บันทึกแล้ว'); render(); return;
+      case 'slotsave': { const i=+act.dataset.i; try{ localStorage.setItem(SLOT_KEY(i),JSON.stringify({ts:Date.now(),data:S})); toast(`บันทึกลงช่อง ${i+1} แล้ว`) }catch(e){ toast('บันทึกไม่ได้ เบราว์เซอร์ไม่อนุญาต') } UI.ask=null; render(); return }
+      case 'slotload': { const i=+act.dataset.i; if(UI.ask!==`load${i}`){ UI.ask=`load${i}`; render(); return }
+        const x=slotInfo(i); UI.ask=null; if(x&&x.data&&x.data.v===1){ S=migrate(x.data); save(); toast(`โหลดช่อง ${i+1} แล้ว`) } render(); return }
+      case 'copysave': { const ta=$('#expcode'); ta.select(); (navigator.clipboard?.writeText(ta.value)||Promise.reject()).then(()=>toast('คัดลอกแล้ว')).catch(()=>{ try{document.execCommand('copy');toast('คัดลอกแล้ว')}catch(e){toast('กดค้างที่ช่องรหัสแล้วเลือกคัดลอก')} }); return }
+      case 'importsave': { const d=decodeSave($('#impcode').value); if(!d){ UI.ask=null; toast('รหัสไม่ถูกต้อง'); return }
+        if(UI.ask!=='import'){ UI.ask='import'; UI.imp=$('#impcode').value; render(); $('#impcode').value=UI.imp; toast(`พบเซฟ: ${saveSummary(d)} แตะอีกครั้งเพื่อยืนยัน`); return }
+        UI.ask=null; S=migrate(d); save(); render(); toast('โหลดเกมจากรหัสแล้ว'); return }
       case 'afk': { sfx('coin'); const r=afkNow(); S.gold+=r.gold; S.exp+=r.exp; S.gems+=r.gems; S.potions+=Math.floor(r.mins/120); S.afkSince=Date.now(); S.daily.afk++; save(); render(); toast(`เก็บแล้ว เงิน +${fmt(r.gold)} · EXP +${fmt(r.exp)}${r.gems?` · หยก +${r.gems}`:''}`); return }
       case 'fight': fight(); return;
       case 'autosk': S.autoSkill=S.autoSkill===false; save(); act.setAttribute('aria-pressed',S.autoSkill); act.querySelector('b').textContent=S.autoSkill?'ON':'OFF';
