@@ -13,6 +13,8 @@ export interface GameState {
   gearSeq: number;
   beasts: Record<string, number>;
   fishPts: number;
+  shards: Record<string, number>;
+  tut: number;
 }
 
 const starter = (lv: number): HeroOwned => ({ lv, star: 1, copies: 0, aw: 0, eq: {} });
@@ -21,9 +23,10 @@ export function newGame(now = Date.now()): GameState {
   return {
     v: 1, gold: 20000, gems: 3000, exp: 6000, stage: 1, tower: 1, tickets: 10,
     afkSince: now - 2 * 3600e3, seed: 20261021, battleSeed: 1,
-    heroes: { liubei: starter(5), zhangfei: starter(5), huangzhong: starter(5), ganning: starter(5), huatuo: starter(5) },
-    team: ['zhangfei', 'liubei', 'huangzhong', 'ganning', 'huatuo'],
-    pityS: 0, pitySP: 0, pulls: 0, souls: {}, story: {}, gear: [], gearSeq: 1, beasts: {}, fishPts: 0,
+    // new players start alone as young Liu Bei; stages 1-1 and 1-2 bring the sworn brothers
+    heroes: { liubei_y: starter(1) },
+    team: ['liubei_y', null, null, null, null, null],   // 0-2 front row, 3-5 back row
+    pityS: 0, pitySP: 0, pulls: 0, souls: {}, story: {}, gear: [], gearSeq: 1, beasts: {}, fishPts: 0, shards: {}, tut: 0,
   };
 }
 

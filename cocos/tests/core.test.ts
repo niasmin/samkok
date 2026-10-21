@@ -30,3 +30,16 @@ test('every general has a placeholder portrait and a bond reference that exists'
   for (const h of G.HEROES) assert.match(G.portrait(h.id), /^<svg/);
   for (const b of G.BONDS) assert.ok(b.ids.every(id => G.HERO[id]), b.name);
 });
+
+test('a lone young Liu Bei clears the opening stage', () => {
+  const solo = [{ id: 'liubei_y', lv: 1, star: 1, aw: 0 }, null, null, null, null, null];
+  let wins = 0;
+  for (let k = 0; k < 10; k++) if (G.simulate(solo, G.enemyTeam(1), 1000 + k).winner === 'p') wins++;
+  assert.equal(wins, 10);
+});
+
+test('strategists deal magic damage and see magic defence', () => {
+  assert.ok(G.ROLE.strat.mag && G.ROLE.heal.mag && !G.ROLE.war.mag);
+  const s = G.stats('zhuge', 10, 1);
+  assert.ok(s.mdef > s.def);
+});

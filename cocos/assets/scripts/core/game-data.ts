@@ -17,15 +17,18 @@ const TALENT = {
 };
 const comboChance = role => role==='cav' ? 0.3 : 0.2;
 const ROLE = {
-  war:  {th:'นักรบ',   hp:1.30, atk:0.90, def:1.30, spd:95,  kind:'single', mult:2.4,  desc:m=>`ฟันศัตรูแถวหน้า 1 คน แรง ${m}% ของพลังโจมตี`},
-  cav:  {th:'ทหารม้า', hp:1.05, atk:1.15, def:1.00, spd:120, kind:'back',   mult:2.6,  desc:m=>`ตีฝ่าแนวหน้าไปโจมตีศัตรูแถวหลัง 1 คน แรง ${m}%`},
-  arch: {th:'นักธนู',  hp:0.85, atk:1.20, def:0.80, spd:110, kind:'aoe',    mult:0.85, desc:m=>`ยิงศัตรูทุกคนพร้อมกัน คนละ ${m}%`},
-  strat:{th:'กุนซือ',  hp:0.85, atk:1.10, def:0.85, spd:100, kind:'aoe',    mult:1.15, desc:m=>`ใช้กลยุทธ์โจมตีศัตรูทุกคน คนละ ${m}%`},
-  heal: {th:'หมอ',     hp:0.95, atk:0.75, def:0.95, spd:105, kind:'heal',   mult:1.8,  desc:m=>`ฟื้นพลังชีวิตฝ่ายเราทุกคน คนละ ${m}% ของพลังโจมตี`}
+  war:  {th:'นักรบ',   hp:1.30, atk:0.90, def:1.30, mdef:0.80, spd:95,  kind:'single', mult:2.4,  desc:m=>`ฟันศัตรูแถวหน้า 1 คน แรง ${m}% ของพลังโจมตี`},
+  cav:  {th:'ทหารม้า', hp:1.05, atk:1.15, def:1.00, mdef:0.90, spd:120, kind:'back',   mult:2.6,  desc:m=>`ตีฝ่าแนวหน้าไปโจมตีศัตรูแถวหลัง 1 คน แรง ${m}%`},
+  arch: {th:'นักธนู',  hp:0.85, atk:1.20, def:0.80, mdef:0.90, spd:110, kind:'aoe',    mult:0.85, desc:m=>`ยิงศัตรูทุกคนพร้อมกัน คนละ ${m}%`},
+  strat:{th:'กุนซือ',  hp:0.85, atk:1.10, def:0.85, mdef:1.30, mag:true, spd:100, kind:'aoe',    mult:1.15, desc:m=>`ใช้กลยุทธ์โจมตีศัตรูทุกคน คนละ ${m}%`},
+  heal: {th:'หมอ',     hp:0.95, atk:0.75, def:0.95, mdef:1.25, mag:true, spd:105, kind:'heal',   mult:1.8,  desc:m=>`ฟื้นพลังชีวิตฝ่ายเราทุกคน คนละ ${m}% ของพลังโจมตี`}
 };
 const RAR = {A:{label:'A', m:1.00, spd:0, sk:1.0}, S:{label:'S', m:1.25, spd:5, sk:1.1}, SP:{label:'S+', m:1.55, spd:10, sk:1.25}};
 const HEROES = [
   // Shu
+  {id:'liubei_y', th:'เล่าปี่วัยหนุ่ม',  en:'Young Liu Bei',  ch:'玄', fac:'shu', rar:'A',  role:'war',   sk:'ปณิธานใต้ต้นท้อ'},
+  {id:'guanyu_y', th:'กวนอูวัยหนุ่ม',  en:'Young Guan Yu',  ch:'长', fac:'shu', rar:'A',  role:'war',   sk:'ง้าวพเนจร'},
+  {id:'zhangfei_y',th:'เตียวหุยวัยหนุ่ม', en:'Young Zhang Fei',ch:'益', fac:'shu', rar:'A',  role:'cav',   sk:'คำรามแห่งตุ้นก้วน'},
   {id:'guanyu',  th:'กวนอู',        en:'Guan Yu',        ch:'羽', fac:'shu', rar:'SP', role:'war',   sk:'ง้าวมังกรเขียว'},
   {id:'zhuge',   th:'ขงเบ้ง',        en:'Zhuge Liang',    ch:'亮', fac:'shu', rar:'SP', role:'strat', sk:'ลมบูรพาเผาทัพ'},
   {id:'zhaoyun', th:'จูล่ง',          en:'Zhao Yun',       ch:'云', fac:'shu', rar:'S',  role:'cav',   sk:'ฝ่าทัพทุ่งเตียงปัน'},
@@ -98,6 +101,7 @@ const HERO = Object.fromEntries(HEROES.map(h=>[h.id,h]));
 HERO.boss = {id:'boss', th:'อสูรเพลิงบรรพกาล', en:'Primeval Flame Beast', ch:'兽', fac:'qun', rar:'SP', role:'strat', sk:'เปลวเพลิงล้างโลก', boss:1};
 // portrait features for the procedurally drawn chibi faces
 const LOOK = {
+  liubei_y:{}, guanyu_y:{beard:'short'}, zhangfei_y:{},
   guanyu:{beard:'long'}, zhangfei:{beard:'wild'}, liubei:{beard:'short'}, huangzhong:{beard:'long',old:1}, caocao:{beard:'short'},
   simayi:{beard:'goatee'}, zhangliao:{beard:'short'}, xiahoudun:{beard:'short',patch:1}, dianwei:{beard:'wild'}, xunyu:{beard:'goatee'},
   sunquan:{beard:'short',beardColor:'#5a3a7a'}, sunshangxiang:{f:1,hair:'#6a2a1a'}, lumeng:{beard:'short'}, ganning:{hair:'#7a2e14'}, daqiao:{f:1,hair:'#3a2a4a'},
@@ -118,7 +122,7 @@ const levelCap = (star, aw=0) => star*100 + aw*100;
 function stats(id, lv, star, aw=0){
   const h=HERO[id], r=ROLE[h.role], q=RAR[h.rar];
   const m = q.m*(1+(lv-1)*0.09)*(1+(star-1)*0.18)*(1+aw*0.25);
-  return {hp:Math.round(1000*r.hp*m), atk:Math.round(100*r.atk*m), def:Math.round(50*r.def*m), spd:r.spd+q.spd};
+  return {hp:Math.round(1000*r.hp*m), atk:Math.round(100*r.atk*m), def:Math.round(50*r.def*m), mdef:Math.round(50*r.mdef*m), spd:r.spd+q.spd};
 }
 const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(1+aw*0.1)).toFixed(2);
 function power(id, lv, star, aw=0){const s=stats(id,lv,star,aw);return Math.round(s.hp*0.25+s.atk*3+s.def*2)}
@@ -130,6 +134,7 @@ const stageLabel = s => `${Math.floor((s-1)/10)+1}-${(s-1)%10+1}`;
 // Bonds (มิตรภาพ): when every listed general is in the same team, those generals gain the bonus.
 const BONDS = [
   {name:'สามพี่น้องสวนท้อ',  ids:['liubei','guanyu','zhangfei'], hp:.20, atk:.20},
+  {name:'สามพี่น้องวัยหนุ่ม', ids:['liubei_y','guanyu_y','zhangfei_y'], hp:.15, atk:.15},
   {name:'ห้าทหารเสือ',       ids:['guanyu','zhangfei','zhaoyun','machao','huangzhong'], hp:.30, atk:.30},
   {name:'นายกับกุนซือ',      ids:['liubei','zhuge'], hp:0, atk:.15},
   {name:'ศึกผาแดง',          ids:['zhouyu','zhuge'], hp:0, atk:.15},
@@ -155,8 +160,14 @@ function pickTeam(rnd, pool){
   ids.sort((a,b)=>{const o={war:0,cav:1,heal:3,strat:2,arch:2};return o[HERO[a].role]-o[HERO[b].role]});
   return ids;
 }
+// The first stages are a gentle opening: few, weakened enemies so a lone young Liu Bei can win.
+const OPENING = {1:{n:2, weak:.75}, 2:{n:3, weak:.45}, 3:{n:4, weak:.3}};
 function enemyTeam(stage){
-  const rnd = mulberry32(stage*7919+17);
+  const rnd = mulberry32(stage*7919+17), op=OPENING[stage];
+  if(op){
+    const ids=pickTeam(rnd, HEROES.filter(h=>h.rar==='A' && h.fac!=='shu').map(h=>h.id)).slice(0,op.n);
+    return ids.map(id=>({id, lv:1, star:1, aw:0, bonus:{hpPct:-op.weak, atkPct:-op.weak}}));
+  }
   const ids = pickTeam(rnd, HEROES.filter(h => h.rar==='A' || (h.rar==='S' && stage>=8) || (h.rar==='SP' && stage>=20)).map(h=>h.id));
   const star = Math.min(5, 1+Math.floor((stage-1)/20));
   const lv = Math.min(levelCap(star), stage);
@@ -171,6 +182,7 @@ function towerTeam(floor){
   const lv = Math.min(levelCap(star,aw), 1+Math.floor(floor*1.5));
   return ids.map(id=>({id, lv, star, aw}));
 }
+const FIRST_HERO = {1:'guanyu_y', 2:'zhangfei_y', 3:'huatuo', 4:'huangzhong', 6:'ganning'};
 const stageReward = s => ({gold:300+s*60, exp:200+s*40, gems: s%5===0 ? 120 : 20});
 const towerReward = f => ({gems:30, tickets:2, chest: f%10===0});
 
@@ -203,9 +215,9 @@ function beastPct(levels){ const p={hp:0,atk:0,def:0}; for(const b of BEASTS){co
 function finalStats(x, bb={hp:0,atk:0}){
   const s=stats(x.id,x.lv,x.star,x.aw||0), b=x.bonus||{};
   return {hp:Math.round((s.hp+(b.hp||0))*(1+bb.hp+(b.hpPct||0))), atk:Math.round((s.atk+(b.atk||0))*(1+bb.atk+(b.atkPct||0))),
-          def:Math.round((s.def+(b.def||0))*(1+(b.defPct||0))), spd:s.spd+(b.spd||0)};
+          def:Math.round((s.def+(b.def||0))*(1+(b.defPct||0))), mdef:Math.round((s.mdef+(b.def||0)*0.5)*(1+(b.defPct||0))), spd:s.spd+(b.spd||0)};
 }
-const powerOf = f => Math.round(f.hp*0.25+f.atk*3+f.def*2+(f.spd-100)*20);
+const powerOf = f => Math.round(f.hp*0.25+f.atk*3+f.def*1.2+(f.mdef||0)*1.2+(f.spd-100)*20);
 
 // Arena (สนามประลอง): a fixed ladder of 50 NPC rivals.
 const BOT_PRE=['จอมทัพ','ขุนศึก','กุนซือ','เจ้าเมือง','นักพรต','แม่ทัพ','บัณฑิต','จอมยุทธ์'];
@@ -230,14 +242,14 @@ function simulate(A, B, seed){
   const mk = (side, arr) => { const ids=arr.filter(Boolean).map(x=>x.id);
     arr.forEach((x,i)=>{ if(!x) return; const aw=x.aw||0, f=finalStats(x, bondBonus(ids,x.id));
       const role=HERO[x.id].role;
-      units.push({uid:side+i, side, slot:i, id:x.id, fac:HERO[x.id].fac, role, lv:x.lv, star:x.star, aw, hp:f.hp, max:f.hp, atk:Math.round(f.atk*(role==='arch'?1.1:1)), def:f.def, spd:f.spd, rage:0, alive:true, div:false}); }); };
+      units.push({uid:side+i, side, slot:i, id:x.id, fac:HERO[x.id].fac, role, lv:x.lv, star:x.star, aw, hp:f.hp, max:f.hp, atk:Math.round(f.atk*(role==='arch'?1.1:1)), def:f.def, mdef:f.mdef, spd:f.spd, rage:0, alive:true, div:false}); }); };
   mk('p',A); mk('e',B);
   const start = units.map(u=>({...u}));
   const actions = [];
   const alive = side => units.filter(u=>u.alive && u.side===side);
   const pick = arr => arr[Math.floor(rnd()*arr.length)];
-  const front = foes => { const f=foes.filter(u=>u.slot<2); return f.length?f:foes };
-  const back  = foes => { const b=foes.filter(u=>u.slot>=2); return b.length?b:foes };
+  const front = foes => { const f=foes.filter(u=>u.slot<3); return f.length?f:foes };
+  const back  = foes => { const b=foes.filter(u=>u.slot>=3); return b.length?b:foes };
   let round = 0, winner = null;
   for(round=1; round<=20 && !winner; round++){
     const order = units.filter(u=>u.alive).sort((a,b)=>b.spd-a.spd || (a.uid<b.uid?-1:1));
@@ -253,7 +265,7 @@ function simulate(A, B, seed){
       const strike = (t, mult, combo=false) => {
         const adv = BEATS[u.fac]===t.fac ? 1.25 : BEATS[t.fac]===u.fac ? 0.85 : 1;
         const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12);
-        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+t.def))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)));
+        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)));
         t.hp = Math.max(0, t.hp-dmg);
         if(t.hp===0) t.alive=false; else t.rage=Math.min(100,t.rage+10);
         hits.push({tgt:t.uid, dmg, crit, adv, combo, hp:t.hp, dead:!t.alive});
@@ -343,7 +355,7 @@ function storyTeam(c, si){
   return team;
 }
 
-// ---------- placeholder portraits (SVG strings) ----------
+// ---------- placeholder portraits ----------
 // Chibi portraits drawn from simple shapes: role decides the headgear, LOOK adds beards, hair and details.
 const ARMOR = {wei:'#20446b', shu:'#285c35', wu:'#7d2219', qun:'#4a3270'};
 const PCACHE = {};
@@ -355,10 +367,13 @@ const PDEFS = `<defs><radialGradient id="pg-aura"><stop offset="0" stop-color="#
   <radialGradient id="pg-mech"><stop offset="0" stop-color="#9ff8ff" stop-opacity=".7"/><stop offset="1" stop-color="#2a8aa8" stop-opacity="0"/></radialGradient>
   <linearGradient id="pg-steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9e4ee"/><stop offset="1" stop-color="#7d8fa6"/></linearGradient>
   <linearGradient id="pg-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="1" stop-color="#b8862a"/></linearGradient></defs>`;
+// Painted art supplied by the owner (art/<id>.webp). Generals without it, and every mecha form, use the drawn SVG.
+const ART = new Set(['zhuge','diaochan','guanyu','fazheng','guanyinping','jiangwei','machao','zhaoyun','liubei','zuoci','zhangjiao','lubu','sunjian','sunce','zhouyu','guojia']);
 function portrait(id, mech=false){
   const key=id+(mech?'#m':'');
   if(PCACHE[key]) return PCACHE[key];
   const h=HERO[id];
+  if(!mech && ART.has(id)) return PCACHE[key]=`<img class="art" src="art/${id}.webp" alt="" draggable="false" decoding="async">`;
   if(h.boss) return PCACHE[key]=`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="56" r="40" fill="#ff6a2a" opacity=".25"/><path d="M14 40 L26 6 L38 34Z M86 40 L74 6 L62 34Z" fill="#e8c45a" stroke="#6b4a10"/><circle cx="50" cy="54" r="34" fill="#4a0e08"/><path d="M20 50 Q50 30 80 50 Q66 42 50 44 Q34 42 20 50Z" fill="#2a0604"/><ellipse cx="37" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="63" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="37" cy="52" rx="2" ry="5" fill="#2a0604"/><ellipse cx="63" cy="52" rx="2" ry="5" fill="#2a0604"/><path d="M30 70 L38 64 L44 72 L50 64 L56 72 L62 64 L70 70 L62 80 L38 80Z" fill="#fff4dc"/></svg>`;
   const L=LOOK[id]||{}, f=!!L.f, hv=hashN(id);
   const skin=L.skin||'#f9d8b9', skinS=L.skin?'#b07a52':'#eab894', hair=L.old?'#dcd6cc':(L.hair||'#22170f'), bc=L.old?'#efebe3':(L.beardColor||hair);
@@ -436,7 +451,7 @@ function portrait(id, mech=false){
 
 
 export {
-  FAC, BEATS, ROLE, RAR, HEROES, HERO, LOOK, TALENT, BONDS, SLOTS, QUAL, BEASTS, BOTS, LOGIN7, FISH, STORY, EVENTS,
+  FAC, BEATS, ROLE, RAR, HEROES, HERO, LOOK, TALENT, BONDS, SLOTS, QUAL, BEASTS, BOTS, LOGIN7, FISH, STORY, EVENTS, OPENING, FIRST_HERO,
   mulberry32, levelCap, stats, skillMult, power, lvCost, starCost, awCost, stageLabel, comboChance,
   activeBonds, bondBonus, pickTeam, enemyTeam, towerTeam, stageReward, towerReward,
   gearStats, gearScore, enhCost, beastCost, beastPct, finalStats, powerOf, botTeam, arenaRankReward,
