@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=6b02d2a2ed').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=4a72ab56bd').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -906,6 +906,25 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .bhead .btn{padding:8px 10px;white-space:nowrap}.bhead .rnd,.bhead .sub{white-space:nowrap}
 .aptag{font-size:13px}
 .privacy{padding:12px 14px;font-size:13px;line-height:1.6}.privacy p{margin:0 0 8px}.privacy p:last-child{margin:0}
+
+/* tiers & roles */
+.subtabs.t3{grid-template-columns:repeat(3,1fr)}
+.ri{width:20px;height:20px;object-fit:contain;vertical-align:-5px}.ri.sm{width:16px;height:16px;margin-right:3px;vertical-align:-3px}
+.card .cri{position:absolute;left:3px;top:24px;z-index:1;width:24px;height:24px;padding:2px;border-radius:50%;object-fit:contain;background:rgba(26,8,4,.75);border:1px solid #d4a446}
+.tierrow{display:grid;grid-template-columns:70px 1fr;gap:8px;margin-bottom:10px;border-radius:12px;overflow:hidden;border:1.5px solid #d4a446;background:#fff8e8}
+.tierrow .tl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;color:#fff;text-align:center}
+.tierrow .tl b{font:28px var(--f-display)}.tierrow .tl small{font-size:10.5px;line-height:1.3}
+.tierrow.T0 .tl{background:linear-gradient(160deg,#ff8a3a,#c4321f)}.tierrow.T1 .tl{background:linear-gradient(160deg,#c06cff,#6a2aa0)}
+.tierrow.T2 .tl{background:linear-gradient(160deg,#3fa0ff,#1a5aa0)}.tierrow.T3 .tl{background:linear-gradient(160deg,#8a9a8a,#4a5a4a)}
+.tlist{display:flex;flex-wrap:wrap;gap:6px;padding:8px 6px}
+.th{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;gap:1px;color:#3a2416}
+.th .tok{width:54px;height:54px}.th .ri{position:absolute;top:36px;right:2px;width:20px;height:20px;background:rgba(26,8,4,.75);border-radius:50%;padding:2px;border:1px solid #d4a446}
+.th span{font-size:10.5px;font-weight:700;line-height:1.2;text-align:center;max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.th em{position:absolute;top:-2px;left:0;font:italic 800 11px/1 var(--f-display);color:#fff;background:#8a1e14;border-radius:4px;padding:2px 3px}
+.th.off{filter:grayscale(.9) opacity(.55)}
+.tierrec{padding:10px 12px;margin-bottom:10px}.tierrec small{display:block;font-size:12px;color:var(--muted)}
+.tag.tier{color:#fff}.tag.tier.T0{background:#c4321f}.tag.tier.T1{background:#6a2aa0}.tag.tier.T2{background:#1a5aa0}.tag.tier.T3{background:#5a6a5a}
+.trait{margin:10px 0 0;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,#fff3c0,#fff8e8);border:1.5px solid #d4a446;font-size:13.5px;font-weight:600;color:#6a3a08}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1054,12 +1073,82 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // Awakening (ตื่นจิต) needs 5 stars; each tier adds 25% stats, 10% skill power and 100 levels of cap.
 // 5 stars = Lv.500, 5 awakenings = Lv.1000.
 const levelCap = (star, aw=0) => star*100 + aw*100;
+// Per-hero signature: multipliers on HP/ATK/DEF/MDEF, flat speed, skill power and extra crit chance, with a one-line trait.
+// Each row trades strengths for weaknesses so totals stay near the rarity baseline.
+const HERO_MOD = {
+  liubei_y:   {hp:1.05, def:1.05, atk:.95, t:'ใจผู้นำ: ทนทานกว่านักรบทั่วไปเล็กน้อย'},
+  guanyu_y:   {atk:1.08, def:.96, t:'ง้าวหนุ่ม: ฟันแรงขึ้น แต่เกราะยังบาง'},
+  zhangfei_y: {hp:1.08, spd:-5, crit:.05, t:'ใจร้อน: เลือดหนา คริติคอลบ่อย แต่ช้า'},
+  guanyu:     {atk:1.15, hp:1.05, spd:-5, def:.92, sk:1.08, t:'เทพเจ้าสงคราม: โจมตีสูงสุดในสายนักรบ'},
+  zhuge:      {sk:1.18, mdef:1.1, hp:.88, atk:1.02, t:'ปราชญ์มังกรหลับ: สกิลแรงที่สุดในเกม แต่เปราะ'},
+  zhaoyun:    {spd:12, crit:.05, hp:.95, atk:1.02, t:'ทะลวงทัพ: เร็วที่สุดในระดับ S ออกสกิลก่อนใคร'},
+  liubei:     {hp:1.08, mdef:1.1, atk:.9, t:'จักรพรรดิเมตตา: ทนเวทและทนทานสูง'},
+  machao:     {atk:1.1, crit:.04, def:.9, t:'ม้าศึกตะวันตก: บุกแรง คริติคอลสูง เกราะบาง'},
+  zhangfei:   {hp:1.12, def:1.05, atk:.95, spd:-5, t:'โล่หน้าทัพ: เลือดหนาที่สุดในระดับ A'},
+  huangzhong: {atk:1.12, crit:.04, hp:.9, t:'ธนูเฒ่า: ยิงแรงสุดในนักธนูระดับ A'},
+  caocao:     {sk:1.1, hp:1.08, def:1.05, atk:.95, t:'ยอดวีรบุรุษ: กุนซือที่ทนทานที่สุด'},
+  simayi:     {sk:1.12, spd:5, hp:.92, t:'หมาป่าเจ้าเล่ห์: สกิลแรงและออกเร็ว'},
+  zhangliao:  {atk:1.08, spd:6, hp:.94, t:'สะเทือนเซียวเหยา: ตีแถวหลังได้ไวมาก'},
+  xiahoudun:  {hp:1.1, def:1.08, atk:.92, t:'ตาเดียวไม่ถอย: กำแพงหน้าทัพของวุย'},
+  xuchu:      {hp:1.1, atk:1.04, spd:-8, def:.96, t:'เสือโง่: แรงและทน แต่ช้ามาก'},
+  dianwei:    {def:1.12, hp:1.06, atk:.92, t:'องครักษ์เหล็ก: เกราะหนาที่สุดในระดับ A'},
+  xunyu:      {sk:1.08, mdef:1.08, hp:.95, t:'ที่ปรึกษาราชสำนัก: ฮีลแรงขึ้น'},
+  zhouyu:     {sk:1.15, atk:1.05, hp:.88, def:.92, t:'ไฟเผาผาแดง: สกิลเผาทั้งทัพแรงมาก'},
+  sunquan:    {hp:1.06, mdef:1.08, atk:.95, t:'ผู้ครองกังตั๋ง: นักรบที่ทนเวทดี'},
+  sunshangxiang:{spd:8, crit:.05, hp:.92, t:'องค์หญิงธนู: ยิงเร็วและคริติคอลบ่อย'},
+  lumeng:     {atk:1.05, sk:1.05, def:.94, t:'ขุนพลผู้ใฝ่รู้: สกิลบุกแรงขึ้น'},
+  ganning:    {crit:.06, spd:5, def:.9, t:'โจรสลัดผ้าไหม: คริติคอลสูงในนักธนู'},
+  daqiao:     {spd:6, mdef:1.05, atk:.95, t:'ดอกไม้ง่อก๊ก: ฮีลออกเร็ว'},
+  lubu:       {atk:1.22, crit:.06, hp:.98, def:.88, mdef:.88, t:'ไร้เทียมทาน: โจมตีสูงที่สุดในเกม แต่ป้องกันต่ำ'},
+  diaochan:   {spd:10, sk:1.05, hp:.88, t:'นางงามล่มเมือง: เร็วที่สุดในสายกุนซือ'},
+  dongzhuo:   {hp:1.15, atk:1.02, spd:-10, def:.95, t:'ทรราช: เลือดมหาศาล แต่อืดที่สุด'},
+  yuanshao:   {hp:1.06, atk:.97, t:'เจ้าแห่งเหอเป่ย: นักธนูที่ทนทาน'},
+  huatuo:     {sk:1.12, hp:1.0, atk:.95, t:'หมอเทวดา: ฮีลแรงที่สุดในระดับ A'},
+  guojia:     {sk:1.12, crit:.05, hp:.88, t:'อัจฉริยะอายุสั้น: สกิลแรง คริติคอลบ่อย เปราะมาก'},
+  caopi:      {hp:1.05, atk:1.03, spd:-3, t:'จักรพรรดิวุย: นักรบสมดุล'},
+  zhenji:     {mdef:1.12, sk:1.04, atk:.96, t:'เทพธิดาแม่น้ำลั่ว: ทนเวทสูงมาก'},
+  xuhuang:    {atk:1.06, def:1.02, spd:-4, t:'ขวานใหญ่: ฟันแรงและมั่นคง'},
+  caoren:     {def:1.15, hp:1.05, atk:.88, t:'ป้อมปราการ: ป้องกันกายสูงสุดในเกม'},
+  pangtong:   {sk:1.14, atk:1.04, hp:.9, def:.92, t:'หงส์อ่อน: สกิลแรงรองจากขงเบ้ง'},
+  jiangwei:   {atk:1.04, mdef:1.08, sk:1.04, t:'ทายาทขงเบ้ง: ทหารม้าที่ทนเวท'},
+  guanyinping:{atk:1.06, spd:6, hp:.95, t:'บุตรีกวนอู: นักรบที่เร็ว'},
+  yueying:    {mdef:1.1, sk:1.05, hp:.95, t:'นางช่างกล: ฮีลและทนเวท'},
+  weiyan:     {atk:1.08, crit:.04, def:.92, t:'กบฏในทัพ: ฟันแรงแต่เกราะบาง'},
+  sunce:      {atk:1.12, spd:8, hp:.95, def:.94, t:'ฌ้อปาอ๋องน้อย: บุกเร็วและแรง'},
+  luxun:      {sk:1.1, spd:4, hp:.9, t:'เผาค่ายเจ็ดร้อยลี้: สกิลไฟแรง'},
+  taishici:   {atk:1.06, hp:1.04, crit:.02, spd:-4, t:'ธนูคู่ทวน: นักธนูที่ทน'},
+  huanggai:   {hp:1.1, def:1.05, atk:.92, t:'ทุกข์ทรมานกาย: เลือดหนา'},
+  lusu:       {hp:1.05, mdef:1.05, sk:.98, t:'ผู้ซื่อสัตย์: ฮีลที่ทนทาน'},
+  zhangjiao:  {sk:1.12, mdef:1.08, hp:.92, def:.92, t:'มหาเทพโพกผ้าเหลือง: เวทแรงทนเวทดี'},
+  menghuo:    {hp:1.15, def:1.05, atk:.9, spd:-6, t:'ราชาป่าใต้: นักรบที่เลือดหนาที่สุดระดับ S'},
+  zhurong:    {atk:1.06, spd:4, hp:.94, t:'เทพไฟแดนใต้: นักธนูที่เร็ว'},
+  gongsunzan: {spd:8, hp:.96, t:'ม้าขาว: ทหารม้าที่เร็ว'},
+  yuanshu:    {sk:1.04, hp:1.02, atk:.96, t:'จักรพรรดิปลอม: กุนซือธรรมดา'},
+  sunjian:    {atk:1.1, hp:1.08, def:1.0, spd:-4, sk:1.04, t:'เสือกังตั๋ง: นักรบ S+ ที่แรงและทน'},
+  zuoci:      {sk:1.08, spd:10, mdef:1.08, hp:.88, t:'เซียนจอจู้: เร็วและทนเวท'},
+  dengai:     {atk:1.06, spd:4, crit:.03, def:.94, t:'ข้ามเขาอิมเป๋ง: บุกทะลวงหลัง'},
+  xiahouyuan: {spd:10, atk:1.03, hp:.9, t:'ธนูเร็ว: นักธนูที่เร็วที่สุด'},
+  fazheng:    {sk:1.08, crit:.03, hp:.92, t:'กุนซือแค้นฝังใจ: สกิลแรง'},
+  caiwenji:   {sk:1.1, mdef:1.05, hp:.92, t:'นักพิณ: ฮีลแรงในระดับ S'},
+  zhonghui:   {sk:1.05, atk:1.03, hp:.92, t:'ผู้ทะเยอทะยาน: กุนซือแรงแต่เปราะ'},
+  caozhi:     {sk:1.05, spd:4, hp:.95, t:'กวีเจ็ดก้าว: ฮีลเร็ว'},
+  yuejin:     {spd:6, atk:1.02, hp:.95, t:'ทัพหน้า: นักรบที่เร็ว'},
+  guanxing:   {atk:1.06, sk:1.03, def:.95, t:'บุตรกวนอู: ฟันแรง'},
+  zhangbao:   {hp:1.06, crit:.03, spd:-3, t:'บุตรเตียวหุย: ทหารม้าที่ทน'},
+  mayunlu:    {spd:8, atk:1.02, hp:.94, t:'ขุนพลหญิงแห่งเสเหลียง: เร็ว'},
+  zhoutai:    {hp:1.14, def:1.02, atk:.9, t:'แผลทั่วกาย: เลือดหนามาก'},
+  dingfeng:   {crit:.04, atk:1.03, hp:.95, t:'ฝ่าหิมะ: คริติคอลบ่อย'},
+  lingtong:   {atk:1.05, spd:4, def:.94, t:'ขุนพลหนุ่มง่อ: บุกแรง'},
+  huaxiong:   {hp:1.08, def:1.06, atk:.96, t:'ด่านซื่อซุยก๋วน: กำแพงต้นเกม'}
+};
+const HMOD = id => HERO_MOD[id] || {};
 function stats(id, lv, star, aw=0){
   const h=HERO[id], r=ROLE[h.role], q=RAR[h.rar];
   const m = q.m*(1+(lv-1)*0.09)*(1+(star-1)*0.18)*(1+aw*0.25);
-  return {hp:Math.round(1000*r.hp*m), atk:Math.round(100*r.atk*m), def:Math.round(50*r.def*m), mdef:Math.round(50*r.mdef*m), spd:r.spd+q.spd};
+  const o=HMOD(id);
+  return {hp:Math.round(1000*r.hp*m*(o.hp||1)), atk:Math.round(100*r.atk*m*(o.atk||1)), def:Math.round(50*r.def*m*(o.def||1)), mdef:Math.round(50*r.mdef*m*(o.mdef||1)), spd:r.spd+q.spd+(o.spd||0)};
 }
-const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(1+aw*0.1)).toFixed(2);
+const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(HMOD(id).sk||1)*(1+aw*0.1)).toFixed(2);
 function power(id, lv, star, aw=0){const s=stats(id,lv,star,aw);return Math.round(s.hp*0.25+s.atk*3+s.def*2)}
 // Front-liners are cheap to train, strategists cost the most.
 const ROLE_COST = {war:0.85, cav:0.95, arch:1.0, heal:1.05, strat:1.15};
@@ -1205,7 +1294,7 @@ function simulate(A, B, seed){
       const hits = [];
       const strike = (t, mult, combo=false) => {
         const adv = BEATS[u.fac]===t.fac ? 1.25 : BEATS[t.fac]===u.fac ? 0.85 : 1;
-        const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12);
+        const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12) + (HMOD(u.id).crit||0);
         const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)*fatigue(round)));
         t.hp = Math.max(0, t.hp-dmg);
         if(t.hp===0) t.alive=false; else t.rage=Math.min(100,t.rage+10);
@@ -1573,7 +1662,7 @@ function cardHTML(id, opts={}){
   const cls = ['card',h.fac,h.rar, aw>0?'aw':'', (!own && !opts.force)?'off':'', (opts.team!==false && S.team.includes(id))?'in-team':''].join(' ');
   const hook = opts.act ? `data-act="${opts.act}" data-id="${id}"${opts.pressed!==undefined?` aria-pressed="${opts.pressed}"`:''}` : `data-hero="${id}"`;
   return `<button class="${cls}" ${hook} aria-label="${esc(h.th)} ระดับ ${RAR[h.rar].label}">
-    <span class="fb">${FAC[h.fac].th}</span><span class="rar">${RAR[h.rar].label}</span>${lv?`<span class="lv">Lv.${lv}</span>`:''}
+    <span class="fb">${FAC[h.fac].th}</span>${h.role&&ROLE_IC[h.role]?roleIcon(h.role,'cri'):''}<span class="rar">${RAR[h.rar].label}</span>${lv?`<span class="lv">Lv.${lv}</span>`:''}
     <span class="seal">${portrait(id, isMech(id))}<em>${h.ch}</em></span>${isMech(id)?'<span class="mechtag">จักรกล</span>':''}
     <span class="stars">${own||opts.force?(aw>0?'☾'.repeat(aw):stars(st)):''}</span>
     <span class="nm">${esc(h.th)}</span>${opts.extra||''}</button>`;
@@ -1620,7 +1709,7 @@ function renderTop(){
   $('#cgold').textContent=fmt(S.gold); $('#cgems').textContent=fmt(S.gems); $('#cexp').textContent=fmt(S.exp);
   $('#ppower').textContent=fmt(teamPower());
   document.querySelectorAll('#nav button').forEach(b=>{
-    b.setAttribute('aria-current', b.dataset.go===(tab==='formation'?'heroes':tab)?'page':'false');
+    b.setAttribute('aria-current', b.dataset.go===(['formation','tier'].includes(tab)?'heroes':tab)?'page':'false');
     b.querySelector('.dot')?.remove();
     const need = (b.dataset.go==='city' && (tasksClaimable() || bagCount()>0 || loginReady())) || (b.dataset.go==='city' && S.freeDate!==today()) || (b.dataset.go==='train' && S.train.left>0) || (b.dataset.go==='camp' && afkNow().mins>=60);
     if(need) b.insertAdjacentHTML('beforeend','<span class="dot"></span>');
@@ -1745,7 +1834,43 @@ function viewSummon(){
   <div class="note">หยกได้จากการผ่านด่าน รางวัลออฟไลน์ และภารกิจรายวัน ทั้งหมดเป็นของในเกม ไม่มีการซื้อด้วยเงินจริง</div>`;
 }
 
-const heroTabs = () => `<div class="subtabs"><button data-go="heroes" aria-pressed="${tab==='heroes'}">รายชื่อขุนพล</button><button data-go="formation" aria-pressed="${tab==='formation'}">จัดทีม</button></div>`;
+const heroTabs = () => `<div class="subtabs t3"><button data-go="heroes" aria-pressed="${tab==='heroes'}">รายชื่อ</button><button data-go="formation" aria-pressed="${tab==='formation'}">จัดทีม</button><button data-go="tier" aria-pressed="${tab==='tier'}">จัดอันดับ</button></div>`;
+// ---------- tier list ----------
+const ROLE_IC={war:'wp-0', cav:'horse', arch:'wp-6', strat:'wp-7', heal:'wp-8'};
+const roleIcon = (role, cls='ri') => `<img class="${cls}" src="ui/${ROLE_IC[role]}.webp" alt="${ROLE[role].th}" title="${ROLE[role].th}">`;
+let TIERS=null;
+// Rating at a common reference (Lv100, 5 stars): combat power, skill strength, crit and speed, relative to the role average. Tiers by rank order.
+function tierTable(){
+  if(TIERS) return TIERS;
+  let list=HEROES.filter(h=>h.id!=='boss').map(h=>{ const st=stats(h.id,100,5), o=HMOD(h.id);
+    const base=st.hp*0.25+st.atk*3+st.def*1.2+st.mdef*1.2;
+    const score=base*(1+(skillMult(h.id)/ROLE[h.role].mult-1)*0.8)*(1+(o.crit||0)*1.5)*(1+(st.spd-100)*0.004);
+    return {id:h.id, role:h.role, score}; });
+  // compare each hero with others of the same role, so tanks and healers are judged at their own job
+  const avg={}; for(const r of Object.keys(ROLE)){ const xs=list.filter(x=>x.role===r); avg[r]=xs.reduce((a,x)=>a+x.score,0)/xs.length }
+  for(const x of list) x.score=x.score/avg[x.role]*1000;
+  list.sort((a,b)=>b.score-a.score);
+  const cut=[['T0',8],['T1',14],['T2',20],['T3',99]]; let i=0; TIERS={};
+  for(const [t,n] of cut) for(const x of list.slice(i,i+=n)) TIERS[x.id]={t, rank:list.indexOf(x)+1, score:Math.round(x.score)};
+  return TIERS;
+}
+const TIER_TXT={T0:'แกนหลักของทัพ ปั้นก่อนได้เลย', T1:'แรงมาก ใช้ได้ยาวถึงท้ายเกม', T2:'ดีในตำแหน่งของตัวเอง เหมาะเติมช่องว่าง', T3:'ใช้ช่วงต้นเกมหรือเอาไว้เปิดมิตรภาพ'};
+function viewTier(){
+  const T=tierTable(), f=UI.tierRole||'all';
+  const chip=(k,l)=>`<button class="chip" data-act="tierrole" data-k="${k}" aria-pressed="${f===k}">${k==='all'?'':roleIcon(k,'ri sm')}${l}</button>`;
+  const rows=['T0','T1','T2','T3'].map(t=>{
+    const hs=HEROES.filter(h=>T[h.id]&&T[h.id].t===t&&(f==='all'||h.role===f)).sort((a,b)=>T[a.id].rank-T[b.id].rank);
+    if(!hs.length) return '';
+    return `<div class="tierrow ${t}"><div class="tl"><b>${t}</b><small>${TIER_TXT[t]}</small></div><div class="tlist">${hs.map(h=>`<button class="th ${S.heroes[h.id]?'own':'off'}" data-hero="${h.id}">${tok(h.id)}${roleIcon(h.role)}<span>${esc(h.th)}</span><em>${RAR[h.rar].label}</em></button>`).join('')}</div></div>`}).join('');
+  const own=Object.keys(S.heroes).filter(id=>T[id]).sort((a,b)=>T[a].rank-T[b].rank);
+  const pick=['war','cav','arch','strat','heal'].map(r=>own.find(id=>HERO[id].role===r)).filter(Boolean);
+  return `${heroTabs()}
+  <h1 class="h">จัดอันดับขุนพล <span class="sub">เทียบที่ Lv.100 · 5 ดาว</span></h1>
+  ${own.length?`<div class="panel tierrec"><b>แนะนำให้ปั้นจากที่ท่านมี</b><div class="tlist">${pick.map(id=>`<button class="th own" data-hero="${id}">${tok(id)}${roleIcon(HERO[id].role)}<span>${esc(HERO[id].th)}</span><em>${T[id].t}</em></button>`).join('')}</div><small>ตัวที่อันดับสูงสุดของแต่ละบทบาท ทีมที่ดีควรมีนักรบหรือทหารม้าแถวหน้า และหมออย่างน้อย 1 คน</small></div>`:''}
+  <div class="chips">${chip('all','ทั้งหมด')}${Object.keys(ROLE).map(k=>chip(k,ROLE[k].th)).join('')}</div>
+  ${rows}
+  <div class="note">อันดับคิดจากค่าพลัง ความแรงสกิล คริติคอล และความเร็วของแต่ละตัว ยังไม่รวมมิตรภาพและก๊กข่ม ตัวที่ยังไม่มีแสดงเป็นสีจาง แตะเพื่อดูรายละเอียด</div>`;
+}
 function viewFormation(){
   const slot=i=>{const id=S.team[i]; return id?cardHTML(id,{team:false}):`<button class="slot-empty" data-act="pickslot" data-slot="${i}">ว่าง<br>แตะขุนพลในหน้า “ขุนพล”</button>`};
   const facs={}; S.team.filter(Boolean).forEach(id=>facs[HERO[id].fac]=(facs[HERO[id].fac]||0)+1);
@@ -2581,7 +2706,7 @@ function viewTasks(){
 function render(){
   checkDaily();
   if(tab!=='fish' && fishG){ cancelAnimationFrame(fishG.raf); fishG=null; fishMsg='ปลาหลุดไปตอนออกจากบ่อ' }
-  const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, savegame:viewSave, coupon:viewCoupon, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
+  const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, tier:viewTier, savegame:viewSave, coupon:viewCoupon, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
     arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap, train:viewTrain, evrank:viewEvRank}[tab]();
   sendTab();
   $('#view').innerHTML=v; renderTop(); tutorial();
@@ -2632,10 +2757,11 @@ function openHero(id){
         <div>
           <h2>${esc(h.th)}</h2>
           <div class="en">${esc(h.en)} · ${own?`Lv.${lv}/${cap} · สำเนา ${own.copies}`:'ยังไม่มีในทัพ อัญเชิญเพื่อรับ'}</div>
-          <div class="tags"><span class="tag" style="background:var(--${h.fac})">${FAC[h.fac].ch} ${FAC[h.fac].th}</span><span class="tag role">${r.th}</span><span class="tag" style="background:#8a5a12">${RAR[h.rar].label}</span></div>
+          <div class="tags"><span class="tag" style="background:var(--${h.fac})">${FAC[h.fac].ch} ${FAC[h.fac].th}</span><span class="tag role">${roleIcon(h.role,'ri sm')}${r.th}</span>${tierTable()[id]?`<span class="tag tier ${tierTable()[id].t}">${tierTable()[id].t} · อันดับ ${tierTable()[id].rank}</span>`:''}<span class="tag" style="background:#8a5a12">${RAR[h.rar].label}</span></div>
           <div class="power" style="color:var(--wu);margin-top:8px"><small style="color:var(--muted)">พลัง</small>${fmt(own?heroPower(id):power(id,lv,st,aw))}</div>
         </div>
       </div>
+      ${HMOD(id).t?`<div class="trait">★ ${esc(HMOD(id).t)}</div>`:''}
       <div class="stats">
         <div class="stat"><span>❤ พลังชีวิต</span><b>${fmt(s.hp)}</b></div>
         <div class="stat"><span>⚔ โจมตี</span><b>${fmt(s.atk)}</b></div>
@@ -2979,6 +3105,7 @@ document.addEventListener('click',e=>{
       case 'cpcopy': { const ta=$('#cpout'); ta.select(); (navigator.clipboard?.writeText(ta.value)||Promise.reject()).then(()=>toast('คัดลอกแล้ว')).catch(()=>{ try{document.execCommand('copy');toast('คัดลอกแล้ว')}catch(e){toast('กดค้างที่ช่องแล้วเลือกคัดลอก')} }); return }
       case 'sendfb': { const t=$('#fbtext').value.trim(); if(!t) return toast('พิมพ์ความเห็นก่อน'); act.disabled=true;
         SB.from('feedback').insert({message:t.slice(0,1000), name:(S.pname||'').slice(0,24), stage:S.stage}).then(({error})=>{ if(error){ act.disabled=false; toast('ส่งไม่สำเร็จ ลองใหม่') } else { $('#fbtext').value=''; toast('ขอบคุณสำหรับความเห็น!') } }); return }
+      case 'tierrole': UI.tierRole=act.dataset.k; render(); return;
       case 'apstart': startAuto(act.dataset.m); return;
       case 'apstop': stopAuto(); return;
       case 'apcfg': { const c=apCfg(), k=act.dataset.k; c[k]=!c[k]; save(); act.setAttribute('aria-pressed',c[k]); return }

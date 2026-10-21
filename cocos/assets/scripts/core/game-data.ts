@@ -119,12 +119,82 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // Awakening (ตื่นจิต) needs 5 stars; each tier adds 25% stats, 10% skill power and 100 levels of cap.
 // 5 stars = Lv.500, 5 awakenings = Lv.1000.
 const levelCap = (star, aw=0) => star*100 + aw*100;
+// Per-hero signature: multipliers on HP/ATK/DEF/MDEF, flat speed, skill power and extra crit chance, with a one-line trait.
+// Each row trades strengths for weaknesses so totals stay near the rarity baseline.
+const HERO_MOD = {
+  liubei_y:   {hp:1.05, def:1.05, atk:.95, t:'ใจผู้นำ: ทนทานกว่านักรบทั่วไปเล็กน้อย'},
+  guanyu_y:   {atk:1.08, def:.96, t:'ง้าวหนุ่ม: ฟันแรงขึ้น แต่เกราะยังบาง'},
+  zhangfei_y: {hp:1.08, spd:-5, crit:.05, t:'ใจร้อน: เลือดหนา คริติคอลบ่อย แต่ช้า'},
+  guanyu:     {atk:1.15, hp:1.05, spd:-5, def:.92, sk:1.08, t:'เทพเจ้าสงคราม: โจมตีสูงสุดในสายนักรบ'},
+  zhuge:      {sk:1.18, mdef:1.1, hp:.88, atk:1.02, t:'ปราชญ์มังกรหลับ: สกิลแรงที่สุดในเกม แต่เปราะ'},
+  zhaoyun:    {spd:12, crit:.05, hp:.95, atk:1.02, t:'ทะลวงทัพ: เร็วที่สุดในระดับ S ออกสกิลก่อนใคร'},
+  liubei:     {hp:1.08, mdef:1.1, atk:.9, t:'จักรพรรดิเมตตา: ทนเวทและทนทานสูง'},
+  machao:     {atk:1.1, crit:.04, def:.9, t:'ม้าศึกตะวันตก: บุกแรง คริติคอลสูง เกราะบาง'},
+  zhangfei:   {hp:1.12, def:1.05, atk:.95, spd:-5, t:'โล่หน้าทัพ: เลือดหนาที่สุดในระดับ A'},
+  huangzhong: {atk:1.12, crit:.04, hp:.9, t:'ธนูเฒ่า: ยิงแรงสุดในนักธนูระดับ A'},
+  caocao:     {sk:1.1, hp:1.08, def:1.05, atk:.95, t:'ยอดวีรบุรุษ: กุนซือที่ทนทานที่สุด'},
+  simayi:     {sk:1.12, spd:5, hp:.92, t:'หมาป่าเจ้าเล่ห์: สกิลแรงและออกเร็ว'},
+  zhangliao:  {atk:1.08, spd:6, hp:.94, t:'สะเทือนเซียวเหยา: ตีแถวหลังได้ไวมาก'},
+  xiahoudun:  {hp:1.1, def:1.08, atk:.92, t:'ตาเดียวไม่ถอย: กำแพงหน้าทัพของวุย'},
+  xuchu:      {hp:1.1, atk:1.04, spd:-8, def:.96, t:'เสือโง่: แรงและทน แต่ช้ามาก'},
+  dianwei:    {def:1.12, hp:1.06, atk:.92, t:'องครักษ์เหล็ก: เกราะหนาที่สุดในระดับ A'},
+  xunyu:      {sk:1.08, mdef:1.08, hp:.95, t:'ที่ปรึกษาราชสำนัก: ฮีลแรงขึ้น'},
+  zhouyu:     {sk:1.15, atk:1.05, hp:.88, def:.92, t:'ไฟเผาผาแดง: สกิลเผาทั้งทัพแรงมาก'},
+  sunquan:    {hp:1.06, mdef:1.08, atk:.95, t:'ผู้ครองกังตั๋ง: นักรบที่ทนเวทดี'},
+  sunshangxiang:{spd:8, crit:.05, hp:.92, t:'องค์หญิงธนู: ยิงเร็วและคริติคอลบ่อย'},
+  lumeng:     {atk:1.05, sk:1.05, def:.94, t:'ขุนพลผู้ใฝ่รู้: สกิลบุกแรงขึ้น'},
+  ganning:    {crit:.06, spd:5, def:.9, t:'โจรสลัดผ้าไหม: คริติคอลสูงในนักธนู'},
+  daqiao:     {spd:6, mdef:1.05, atk:.95, t:'ดอกไม้ง่อก๊ก: ฮีลออกเร็ว'},
+  lubu:       {atk:1.22, crit:.06, hp:.98, def:.88, mdef:.88, t:'ไร้เทียมทาน: โจมตีสูงที่สุดในเกม แต่ป้องกันต่ำ'},
+  diaochan:   {spd:10, sk:1.05, hp:.88, t:'นางงามล่มเมือง: เร็วที่สุดในสายกุนซือ'},
+  dongzhuo:   {hp:1.15, atk:1.02, spd:-10, def:.95, t:'ทรราช: เลือดมหาศาล แต่อืดที่สุด'},
+  yuanshao:   {hp:1.06, atk:.97, t:'เจ้าแห่งเหอเป่ย: นักธนูที่ทนทาน'},
+  huatuo:     {sk:1.12, hp:1.0, atk:.95, t:'หมอเทวดา: ฮีลแรงที่สุดในระดับ A'},
+  guojia:     {sk:1.12, crit:.05, hp:.88, t:'อัจฉริยะอายุสั้น: สกิลแรง คริติคอลบ่อย เปราะมาก'},
+  caopi:      {hp:1.05, atk:1.03, spd:-3, t:'จักรพรรดิวุย: นักรบสมดุล'},
+  zhenji:     {mdef:1.12, sk:1.04, atk:.96, t:'เทพธิดาแม่น้ำลั่ว: ทนเวทสูงมาก'},
+  xuhuang:    {atk:1.06, def:1.02, spd:-4, t:'ขวานใหญ่: ฟันแรงและมั่นคง'},
+  caoren:     {def:1.15, hp:1.05, atk:.88, t:'ป้อมปราการ: ป้องกันกายสูงสุดในเกม'},
+  pangtong:   {sk:1.14, atk:1.04, hp:.9, def:.92, t:'หงส์อ่อน: สกิลแรงรองจากขงเบ้ง'},
+  jiangwei:   {atk:1.04, mdef:1.08, sk:1.04, t:'ทายาทขงเบ้ง: ทหารม้าที่ทนเวท'},
+  guanyinping:{atk:1.06, spd:6, hp:.95, t:'บุตรีกวนอู: นักรบที่เร็ว'},
+  yueying:    {mdef:1.1, sk:1.05, hp:.95, t:'นางช่างกล: ฮีลและทนเวท'},
+  weiyan:     {atk:1.08, crit:.04, def:.92, t:'กบฏในทัพ: ฟันแรงแต่เกราะบาง'},
+  sunce:      {atk:1.12, spd:8, hp:.95, def:.94, t:'ฌ้อปาอ๋องน้อย: บุกเร็วและแรง'},
+  luxun:      {sk:1.1, spd:4, hp:.9, t:'เผาค่ายเจ็ดร้อยลี้: สกิลไฟแรง'},
+  taishici:   {atk:1.06, hp:1.04, crit:.02, spd:-4, t:'ธนูคู่ทวน: นักธนูที่ทน'},
+  huanggai:   {hp:1.1, def:1.05, atk:.92, t:'ทุกข์ทรมานกาย: เลือดหนา'},
+  lusu:       {hp:1.05, mdef:1.05, sk:.98, t:'ผู้ซื่อสัตย์: ฮีลที่ทนทาน'},
+  zhangjiao:  {sk:1.12, mdef:1.08, hp:.92, def:.92, t:'มหาเทพโพกผ้าเหลือง: เวทแรงทนเวทดี'},
+  menghuo:    {hp:1.15, def:1.05, atk:.9, spd:-6, t:'ราชาป่าใต้: นักรบที่เลือดหนาที่สุดระดับ S'},
+  zhurong:    {atk:1.06, spd:4, hp:.94, t:'เทพไฟแดนใต้: นักธนูที่เร็ว'},
+  gongsunzan: {spd:8, hp:.96, t:'ม้าขาว: ทหารม้าที่เร็ว'},
+  yuanshu:    {sk:1.04, hp:1.02, atk:.96, t:'จักรพรรดิปลอม: กุนซือธรรมดา'},
+  sunjian:    {atk:1.1, hp:1.08, def:1.0, spd:-4, sk:1.04, t:'เสือกังตั๋ง: นักรบ S+ ที่แรงและทน'},
+  zuoci:      {sk:1.08, spd:10, mdef:1.08, hp:.88, t:'เซียนจอจู้: เร็วและทนเวท'},
+  dengai:     {atk:1.06, spd:4, crit:.03, def:.94, t:'ข้ามเขาอิมเป๋ง: บุกทะลวงหลัง'},
+  xiahouyuan: {spd:10, atk:1.03, hp:.9, t:'ธนูเร็ว: นักธนูที่เร็วที่สุด'},
+  fazheng:    {sk:1.08, crit:.03, hp:.92, t:'กุนซือแค้นฝังใจ: สกิลแรง'},
+  caiwenji:   {sk:1.1, mdef:1.05, hp:.92, t:'นักพิณ: ฮีลแรงในระดับ S'},
+  zhonghui:   {sk:1.05, atk:1.03, hp:.92, t:'ผู้ทะเยอทะยาน: กุนซือแรงแต่เปราะ'},
+  caozhi:     {sk:1.05, spd:4, hp:.95, t:'กวีเจ็ดก้าว: ฮีลเร็ว'},
+  yuejin:     {spd:6, atk:1.02, hp:.95, t:'ทัพหน้า: นักรบที่เร็ว'},
+  guanxing:   {atk:1.06, sk:1.03, def:.95, t:'บุตรกวนอู: ฟันแรง'},
+  zhangbao:   {hp:1.06, crit:.03, spd:-3, t:'บุตรเตียวหุย: ทหารม้าที่ทน'},
+  mayunlu:    {spd:8, atk:1.02, hp:.94, t:'ขุนพลหญิงแห่งเสเหลียง: เร็ว'},
+  zhoutai:    {hp:1.14, def:1.02, atk:.9, t:'แผลทั่วกาย: เลือดหนามาก'},
+  dingfeng:   {crit:.04, atk:1.03, hp:.95, t:'ฝ่าหิมะ: คริติคอลบ่อย'},
+  lingtong:   {atk:1.05, spd:4, def:.94, t:'ขุนพลหนุ่มง่อ: บุกแรง'},
+  huaxiong:   {hp:1.08, def:1.06, atk:.96, t:'ด่านซื่อซุยก๋วน: กำแพงต้นเกม'}
+};
+const HMOD = id => HERO_MOD[id] || {};
 function stats(id, lv, star, aw=0){
   const h=HERO[id], r=ROLE[h.role], q=RAR[h.rar];
   const m = q.m*(1+(lv-1)*0.09)*(1+(star-1)*0.18)*(1+aw*0.25);
-  return {hp:Math.round(1000*r.hp*m), atk:Math.round(100*r.atk*m), def:Math.round(50*r.def*m), mdef:Math.round(50*r.mdef*m), spd:r.spd+q.spd};
+  const o=HMOD(id);
+  return {hp:Math.round(1000*r.hp*m*(o.hp||1)), atk:Math.round(100*r.atk*m*(o.atk||1)), def:Math.round(50*r.def*m*(o.def||1)), mdef:Math.round(50*r.mdef*m*(o.mdef||1)), spd:r.spd+q.spd+(o.spd||0)};
 }
-const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(1+aw*0.1)).toFixed(2);
+const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(HMOD(id).sk||1)*(1+aw*0.1)).toFixed(2);
 function power(id, lv, star, aw=0){const s=stats(id,lv,star,aw);return Math.round(s.hp*0.25+s.atk*3+s.def*2)}
 // Front-liners are cheap to train, strategists cost the most.
 const ROLE_COST = {war:0.85, cav:0.95, arch:1.0, heal:1.05, strat:1.15};
@@ -270,7 +340,7 @@ function simulate(A, B, seed){
       const hits = [];
       const strike = (t, mult, combo=false) => {
         const adv = BEATS[u.fac]===t.fac ? 1.25 : BEATS[t.fac]===u.fac ? 0.85 : 1;
-        const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12);
+        const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12) + (HMOD(u.id).crit||0);
         const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)*fatigue(round)));
         t.hp = Math.max(0, t.hp-dmg);
         if(t.hp===0) t.alive=false; else t.rage=Math.min(100,t.rage+10);
@@ -465,6 +535,7 @@ function portrait(id, mech=false){
 
 
 export {
+  HERO_MOD, HMOD,
   FAC, BEATS, ROLE, RAR, HEROES, HERO, LOOK, TALENT, BONDS, SLOTS, QUAL, BEASTS, BOTS, LOGIN7, FISH, STORY, EVENTS, OPENING, FIRST_HERO, REGIONS, ROLE_COST,
   mulberry32, levelCap, stats, skillMult, power, lvCost, starCost, awCost, stageLabel, comboChance, regionOf,
   activeBonds, bondBonus, pickTeam, enemyTeam, towerTeam, stageReward, towerReward,
