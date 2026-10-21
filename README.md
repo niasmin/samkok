@@ -26,3 +26,14 @@
 
 ## ที่มาของภาพ
 ภาพขุนพล 16 ตัวสร้างด้วย ChatGPT ภาพอื่นวาดด้วยโค้ดในเกม
+
+## Online backend (web build)
+
+The GitHub Pages build talks to the Supabase project `kunphon-samkok` (ref `wkbpbihsdymjwapqgvpp`, Singapore).
+Inside Claude the game keeps using the artifact's own storage instead.
+
+- `players`: one row per player (name + shared doc: defence team, arena points, guild, recent chat). Everyone signed in can read; only the owner writes.
+- `saves`: private cloud save per player, plus a one-day, one-time transfer code (`make_transfer_code` / `claim_transfer`).
+- `coupons` / `coupon_redemptions`: server-checked codes via `redeem_coupon`; admins create and list codes with `admin_create_coupons` / `admin_list_coupons` using a passphrase stored hashed in `private.admin_secret` (`admin_change_pass` rotates it).
+- Players sign in anonymously, so **Authentication → Sign In / Providers → Allow anonymous sign-ins** must be on.
+- The publishable key in `web/index.html` is meant to be public; all access is enforced by row-level security.

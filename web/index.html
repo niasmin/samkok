@@ -830,6 +830,8 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .cpnote{font-size:12px;color:var(--muted);margin:6px 0 8px}
 .cpgen .code{margin-top:10px}
 .cplink{display:block;width:100%;text-align:center;padding:12px;margin-bottom:10px;font-weight:700;color:#5a1008}
+
+.tcode{font:700 20px ui-monospace,monospace;letter-spacing:3px;color:#8a1e14;align-self:center}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1238,7 +1240,7 @@ const POTION_EXP = 500;
 const addEv = n => { S.evw.pts+=n };
 const bagCount = () => Object.values(S.bag).reduce((a,b)=>a+b,0);
 let SAVED_AT=0;
-function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));SAVED_AT=Date.now()}catch(e){} syncSoon()}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));SAVED_AT=Date.now()}catch(e){} syncSoon(); if(typeof cloudSaveSoon==='function') cloudSaveSoon()}
 const SLOT_KEY=i=>SAVE_KEY+'-slot'+i;
 // ---------- coupon codes ----------
 // Codes are self-checking: the rewards are packed into the code with a checksum, so they work offline on any copy of the game.
@@ -1278,13 +1280,35 @@ function redeemCoupon(t){
   if(!r) return {ok:false, msg:'โค้ดไม่ถูกต้อง ตรวจตัวอักษรอีกครั้ง'};
   if(S.coupons.some(x=>x.k===r.key)) return {ok:false, msg:'ใช้โค้ดนี้ไปแล้ว'};
   if(r.until && cpDay(Date.now())>r.until) return {ok:false, msg:'โค้ดนี้หมดอายุแล้ว'};
+  return grantCoupon(r, r.key);
+}
+function grantCoupon(r, key){
   S.gems+=r.gems||0; S.gold+=r.gold||0; S.exp+=r.exp||0; S.tickets+=r.tickets||0; S.potions+=r.potions||0;
   if(r.chest) S.bag.selSP=(S.bag.selSP||0)+r.chest;
-  S.coupons=[...S.coupons,{k:r.key,ts:Date.now(),t:couponText(r)}].slice(-50); save();
+  S.coupons=[...S.coupons,{k:key,ts:Date.now(),t:couponText(r)}].slice(-50); save();
   return {ok:true, msg:`ได้รับ ${couponText(r)}`};
 }
+const CP_REASON={not_found:'ไม่พบโค้ดนี้ ตรวจตัวอักษรอีกครั้ง', used:'ใช้โค้ดนี้ไปแล้ว', expired:'โค้ดนี้หมดอายุแล้ว', exhausted:'โค้ดนี้ถูกใช้ครบจำนวนแล้ว'};
+async function redeemOnline(t){
+  const {data,error}=await SB.rpc('redeem_coupon',{p_code:t});
+  if(error) return {ok:false, msg:'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง'};
+  if(!data.ok) return {ok:false, msg:CP_REASON[data.reason]||'ใช้โค้ดไม่ได้'};
+  return grantCoupon(data.rewards||{}, data.code);
+}
+function sbAdminHTML(f,num){
+  if(!NET.on) return `<div class="panel cprow">ต้องเชื่อมต่อเซิร์ฟเวอร์ก่อน${NET.sbErr?` (${esc(NET.sbErr)})`:''}</div>`;
+  if(!UI.apass) return `<div class="panel cprow"><input id="cpadmin" type="password" autocomplete="off" placeholder="รหัสผ่านผู้ดูแล" aria-label="รหัสผ่านผู้ดูแล"><button class="btn" data-act="cpunlock">ปลดล็อก</button></div>`;
+  return `<div class="panel cpgen">
+    <div class="cpgrid">${num('gems','หยก',100000)}${num('gold','เงิน',50000000)}${num('exp','EXP',50000000)}${num('tickets','ตั๋วทะลวง',500)}${num('potions','ยา EXP',500)}${num('chest','หีบเลือก S+',10)}${num('days','อายุ (วัน, 0 = ไม่หมด)',3650)}${num('n','จำนวนโค้ด',200)}${num('uses','ใช้ได้กี่คนต่อโค้ด',1000000)}</div>
+    <label class="cpf" style="margin-top:8px"><span>ตั้งชื่อโค้ดเอง (ไม่บังคับ เช่น NEWYEAR)</span><input id="cpcustom" maxlength="24" value="${esc(f.custom||'')}"></label>
+    <label class="cpf" style="margin-top:8px"><span>หมายเหตุ</span><input id="cpnote" maxlength="80" value="${esc(f.note||'')}"></label>
+    <button class="btn red" style="width:100%;margin-top:10px" data-act="cpgen">สร้างโค้ดบนเซิร์ฟเวอร์</button>
+    ${f.out?`<textarea id="cpout" class="code" rows="${Math.min(10,f.out.split('\n').length+1)}" readonly>${esc(f.out)}</textarea><button class="btn small" data-act="cpcopy" style="margin-top:6px">คัดลอกทั้งหมด</button>`:''}
+    ${UI.clist?`<h4 style="margin:12px 0 6px">โค้ดล่าสุด</h4>${UI.clist.slice(0,30).map(c=>`<div class="cphist"><b>${esc(c.code)}</b><span>${esc(couponText(c.rewards||{}))}${c.note?` · ${esc(c.note)}`:''}</span><small>${c.uses}/${c.max_uses}${c.expires_at?` · ถึง ${new Date(c.expires_at).toLocaleDateString('th-TH')}`:''}</small></div>`).join('')}`:''}
+  </div>`;
+}
 function viewCoupon(){
-  const f=UI.cp||(UI.cp={gems:500,gold:0,exp:0,tickets:0,potions:0,chest:0,days:30,n:5,out:''});
+  const f=UI.cp||(UI.cp={gems:500,gold:0,exp:0,tickets:0,potions:0,chest:0,days:30,n:5,uses:1,custom:'',note:'',out:''});
   const num=(k,label,max,step=1)=>`<label class="cpf"><span>${label}</span><input type="number" inputmode="numeric" min="0" max="${max}" step="${step}" data-cp="${k}" value="${f[k]}"></label>`;
   return `${back()}
   <h1 class="h">ใส่โค้ด</h1>
@@ -1293,15 +1317,15 @@ function viewCoupon(){
     <div class="cprow"><input id="cpin" autocomplete="off" autocapitalize="characters" placeholder="เช่น KP-XXXXX-XXXXX-XXXXX-XXXXX" aria-label="โค้ดคูปอง"><button class="btn red" data-act="redeem">รับรางวัล</button></div>
   </div>
   ${S.coupons.length?`<h2 class="h" style="font-size:18px">ใช้ไปแล้ว</h2><div class="panel cphistp">${S.coupons.slice(-6).reverse().map(c=>`<div class="cphist"><b>${esc(c.k.length>12?c.k.slice(0,8)+'…':c.k)}</b><span>${esc(c.t)}</span><small>${new Date(c.ts).toLocaleDateString('th-TH')}</small></div>`).join('')}</div>`:''}
-  <h2 class="h" style="font-size:18px">สร้างโค้ดคูปอง <span class="sub">สำหรับผู้ดูแล</span></h2>
-  ${UI.admin?`<div class="panel cpgen">
+  <h2 class="h" style="font-size:18px">สร้างโค้ดคูปอง <span class="sub">${SB?'ตรวจที่เซิร์ฟเวอร์':'สำหรับผู้ดูแล'}</span></h2>
+  ${SB?sbAdminHTML(f,num):UI.admin?`<div class="panel cpgen">
     <div class="cpgrid">${num('gems','หยก',655350,10)}${num('gold','เงิน',4095000,1000)}${num('exp','EXP',4095000,1000)}${num('tickets','ตั๋วทะลวง',63)}${num('potions','ยา EXP',63)}${num('chest','หีบเลือก S+',3)}${num('days','อายุ (วัน, 0 = ไม่หมด)',3000)}${num('n','จำนวนโค้ด',50)}</div>
     <p class="cpnote">หยกปัดเป็นหลักสิบ เงินและ EXP ปัดเป็นหลักพัน</p>
     <button class="btn red" style="width:100%" data-act="cpgen">สร้างโค้ด</button>
     ${f.out?`<textarea id="cpout" class="code" rows="${Math.min(10,f.out.split('\n').length+1)}" readonly>${f.out}</textarea>
       <button class="btn small" data-act="cpcopy" style="margin-top:6px">คัดลอกทั้งหมด</button>`:''}
   </div>`:`<div class="panel cprow"><input id="cpadmin" type="password" autocomplete="off" placeholder="รหัสผู้ดูแล" aria-label="รหัสผู้ดูแล"><button class="btn" data-act="cpunlock">ปลดล็อก</button></div>`}
-  <div class="note">โค้ดที่สร้างใช้ได้ทั้งในเวอร์ชัน Claude และเว็บ GitHub ไม่ต้องต่อเน็ต แต่ละผู้เล่นใช้โค้ดเดียวกันได้คนละครั้ง</div>`;
+  <div class="note">${SB?'โค้ดตรวจที่เซิร์ฟเวอร์ ปลอมไม่ได้ และกำหนดได้ว่าแต่ละโค้ดใช้ได้กี่คน':'โค้ดที่สร้างใช้ได้ทั้งในเวอร์ชัน Claude และเว็บ GitHub ไม่ต้องต่อเน็ต แต่ละผู้เล่นใช้โค้ดเดียวกันได้คนละครั้ง'}</div>`;
 }
 function slotInfo(i){ try{ const r=localStorage.getItem(SLOT_KEY(i)); return r?JSON.parse(r):null }catch(e){ return null } }
 const encodeSave = d => 'KP1:'+btoa(unescape(encodeURIComponent(JSON.stringify(d))));
@@ -1313,6 +1337,14 @@ function viewSave(){
   <h1 class="h">บันทึกเกม</h1>
   <div class="panel item"><span class="ic">存</span><div><b>บันทึกอัตโนมัติ: เปิดอยู่</b><p>เกมบันทึกลงเครื่องทุกครั้งที่ท่านทำอะไร ล่าสุด ${t}</p></div>
     <button class="btn" data-act="savenow">บันทึกเลย</button></div>
+  ${SB?`<h2 class="h" style="font-size:18px">บัญชีออนไลน์</h2>
+  <div class="panel cpbox">
+    <div class="cprow"><input id="pnamein" maxlength="24" value="${esc(S.pname||'')}" aria-label="ชื่อในเกม" placeholder="ชื่อในเกม"><button class="btn" data-act="setname">ตั้งชื่อ</button></div>
+    <p style="margin:8px 0 0">${NET.on?`เซฟคลาวด์: ${CLOUD.at?`ล่าสุด ${new Date(CLOUD.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`:'รอบันทึกครั้งแรก'}${CLOUD.err?` · ผิดพลาด: ${esc(CLOUD.err)}`:''}`:`ออฟไลน์${NET.sbErr?` (${esc(NET.sbErr)})`:''}`}</p>
+    <div class="cprow" style="margin-top:8px"><button class="btn small" data-act="mktransfer" ${NET.on?'':'disabled'}>สร้างรหัสย้ายเครื่อง (8 ตัว)</button>${UI.tcode?`<b class="tcode">${UI.tcode}</b>`:''}</div>
+    <p class="cpnote">ใช้ได้ครั้งเดียวภายใน 24 ชั่วโมง กรอกในเครื่องใหม่ด้านล่าง</p>
+    <div class="cprow"><input id="tclaim" maxlength="12" placeholder="กรอกรหัสย้ายเครื่อง" aria-label="รหัสย้ายเครื่อง"><button class="btn ${UI.ask==='claim'?'red':''}" data-act="claimtransfer" ${NET.on?'':'disabled'}>${UI.ask==='claim'?'ยืนยัน แทนที่เกมนี้':'รับเซฟ'}</button></div>
+  </div>`:''}
   <h2 class="h" style="font-size:18px">ช่องบันทึก</h2>
   ${[0,1,2].map(i=>{const x=slotInfo(i), ask=UI.ask===`load${i}`;
     return `<div class="panel slotrow"><div><b>ช่อง ${i+1}</b><p>${x?`${new Date(x.ts).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})} · ${saveSummary(x.data)}`:'ว่าง'}</p></div>
@@ -1491,6 +1523,7 @@ const allDone = () => TASKS.every(taskDone);
 function tasksClaimable(){ return TASKS.some(t=>taskDone(t)&&!S.daily.got[t.k]) || (allDone() && !S.daily.got.all) }
 
 function renderTop(){
+  $('#pname').textContent=S.pname||'ท่านเจ้าเมือง';
   $('#cgold').textContent=fmt(S.gold); $('#cgems').textContent=fmt(S.gems); $('#cexp').textContent=fmt(S.exp);
   $('#ppower').textContent=fmt(teamPower());
   document.querySelectorAll('#nav button').forEach(b=>{
@@ -1851,7 +1884,8 @@ function netRender(){
   render();
 }
 async function initNet(){
-  if(NET.started || !window.claude?.use) return; NET.started=true;
+  if(!window.claude?.use) return initSupabase();
+  if(NET.started) return; NET.started=true;
   const [db,user,room]=await Promise.all([claude.use('db'),claude.use('user'),claude.use('room')]);
   NET.db=db; NET.user=user; NET.room=room;
   NET.me = user ? await user.id() : null;
@@ -1871,8 +1905,46 @@ async function initNet(){
   }
   render();
 }
+// ---------- Supabase backend (web build outside Claude) ----------
+const SB_URL='https://wkbpbihsdymjwapqgvpp.supabase.co', SB_KEY='sb_publishable_ijZfKYH1VFsmd4BOIsL5oQ_GTCWQlUn';
+let SB=null, cloudT=0;
+const CLOUD={at:0, err:''};
+async function initSupabase(){
+  if(NET.started) return; NET.started=true;
+  try{
+    const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/+esm');
+    SB=createClient(SB_URL, SB_KEY, {auth:{persistSession:true, storageKey:'kunphon-sb-auth'}});
+    let {data:{session}}=await SB.auth.getSession();
+    if(!session){ const r=await SB.auth.signInAnonymously(); if(r.error) throw r.error; session=r.data.session }
+    NET.me=session.user.id; NET.sb=true;
+    if(!S.pname) { S.pname='ท่านเจ้าเมือง'+NET.me.slice(0,4).toUpperCase(); save() }
+    NET.db={doc:()=>({set:async d=>{ const {error}=await SB.from('players').upsert({id:NET.me, name:S.pname, doc:d}); if(error) throw error }})};
+    NET.on=true;
+    const poll=async()=>{
+      const {data,error}=await SB.from('players').select('id,name,doc,updated_at')
+        .gte('updated_at', new Date(Date.now()-30*864e5).toISOString()).order('updated_at',{ascending:false}).limit(300);
+      if(error) return;
+      const next={}, names={}, online=[], now=Date.now();
+      for(const r of data){ next[r.id]=r.doc||{}; names[r.id]={name:r.name}; if(now-Date.parse(r.updated_at)<3*60e3) online.push({by:r.id, isMe:r.id===NET.me, kind:'viewer'}) }
+      NET.players=next; NET.names=names; NET.online=online;
+      if(!NET.loaded){ const mine=next[NET.me]; if(mine){ NET.msgs=[...(mine.msgs||[])]; NET.hits=[...(mine.hits||[])] } NET.loaded=true; syncSoon() }
+      netRender();
+    };
+    await poll();
+    setInterval(()=>{ if(!document.hidden) poll() }, 10000);
+    setInterval(()=>{ if(!document.hidden){ NET.lastJSON=''; syncSoon() } }, 90000); // heartbeat: shows us online
+    document.addEventListener('visibilitychange',()=>{ if(document.hidden) cloudSave() });
+    cloudSaveSoon(); render();
+  }catch(e){ NET.on=false; NET.sbErr=String(e?.message||e); render() }
+}
+async function cloudSave(){
+  if(!SB||!NET.me) return; clearTimeout(cloudT);
+  const {error}=await SB.from('saves').upsert({user_id:NET.me, data:S});
+  if(error) CLOUD.err=error.message; else { CLOUD.at=Date.now(); CLOUD.err='' }
+}
+function cloudSaveSoon(){ if(!SB||!NET.me) return; clearTimeout(cloudT); cloudT=setTimeout(cloudSave, 15000) }
 function sendTab(){ if(NET.room && NET.tabSent!==tab){ NET.tabSent=tab; NET.room.presence({tab}).catch(()=>{}) } }
-const netNote = () => NET.on ? (NET.ro ? 'บัญชีนี้ดูได้อย่างเดียว ทัพของท่านจะไม่ถูกส่งให้ผู้เล่นอื่น' : '') : 'โหมดออฟไลน์: เปิดเกมผ่านลิงก์ที่แชร์และเข้าสู่ระบบ claude.ai เพื่อเล่นกับผู้เล่นจริง';
+const netNote = () => NET.sbErr ? 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตอนนี้เล่นแบบออฟไลน์' : NET.sb ? '' : NET.on ? (NET.ro ? 'บัญชีนี้ดูได้อย่างเดียว ทัพของท่านจะไม่ถูกส่งให้ผู้เล่นอื่น' : '') : 'โหมดออฟไลน์: เปิดเกมผ่านลิงก์ที่แชร์และเข้าสู่ระบบ claude.ai เพื่อเล่นกับผู้เล่นจริง';
 
 // chat: world channel and guild channel, messages live in each sender's own document
 let chatCh='w', chatDraft='';
@@ -2753,15 +2825,27 @@ document.addEventListener('click',e=>{
       case 'more': UI.more=!UI.more; render(); return;
       case 'stab': UI.stab=act.dataset.k; render(); return;
       case 'chathint': { const i=$('#chatin'); if(i&&!i.disabled){ chatDraft=act.dataset.t; i.value=chatDraft; i.focus() } else toast('เปิดในโหมดออนไลน์เพื่อแชต'); return }
-      case 'redeem': { const r=redeemCoupon($('#cpin').value); toast(r.msg); if(r.ok){ sfx('coin'); render() } return }
-      case 'cpunlock': { if(fnv32('coupon-admin:'+$('#cpadmin').value)===ADMIN_HASH){ UI.admin=true; render() } else toast('รหัสผู้ดูแลไม่ถูกต้อง'); return }
-      case 'cpgen': { const f=UI.cp; document.querySelectorAll('[data-cp]').forEach(i=>f[i.dataset.cp]=Math.max(0,+i.value||0));
+      case 'redeem': { const t=$('#cpin').value; if(SB&&NET.on){ act.disabled=true; redeemOnline(t).then(r=>{ toast(r.msg); if(r.ok){ sfx('coin'); render() } else act.disabled=false }); return } const r=redeemCoupon(t); toast(r.msg); if(r.ok){ sfx('coin'); render() } return }
+      case 'cpunlock': if(SB){ const pw=$('#cpadmin').value; SB.rpc('admin_list_coupons',{p_pass:pw}).then(({data,error})=>{ if(error){ toast('รหัสผ่านผู้ดูแลไม่ถูกต้อง'); return } UI.apass=pw; UI.clist=data; render() }); return }
+      {  if(fnv32('coupon-admin:'+$('#cpadmin').value)===ADMIN_HASH){ UI.admin=true; render() } else toast('รหัสผู้ดูแลไม่ถูกต้อง'); return }
+      case 'cpgen': if(SB){ const f=UI.cp; document.querySelectorAll('[data-cp]').forEach(i=>f[i.dataset.cp]=Math.max(0,+i.value||0)); f.custom=$('#cpcustom').value.trim(); f.note=$('#cpnote').value.trim();
+        const rw={gems:f.gems,gold:f.gold,exp:f.exp,tickets:f.tickets,potions:f.potions,chest:f.chest};
+        SB.rpc('admin_create_coupons',{p_pass:UI.apass,p_rewards:rw,p_count:f.n||1,p_max_uses:f.uses||1,p_days:f.days,p_note:f.note||null,p_code:f.custom||null}).then(async({data,error})=>{
+          if(error){ toast(error.message.includes('duplicate')?'มีโค้ดชื่อนี้แล้ว':error.message.includes('no rewards')?'ใส่ของรางวัลอย่างน้อย 1 อย่าง':'สร้างไม่สำเร็จ: '+error.message); return }
+          f.out=data.join('\n')+`\n(${couponText(rw)} · ใช้ได้ ${f.uses} คน/โค้ด${f.days?` · ${f.days} วัน`:''})`;
+          const l=await SB.rpc('admin_list_coupons',{p_pass:UI.apass}); if(!l.error) UI.clist=l.data; render() }); return }
+      {  const f=UI.cp; document.querySelectorAll('[data-cp]').forEach(i=>f[i.dataset.cp]=Math.max(0,+i.value||0));
         const until=f.days?cpDay(Date.now())+f.days:0, n=Math.max(1,Math.min(50,f.n)), base=Math.floor(Math.random()*256);
         f.out=Array.from({length:n},(_,i)=>makeCoupon({...f, until, nonce:(base+i)%256})).join('\n')+`\n(${couponText(f)}${until?` · ใช้ได้ถึง ${new Date(CP_EPOCH+until*864e5).toLocaleDateString('th-TH')}`:''})`;
         render(); return }
       case 'cpcopy': { const ta=$('#cpout'); ta.select(); (navigator.clipboard?.writeText(ta.value)||Promise.reject()).then(()=>toast('คัดลอกแล้ว')).catch(()=>{ try{document.execCommand('copy');toast('คัดลอกแล้ว')}catch(e){toast('กดค้างที่ช่องแล้วเลือกคัดลอก')} }); return }
       case 'shtab': UI.shtab=act.dataset.k; render(); return;
-      case 'savenow': save(); toast('บันทึกแล้ว'); render(); return;
+      case 'savenow': save(); if(SB) cloudSave().then(render); toast('บันทึกแล้ว'); render(); return;
+      case 'setname': { const n=$('#pnamein').value.trim().slice(0,24); if(!n) return toast('ใส่ชื่ออย่างน้อย 1 ตัวอักษร'); S.pname=n; save(); NET.lastJSON=''; syncSoon(); render(); toast('ตั้งชื่อแล้ว'); return }
+      case 'mktransfer': cloudSave().then(()=>SB.rpc('make_transfer_code')).then(({data,error})=>{ if(error) return toast('สร้างรหัสไม่สำเร็จ'); UI.tcode=data; render() }); return;
+      case 'claimtransfer': { const c=$('#tclaim').value.trim(); if(!c) return;
+        if(UI.ask!=='claim'){ UI.ask='claim'; UI.tc=c; render(); $('#tclaim').value=c; toast('แตะอีกครั้งเพื่อยืนยัน เกมในเครื่องนี้จะถูกแทนที่'); return }
+        UI.ask=null; SB.rpc('claim_transfer',{p_code:c}).then(({data,error})=>{ if(error||!data||data.v!==1) return toast('รหัสไม่ถูกต้องหรือหมดอายุ'); const nm=S.pname; S=migrate(data); S.pname=S.pname||nm; save(); render(); toast('ย้ายเซฟมาเครื่องนี้แล้ว') }); return }
       case 'slotsave': { const i=+act.dataset.i; try{ localStorage.setItem(SLOT_KEY(i),JSON.stringify({ts:Date.now(),data:S})); toast(`บันทึกลงช่อง ${i+1} แล้ว`) }catch(e){ toast('บันทึกไม่ได้ เบราว์เซอร์ไม่อนุญาต') } UI.ask=null; render(); return }
       case 'slotload': { const i=+act.dataset.i; if(UI.ask!==`load${i}`){ UI.ask=`load${i}`; render(); return }
         const x=slotInfo(i); UI.ask=null; if(x&&x.data&&x.data.v===1){ S=migrate(x.data); save(); toast(`โหลดช่อง ${i+1} แล้ว`) } render(); return }
