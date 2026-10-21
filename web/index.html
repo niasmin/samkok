@@ -640,6 +640,50 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 @keyframes pulse{50%{transform:scale(1.06);box-shadow:0 0 16px rgba(255,220,120,.9)}}
 .autohint{display:block;text-align:center;font-size:12px;color:var(--parchment-2)}
 .sk.ready{box-shadow:0 0 0 3px #fff3b0,0 0 18px var(--c);animation:pulse 1s ease-in-out infinite;cursor:pointer}
+
+/* mockup pass 4: ranking, formation, bag, tasks, shops, login, fishing */
+.evh{aspect-ratio:852/280;background-image:url(ui/sc-evrank.webp);margin-bottom:10px}
+.o-evt{left:33%;top:82%;width:34%;height:15%;border-radius:999px;background:#5a1008;color:#ffe9a8;font-weight:700;font-size:clamp(11px,3.3vw,14px)}
+.rklist{padding:8px}
+.rk{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:8px;padding:6px 10px;margin-bottom:6px;border-radius:8px;background:rgba(255,255,255,.45);border:1px solid rgba(160,120,60,.3);font-size:15px}
+.rk img{width:34px;height:38px;object-fit:cover;border-radius:6px}
+.rk .no{text-align:center;font-weight:700;background:rgba(160,120,60,.15);border-radius:6px;padding:3px 0}
+.rk .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk em{font-style:normal;font-weight:700;color:#2e7a3a;font-variant-numeric:tabular-nums}
+.rk.r1{background:linear-gradient(90deg,#ffe7a0,#fff2cc)}.rk.r2{background:linear-gradient(90deg,#dfe3ea,#f4f5f8)}.rk.r3{background:linear-gradient(90deg,#f6c9a8,#fde3d0)}
+.rk.me{outline:2px solid #c4321f;background:#ffe3d6}
+.formh{aspect-ratio:852/240;background-image:url(ui/sc-formation.webp);margin:12px 0 10px}
+.bagh{aspect-ratio:852/310;background-image:url(ui/sc-bag.webp);margin-bottom:10px}
+.o-bback{left:3.5%;top:84%;width:24%;height:14%;border-radius:999px;background:#4a120a;border:1.5px solid #d4a446;color:#ffe9a8;font-weight:700;font-size:clamp(10px,3vw,13px);white-space:nowrap}
+.item.big{grid-template-columns:84px 1fr auto}
+.item.big img.ic{width:84px;height:68px;object-fit:cover;padding:0;border-radius:10px}
+.gearempty{aspect-ratio:755/365;background:url(ui/empty-gear.webp) center/cover;border-radius:12px;border:2px solid var(--gold);padding:0}
+.taskh{aspect-ratio:852/460;background-image:url(ui/sc-tasks.webp);margin-bottom:10px}
+.task{grid-template-columns:64px 1fr auto}
+.task .tki{grid-row:1/3;width:60px;height:60px;border-radius:50%;object-fit:cover}
+.task.all .tki{border-radius:8px;object-fit:contain}
+.task.all{background:linear-gradient(180deg,#7a1e14,#4a0e08);color:#ffe9a8;border-color:var(--gold)}
+.task.all small{color:#f2d88e}
+.shtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:-4px 0 10px}
+.shtabs button{padding:9px;border-radius:10px 10px 4px 4px;font:16px var(--f-display);color:#f2d88e;background:linear-gradient(180deg,#5a1a12,#3a0e08);border:2px solid rgba(212,164,70,.6)}
+.shtabs button[aria-pressed="true"]{color:#4a1a08;background:linear-gradient(180deg,#fff3d0,#f0d48a);border-color:var(--gold)}
+.shoph{aspect-ratio:852/310;background-image:url(ui/sc-shop.webp);margin-bottom:10px}
+.fshoph{aspect-ratio:852/455;background-image:url(ui/sc-fshop.webp);margin-bottom:10px}
+.o-fpts{right:3%;bottom:4%;width:26%;aspect-ratio:1;flex-direction:column;border-radius:50%;background:radial-gradient(circle,#8a1e14,#4a0e08);border:3px solid #d4a446;color:#ffe9a8;font-size:clamp(10px,2.8vw,12px);font-weight:700}
+.o-fpts b{font:clamp(20px,6vw,28px) var(--f-display)}
+.loginh{aspect-ratio:852/415;background-image:url(ui/sc-login.webp);margin-bottom:10px}
+.days{grid-template-columns:repeat(3,minmax(0,1fr))}
+.day{background:linear-gradient(180deg,#fff8e8,#f4e2bf);font-size:13px;padding:0 6px 8px;overflow:hidden}
+.day>b{align-self:stretch;margin:0 -6px;padding:4px 0;background:linear-gradient(180deg,#9a2418,#6a120a);color:#ffe9a8}
+.day .dimg{width:100%;height:62px;object-fit:contain}
+.day.big{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;column-gap:10px;align-items:center}
+.day.big>b{grid-column:1/-1}.day.big .dimg{grid-row:2/4;height:96px}
+.day.ready{box-shadow:0 0 0 3px #ffd36a,0 0 16px rgba(255,200,90,.8)}
+.pond.pic{aspect-ratio:852/677;background-image:url(ui/sc-fish.webp)}
+.fishrow{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(160,120,60,.3)}
+.fishrow img{width:96px;height:44px;object-fit:contain}
+.fishrow b{display:block;font-size:15px}.fishrow small{font-size:13px;color:var(--muted)}
+.fishrow>span{font-size:13px;background:rgba(160,120,60,.15);border-radius:8px;padding:4px 8px;white-space:nowrap}
 </style>
 
 <div id="app">
@@ -1331,7 +1375,7 @@ function viewFormation(){
   const fig=i=>{const id=S.team[i]; return id?`<button class="fig f${i}" data-hero="${id}"><span class="lvb">Lv.${S.heroes[id].lv}</span>${portrait(id,isMech(id))}</button>`:''};
   return `${heroTabs()}
   <div class="tstage">${[3,4,5,0,1,2].map(fig).join('')}<div class="tpow">⚔ พลังทัพ ${fmt(teamPower())}</div></div>
-  <h1 class="h" style="margin-top:14px">จัดทีมขุนพล <span class="sub">แตะขุนพลในหน้า “ขุนพล” เพื่อส่งลงทัพ</span></h1>
+  <div class="pic formh"><h1 class="vh">จัดทีมขุนพล</h1></div>
   <div class="rowlabel">แถวหน้า 3 ช่อง · รับดาบก่อน เหมาะกับนักรบและทหารม้า</div>
   <div class="slots front">${slot(0)}${slot(1)}${slot(2)}</div>
   <div class="rowlabel">แถวหลัง 3 ช่อง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
@@ -1362,7 +1406,7 @@ function eventLeft(){
   const ms=end-d; return `เหลือ ${Math.floor(ms/864e5)}วัน${Math.floor(ms%864e5/36e5)}ชม.`;
 }
 
-const UI={more:false, stab:'hi'};
+const UI={more:false, stab:'hi', shtab:'gen'};
 function viewCity(){
   const goal=Math.ceil(S.tower/10)*10, ev=curEvent();
   const dot=c=>c?'<span class="dot"></span>':'';
@@ -1514,17 +1558,16 @@ function viewBag(){
   const n=S.bag.selSP||0;
   const free=S.gear.filter(g=>!gearOwner(g.uid)).sort((a,b)=>gearScore(b)-gearScore(a));
   const low=free.filter(g=>g.q<=1).length;
-  return `${back()}
-  <h1 class="h">กระเป๋า</h1>
-  ${n?`<div class="panel item"><span class="ic">选</span><div><b>หีบเลือกขุนพล S+ ×${n}</b><p>เปิดแล้วเลือกรับขุนพล S+ 1 คน ถ้ามีแล้วจะได้เป็นสำเนาไว้เลื่อนดาว</p></div>
+  return `<div class="pic bagh"><h1 class="vh">กระเป๋า</h1><button class="ov o-bback" data-go="city">‹ กลับเมืองหลัก</button></div>
+  ${n?`<div class="panel item big"><img class="ic" src="ui/it-selchest.webp" alt=""><div><b>หีบเลือกขุนพล S+ ×${n}</b><p>เปิดแล้วเลือกรับขุนพล S+ 1 คน ถ้ามีแล้วจะได้เป็นสำเนาไว้เลื่อนดาว</p></div>
     <button class="btn" data-act="opensel">ใช้</button></div>`:''}
-  <div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#c9a8ff,#5a3a9a)">药</span><div><b>ยา EXP ×${S.potions}</b><p>ใช้แล้วได้ EXP ขวดละ ${POTION_EXP} ได้จากการผ่านด่าน รางวัลออฟไลน์ และร้านมิตรภาพ</p></div>
+  <div class="panel item big"><img class="ic" src="ui/it-potion.webp" alt=""><div><b>ยา EXP ×${S.potions}</b><p>ใช้แล้วได้ EXP ขวดละ ${POTION_EXP} ได้จากการผ่านด่าน รางวัลออฟไลน์ และร้านมิตรภาพ</p></div>
     <button class="btn" data-act="potion" ${S.potions?'':'disabled'}>ใช้ทั้งหมด</button></div>
   ${shardHTML()}
   <div class="row" style="margin:6px 0"><b>อุปกรณ์ที่ยังไม่ได้สวม ${free.length} ชิ้น</b>
     <button class="btn ghost small" data-act="salvagelow" ${low?'':'disabled'}>แยกชิ้นส่วนธรรมดา/ดี (${low})</button></div>
   ${free.length?`<div class="glist">${free.map(g=>gearRow(g,`<button class="btn ghost small" style="color:var(--on-parch)" data-act="salvage" data-uid="${g.uid}">แยก +${fmt(salvageValue(g))}</button>`)).join('')}</div>`
-    :`<div class="empty">ยังไม่มีอุปกรณ์ว่าง ได้จากการผ่านด่าน หอท้าขุนพล และร้านค้า</div>`}`;
+    :`<div class="empty gearempty" role="img" aria-label="ยังไม่มีอุปกรณ์ว่าง ได้จากการผ่านด่าน หอท้าขุนพล และร้านค้า"></div>`}`;
 }
 const salvageValue = g => Math.round(200*(g.q+1)*(1+g.il/20)*(1+g.enh*0.5));
 
@@ -1684,13 +1727,13 @@ let fishG=null, fishMsg='โยนเบ็ดแล้วกด “ดึงเ
 function viewFish(){
   const z=fishG?.zone??40, w=fishG?.w??22;
   return `${back()}
-  <h1 class="h">บ่อตกปลา</h1>
-  <div class="pond">${fishG?'<span class="line"></span><span class="bob"></span>':''}<div class="msg" id="fmsg">${esc(fishMsg)}</div></div>
+  <h1 class="vh">บ่อตกปลา</h1>
+  <div class="pond pic">${fishG?'<span class="line"></span><span class="bob"></span>':''}<div class="msg" id="fmsg">${esc(fishMsg)}</div></div>
   <div class="fishbar" aria-hidden="true"><span class="zone" style="left:${z}%;width:${w}%"></span><span class="mark" id="fmark" style="left:${fishG?.pos??0}%"></span></div>
   ${fishG?`<button class="btn red" style="width:100%;font:20px var(--f-display);padding:12px" data-act="pull">ดึงเบ็ด!</button>`
     :`<button class="btn" style="width:100%;font:20px var(--f-display);padding:12px" data-act="cast" ${S.fishing.casts<1?'disabled':''}>โยนเบ็ด (เหลือ ${S.fishing.casts} ครั้ง)</button>`}
   <div class="panel rates" style="margin-top:12px">
-    ${FISH.map((f,i)=>`<div>${f.th}: ${f.pts} แต้ม${f.gems?` + หยก ${f.gems}`:''} · จับได้แล้ว <b>${S.fishing.log[i]}</b></div>`).join('')}
+    ${FISH.map((f,i)=>`<div class="fishrow"><img src="ui/fish-${i}.webp" alt=""><div><b>${f.th}</b><small>${f.pts} แต้ม${f.gems?` + หยก ${f.gems}`:''}</small></div><span>จับได้แล้ว <b>${S.fishing.log[i]}</b></span></div>`).join('')}
     <div style="margin-top:4px">ตกได้วันละ 5 ครั้ง ซื้อเหยื่อเพิ่มได้ที่ร้านค้า แต้มปลาใช้เลี้ยงสัตว์เทพ</div></div>`;
 }
 function fishLoop(){
@@ -1957,10 +2000,10 @@ const evReward = r => r<=1?{gems:1000,chest:1}:r<=3?{gems:600}:r<=10?{gems:300}:
 function viewEvRank(){
   const rows=evBoard(), myRank=rows.findIndex(r=>r.me)+1, rw=evReward(myRank), lastDay=new Date().getDay()===0;
   return `${back()}
-  <h1 class="h">อันดับกิจกรรมสัปดาห์ <span class="sub">${eventLeft()}</span></h1>
+  <div class="pic evh"><h1 class="vh">อันดับกิจกรรมสัปดาห์</h1><span class="ov o-evt">⏱ ${eventLeft()}</span></div>
   <div class="arena-top"><div><b>${myRank}</b><span>อันดับของท่าน</span></div><div><b>${fmt(S.evw.pts)}</b><span>แต้มสัปดาห์นี้</span></div><div><b>${fmt(rw.gems)}</b><span>หยกถ้าจบตอนนี้</span></div></div>
-  <div class="panel rates">${rows.slice(0,15).map((r,i)=>`<div class="bond ${r.me?'on':''}" style="opacity:1"><span>${i+1}. ${esc(r.name)}${r.real?' (ผู้เล่น)':''}</span><em>${fmt(r.pts)}</em></div>`).join('')}
-    ${myRank>15?`<div class="bond on" style="opacity:1"><span>${myRank}. ท่าน</span><em>${fmt(S.evw.pts)}</em></div>`:''}</div>
+  <div class="panel rklist">${rows.slice(0,15).map((r,i)=>`<div class="rk r${i+1} ${r.me?'me':''}">${i<3?`<img src="ui/medal${i+1}.webp" alt="อันดับ ${i+1}">`:`<span class="no">${i+1}.</span>`}<span class="nm">${esc(r.name)}${r.real?' (ผู้เล่น)':''}</span><em>${fmt(r.pts)}</em></div>`).join('')}
+    ${myRank>15?`<div class="rk me"><span class="no">${myRank}.</span><span class="nm">ท่าน</span><em>${fmt(S.evw.pts)}</em></div>`:''}</div>
   <button class="btn red" style="width:100%;margin-top:10px" data-act="evclaim" ${lastDay&&!S.evw.claimed?'':'disabled'}>${S.evw.claimed?'รับรางวัลสัปดาห์นี้แล้ว':lastDay?`รับรางวัลอันดับ ${myRank}`:'รับรางวัลได้วันอาทิตย์'}</button>
   <div class="note">แต้มได้จาก: ผ่านด่าน +10 · หอท้า +15 · เนื้อเรื่อง +10 · ชนะประลอง +10 · ตีบอสกิลด์ +5 · ลานฝึก +5 · อัญเชิญ +5 ต่อครั้ง · รางวัล: อันดับ 1 หยก 1,000 + หีบเลือก S+ · อันดับ 2–3 หยก 600 · 4–10 หยก 300 · อื่น ๆ 100 · คู่แข่งที่ไม่ได้ระบุว่าเป็นผู้เล่นคือ NPC</div>`;
 }
@@ -1969,9 +2012,9 @@ function viewEvRank(){
 function viewLogin(){
   const label=r=>r.gems?`หยก ${r.gems}`:r.tickets?`ตั๋วทะลวง ${r.tickets}`:r.gold?`เงิน ${fmt(r.gold)}`:r.fish?`ปลา ${r.fish} แต้ม`:r.exp?`EXP ${fmt(r.exp)}`:'หีบเลือกขุนพล S+';
   return `${back()}
-  <h1 class="h">ของขวัญเข้าเกม 7 วัน</h1>
+  <div class="pic loginh"><h1 class="vh">ของขวัญเข้าเกม 7 วัน</h1></div>
   <div class="days">${LOGIN7.map((r,i)=>{const got=S.login.got.includes(i), ready=i<S.login.days&&!got;
-    return `<div class="day ${got?'got':ready?'ready':''} ${i===6?'big':''}"><b>วันที่ ${i+1}</b><span>${label(r)}</span>
+    return `<div class="day ${got?'got':ready?'ready':''} ${i===6?'big':''}"><b>วันที่ ${i+1}</b><img class="dimg" src="ui/lg-${i}.webp" alt=""><span>${label(r)}</span>
       ${got?'<span>รับแล้ว</span>':ready?`<button class="btn" data-act="loginclaim" data-i="${i}">รับ</button>`:'<span>ยังไม่ถึง</span>'}</div>`}).join('')}</div>
   <div class="note">เข้าเกมวันละครั้งเพื่อปลดล็อกวันถัดไป ตอนนี้ปลดล็อกแล้ว ${S.login.days} วัน</div>`;
 }
@@ -1986,15 +2029,20 @@ const SHOP = [
 ];
 const cityHead=(t,x0,y0,x1,y1)=>`<div class="shead" style="height:auto;aspect-ratio:${x1-x0}/${y1-y0};background:url(ui/city.webp) ${(x0/(852-(x1-x0))*100).toFixed(1)}% ${(y0/(1105-(y1-y0))*100).toFixed(1)}%/${(852/(x1-x0)*100).toFixed(1)}% auto no-repeat"><h1 class="vh">${t}</h1></div>`;
 function viewShop(){
-  return `${back()}
-  ${cityHead('ร้านค้า',0,500,440,700)}
-  ${SHOP.map(it=>{const c=it.cost, ok=(c.gold||0)<=S.gold&&(c.gems||0)<=S.gems;
-    return `<div class="panel item"><span class="ic">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
-      <button class="btn" data-act="buy" data-k="${it.k}" ${ok?'':'disabled'}><span style="display:flex;gap:4px;align-items:center"><i class="coin ${c.gold?'g':'j'}"></i>${fmt(c.gold||c.gems)}</span></button></div>`}).join('')}
-  <h2 class="h" style="font-size:17px;margin-top:16px">ร้านมิตรภาพ <span class="sub">แต้มมิตรภาพ ${fmt(S.friend)}</span></h2>
+  const fr=UI.shtab==='friend';
+  const tabs=`<div class="shtabs"><button data-act="shtab" data-k="gen" aria-pressed="${!fr}">ทั่วไป</button><button data-act="shtab" data-k="friend" aria-pressed="${fr}">มิตรภาพ</button></div>`;
+  if(fr) return `${back()}
+  <div class="pic fshoph"><h1 class="vh">ร้านมิตรภาพ</h1><div class="ov o-fpts"><span>แต้มมิตรภาพ</span><b>${fmt(S.friend)}</b></div></div>
+  ${tabs}
   ${FSHOP.map(it=>`<div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#ffb0c8,#c4325a)">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
     <button class="btn" data-act="fbuy" data-k="${it.k}" ${S.friend<it.cost?'disabled':''}>${it.cost} แต้ม</button></div>`).join('')}
   <div class="note">แต้มมิตรภาพได้จากชนะประลอง (+10) เช็กอินกิลด์ (+20) และตีบอสกิลด์ (+10) ทุกอย่างในเกมใช้เงิน หยก หรือแต้มในเกมเท่านั้น</div>`;
+  return `${back()}
+  <div class="pic shoph"><h1 class="vh">ร้านค้า</h1></div>
+  ${tabs}
+  ${SHOP.map(it=>{const c=it.cost, ok=(c.gold||0)<=S.gold&&(c.gems||0)<=S.gems;
+    return `<div class="panel item big"><img class="ic" src="ui/sh-${it.k}.webp" alt=""><div><b>${it.th}</b><p>${it.desc}</p></div>
+      <button class="btn" data-act="buy" data-k="${it.k}" ${ok?'':'disabled'}><span style="display:flex;gap:4px;align-items:center"><i class="coin ${c.gold?'g':'j'}"></i>${fmt(c.gold||c.gems)}</span></button></div>`}).join('')}`;
 }
 const FSHOP = [
   {k:'fpot',  th:'ยา EXP ×5',         ch:'药', desc:'ได้ EXP รวม 2,500',             cost:15, give:{potions:5}},
@@ -2098,14 +2146,14 @@ function shrinePull(n){
 
 function viewTasks(){
   const row=(t)=>{const v=Math.min(S.daily[t.k],t.goal), got=S.daily.got[t.k];
-    return `<div class="panel task ${got?'done':''}"><b>${t.th} ${t.goal} ครั้ง</b>
+    return `<div class="panel task ${got?'done':''}"><img class="tki" src="ui/tk-${t.k}.webp" alt=""><b>${t.th} ${t.goal} ครั้ง</b>
       <button class="btn" data-act="task" data-k="${t.k}" ${!taskDone(t)||got?'disabled':''}>${got?'รับแล้ว':`+${t.gems} หยก`}</button>
       <div><div class="bar"><i style="width:${v/t.goal*100}%"></i></div><small>${v}/${t.goal}</small></div></div>`};
   const allGot=S.daily.got.all, n=TASKS.filter(taskDone).length;
   return `${back()}
-  <h1 class="h">ภารกิจรายวัน</h1>
+  <div class="pic taskh"><h1 class="vh">ภารกิจรายวัน</h1></div>
   ${TASKS.map(row).join('')}
-  <div class="panel task ${allGot?'done':''}"><b>ทำภารกิจครบทุกข้อ</b>
+  <div class="panel task all ${allGot?'done':''}"><img class="tki" src="ui/tk-all.webp" alt=""><b>ทำภารกิจครบทุกข้อ</b>
     <button class="btn red" data-act="task" data-k="all" ${!allDone()||allGot?'disabled':''}>${allGot?'รับแล้ว':'+300 หยก'}</button>
     <div><div class="bar"><i style="width:${n/TASKS.length*100}%"></i></div><small>${n}/${TASKS.length}</small></div></div>
   <div class="note">ภารกิจรีเซ็ตทุกวันตอนเที่ยงคืนตามเวลาเครื่องของท่าน</div>
@@ -2457,6 +2505,7 @@ document.addEventListener('click',e=>{
       case 'close': closeLayer(); return;
       case 'more': UI.more=!UI.more; render(); return;
       case 'stab': UI.stab=act.dataset.k; render(); return;
+      case 'shtab': UI.shtab=act.dataset.k; render(); return;
       case 'afk': { sfx('coin'); const r=afkNow(); S.gold+=r.gold; S.exp+=r.exp; S.gems+=r.gems; S.potions+=Math.floor(r.mins/120); S.afkSince=Date.now(); S.daily.afk++; save(); render(); toast(`เก็บแล้ว เงิน +${fmt(r.gold)} · EXP +${fmt(r.exp)}${r.gems?` · หยก +${r.gems}`:''}`); return }
       case 'fight': fight(); return;
       case 'autosk': S.autoSkill=S.autoSkill===false; save(); act.setAttribute('aria-pressed',S.autoSkill); act.querySelector('b').textContent=S.autoSkill?'ON':'OFF';
