@@ -487,6 +487,9 @@ img.art{display:block;width:100%;height:100%;object-fit:cover;object-position:50
 .region.cur .rch{animation:tutpulse 1.4s infinite;outline:3px solid #ffe066}
 .region.lock{opacity:.45;filter:grayscale(1)}
 
+/* phase 10 */
+.tagx{font-size:9px;font-weight:700;color:#06333d;background:#ffe066;border-radius:3px;padding:0 3px;margin-right:2px}
+
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(26,17,12,.94);border:1px solid var(--gold);color:var(--parchment);padding:8px 14px;border-radius:999px;font-size:13px;z-index:40;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
@@ -509,8 +512,8 @@ img.art{display:block;width:100%;height:100%;object-fit:cover;object-position:50
   <nav id="nav" aria-label="เมนูหลัก">
     <button data-go="city"><i>城</i>เมืองหลัก</button>
     <button data-go="heroes"><i>将</i>ขุนพล</button>
-    <button data-go="summon"><i>召</i>อัญเชิญ</button>
-    <button data-go="team"><i>阵</i>จัดทัพ</button>
+    <button data-go="team"><i>援</i>ช่วยสู้</button>
+    <button data-go="train"><i>练</i>ฝึกฝน</button>
     <button data-go="camp"><i>战</i>พิชิตศึก</button>
   </nav>
 </div>
@@ -832,14 +835,15 @@ function freshState(){
     arena:{pts:1000, date:'', left:5, claimed:false, ref:1},
     login:{days:0, last:'', got:[]},
     guild:{id:null, date:'', checked:false, raid:3, best:0, coins:0, lv:1, exp:0},
-    story:{}, potions:3, friend:0
+    story:{}, potions:3, friend:0,
+    assist:{date:'', uses:3, pick:null}, train:{date:'', left:3}, evw:{week:0, pts:0, claimed:false}
   };
 }
 let S;
 // fills fields added after a save was made, so older saves keep working
 function migrate(d){
   const f=freshState();
-  for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story','potions','friend']) if(d[k]===undefined) d[k]=f[k];
+  for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story','potions','friend','assist','train','evw']) if(d[k]===undefined) d[k]=f[k];
   if(!d.bag) d.bag={selSP:1};
   if(d.tut===undefined) d.tut=99;          // saves from before the tutorial skip it
   if(!d.shards) d.shards={};
@@ -885,6 +889,7 @@ function placeInTeam(id){
 }
 // ยา EXP: an item that turns into hero EXP when used; แต้มมิตรภาพ: earned with other players, spent in its own shop.
 const POTION_EXP = 500;
+const addEv = n => { S.evw.pts+=n };
 const bagCount = () => Object.values(S.bag).reduce((a,b)=>a+b,0);
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){} syncSoon()}
 function checkDaily(){
@@ -893,6 +898,9 @@ function checkDaily(){
   if(S.fishing.date!==d) S.fishing={...S.fishing, date:d, casts:5};
   if(S.arena.date!==d) S.arena={...S.arena, date:d, left:5, claimed:false};
   if(S.login.last!==d){ S.login.days=Math.min(7,S.login.days+1); S.login.last=d }
+  if(S.assist.date!==d) S.assist={date:d, uses:3, pick:null};
+  if(S.train.date!==d) S.train={date:d, left:3};
+  if(S.evw.week!==weekNo()) S.evw={week:weekNo(), pts:0, claimed:false};
   if(S.guild.date!==d) S.guild={...S.guild, date:d, checked:false, raid:3, best:0};
 }
 const loginReady = () => LOGIN7.some((_,i)=>i<S.login.days && !S.login.got.includes(i));
@@ -1050,7 +1058,7 @@ function renderTop(){
   document.querySelectorAll('#nav button').forEach(b=>{
     b.setAttribute('aria-current', b.dataset.go===tab?'page':'false');
     b.querySelector('.dot')?.remove();
-    const need = (b.dataset.go==='city' && (tasksClaimable() || bagCount()>0 || loginReady())) || (b.dataset.go==='summon' && S.freeDate!==today()) || (b.dataset.go==='camp' && afkNow().mins>=60);
+    const need = (b.dataset.go==='city' && (tasksClaimable() || bagCount()>0 || loginReady())) || (b.dataset.go==='city' && S.freeDate!==today()) || (b.dataset.go==='train' && S.train.left>0) || (b.dataset.go==='camp' && afkNow().mins>=60);
     if(need) b.insertAdjacentHTML('beforeend','<span class="dot"></span>');
   });
 }
@@ -1170,7 +1178,8 @@ function viewTeam(){
   const slot=i=>{const id=S.team[i]; return id?cardHTML(id,{team:false}):`<button class="slot-empty" data-act="pickslot" data-slot="${i}">ว่าง<br>แตะขุนพลในหน้า “ขุนพล”</button>`};
   const facs={}; S.team.filter(Boolean).forEach(id=>facs[HERO[id].fac]=(facs[HERO[id].fac]||0)+1);
   return `
-  <h1 class="h">จัดทัพ <span class="sub">พลังรวม ${fmt(teamPower())}</span></h1>
+  ${assistHTML()}
+  <h1 class="h" style="margin-top:14px">จัดทัพ <span class="sub">พลังรวม ${fmt(teamPower())}</span></h1>
   <div class="rowlabel">แถวหน้า 3 ช่อง · รับดาบก่อน เหมาะกับนักรบและทหารม้า</div>
   <div class="slots front">${slot(0)}${slot(1)}${slot(2)}</div>
   <div class="rowlabel">แถวหลัง 3 ช่อง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
@@ -1208,6 +1217,8 @@ function viewCity(){
     <button class="evt" data-go="tasks"><i>令</i>ภารกิจ<small>${TASKS.filter(taskDone).length}/${TASKS.length}</small>${tasksClaimable()?'<span class="dot"></span>':''}</button>
     <button class="evt" data-go="bag"><i>囊</i>กระเป๋า<small>${S.gear.length} ชิ้น</small>${bagCount()?'<span class="dot"></span>':''}</button>
     <button class="evt" data-go="team"><i>阵</i>ค่ายทัพ<small>${fmt(teamPower())}</small></button>
+    <button class="evt" data-go="summon"><i>召</i>อัญเชิญ<small>${S.freeDate!==today()?'ฟรีวันนี้':`หยก ${fmt(S.gems)}`}</small>${S.freeDate!==today()?'<span class="dot"></span>':''}</button>
+    <button class="evt" data-go="evrank"><i>榜</i>อันดับ<small>${fmt(S.evw.pts)} แต้ม</small></button>
     <button class="evt" data-go="story"><i>史</i>เนื้อเรื่อง<small>${Object.keys(S.story).length}/${STORY.length*3}</small></button>
     <button class="evt" data-go="chat"><i>话</i>แชต<small>${NET.room?`ออนไลน์ ${NET.online.length}`:'ออฟไลน์'}</small></button>
     <button class="evt" data-go="guild"><i>盟</i>กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
@@ -1360,7 +1371,7 @@ const realPlayers = () => Object.entries(NET.players).filter(([id,d])=>id!==NET.
 const pname = id => (NET.names[id]?.name) || 'ขุนพลนิรนาม';
 function myDoc(){
   return {v:1, team:S.team.map(id=>id?{id, lv:H(id).lv, star:H(id).star, aw:H(id).aw, bonus:heroBonus(id)}:null), power:teamPower(),
-    pts:S.arena.pts, guild:S.guild.id, glv:S.guild.lv, raid:S.guild.best, rdate:S.guild.date, msgs:NET.msgs.slice(-6), hits:NET.hits.slice(-8)};
+    pts:S.arena.pts, evw:S.evw.week, evp:S.evw.pts, guild:S.guild.id, glv:S.guild.lv, raid:S.guild.best, rdate:S.guild.date, msgs:NET.msgs.slice(-6), hits:NET.hits.slice(-8)};
 }
 function syncSoon(){
   if(!NET.on || NET.ro || !NET.loaded) return;
@@ -1713,6 +1724,77 @@ function toggleSound(){
   if(SND.on) setMusic(B&&!B.done?'battle':'city'); else { clearInterval(SND.timer); SND.timer=0 }
 }
 
+// ---------- assist (ช่วยสู้): borrow one general a day-slot at a time ----------
+function assistOptions(){
+  const opts=[];
+  for(const p of realPlayers()){
+    const best=(p.team||[]).filter(x=>x&&HERO[x.id]).sort((a,b)=>power(b.id,b.lv,b.star,b.aw)-power(a.id,a.lv,a.star,a.aw))[0];
+    if(best) opts.push({src:pname(p.uid), real:true, e:{id:best.id, lv:+best.lv||1, star:+best.star||1, aw:+best.aw||0, bonus:best.bonus||{}}});
+  }
+  // NPC lords lend a general a little stronger than the team
+  const lv=Math.max(1,Math.round(avgTeamLv()*1.1)), rnd=mulberry32(hashStr(today())+7);
+  for(let i=0;i<4-Math.min(2,opts.length);i++){
+    const bot=BOTS[Math.floor(rnd()*BOTS.length)], pool=HEROES.filter(h=>h.rar!=='SP'), h=pool[Math.floor(rnd()*pool.length)];
+    const star=Math.min(5,Math.max(1,Math.ceil(lv/100)));
+    opts.push({src:bot.name, real:false, e:{id:h.id, lv, star, aw:0}});
+  }
+  return opts.slice(0,6);
+}
+let ASSIST_OPTS=null;
+function assistHTML(){
+  ASSIST_OPTS=assistOptions();
+  const pk=S.assist.pick, free=S.team.filter(x=>!x).length;
+  return `<h1 class="h">ช่วยสู้ <span class="sub">ใช้ได้อีก ${S.assist.uses}/3 ครั้งวันนี้</span></h1>
+  <div class="note" style="margin-top:-6px">ยืมขุนพลจาก${NET.on?'ผู้เล่นคนอื่นหรือ':''}เจ้าเมือง NPC มาเข้าช่องที่ว่างในทัพ ใช้ได้ในด่านพิชิตศึก หอท้า และเนื้อเรื่อง ${free?`ตอนนี้ทัพว่าง ${free} ช่อง`:'<b>ทัพเต็มแล้ว ถอนขุนพลออก 1 คนเพื่อเปิดช่อง</b>'}</div>
+  ${pk?`<div class="panel item"><span class="tok ${HERO[pk.id].fac}" style="width:56px;height:56px">${portrait(pk.id)}</span><div><b>${esc(HERO[pk.id].th)} Lv.${pk.lv}</b><p>ยืมแล้ว จะร่วมรบอีก ${S.assist.uses} ครั้งวันนี้</p></div>
+    <button class="btn ghost small" style="color:var(--on-parch)" data-act="assistclear">คืน</button></div>`
+  :`<div class="glist">${ASSIST_OPTS.map((o,i)=>{const h=HERO[o.e.id]; return `<div class="grow shard" style="--q:var(--${h.fac})">${tok(o.e.id,'',false)}
+      <div><b>${esc(h.th)} <small>${RAR[h.rar].label} · Lv.${o.e.lv}</small></b><p>จาก ${esc(o.src)}${o.real?' (ผู้เล่น)':''} · พลัง ${fmt(power(o.e.id,o.e.lv,o.e.star,o.e.aw))}</p></div>
+      <div class="acts"><button class="btn small" data-act="assistpick" data-i="${i}" ${S.assist.uses<1?'disabled':''}>ยืม</button></div></div>`}).join('')}</div>`}`;
+}
+
+// ---------- training ground (ฝึกฝน) ----------
+function trainTeam(){
+  const lv=Math.max(1,Math.round(avgTeamLv())), rnd=mulberry32(hashStr(today())+S.train.left);
+  const ids=pickTeam(rnd, HEROES.filter(h=>h.rar==='A').map(h=>h.id));
+  return ids.map(id=>({id, lv, star:Math.min(5,Math.max(1,Math.ceil(lv/100))), aw:0, bonus:{hpPct:-.25, atkPct:-.25}}));
+}
+function viewTrain(){
+  const team=S.team.filter(Boolean);
+  const row=id=>{const h=H(id), cap=levelCap(h.star,h.aw), c=lvCost(h.lv,HERO[id].role), sc=starCost(h.star), ac=awCost(h.aw);
+    const canLv=h.lv<cap&&S.gold>=c.gold&&S.exp>=c.exp, canSt=h.star<5&&h.copies>=sc.copies&&S.gold>=sc.gold, canAw=h.star>=5&&h.aw<5&&(S.souls[id]||0)>=ac.soul&&S.gold>=ac.gold;
+    return `<div class="grow shard" style="--q:var(--${HERO[id].fac})">${tok(id)}<div><b>${esc(HERO[id].th)} <small>Lv.${h.lv}/${cap} · ${h.aw?'☾'.repeat(h.aw):'★'.repeat(h.star)}</small></b>
+      <p>เลื่อนระดับ: เงิน ${fmt(c.gold)} · EXP ${fmt(c.exp)}${canSt?' · <b style="color:var(--shu)">เลื่อนดาวได้</b>':''}${canAw?' · <b style="color:var(--wu)">ตื่นจิตได้</b>':''}</p></div>
+      <div class="acts"><button class="btn small" data-act="lvup" data-id="${id}" ${canLv?'':'disabled'}>+1</button><button class="btn small" data-act="lvup10" data-id="${id}" ${canLv?'':'disabled'}>+10</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="hero" data-id="${id}">ดู</button></div></div>`};
+  return `<h1 class="h">ฝึกฝน</h1>
+  <div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#9ad48a,#2e6a32)">练</span><div><b>ลานฝึก ${S.train.left}/3 รอบวันนี้</b><p>ซ้อมรบกับหุ่นฝึกระดับเดียวกับทัพ ชนะได้ยา EXP 3 ขวดและ EXP ตามเลเวลทัพ แพ้ก็ยังได้ยา 1 ขวด</p></div>
+    <button class="btn red" data-act="train" ${S.train.left?'':'disabled'}>ฝึก</button></div>
+  <div class="row" style="margin:10px 0 6px"><b>ขุนพลในทัพ ${team.length} คน</b>
+    <span style="display:flex;gap:6px"><button class="btn small" data-act="lvall">เลื่อนระดับทั้งทัพ</button><button class="btn ghost small" data-act="gearall">สวมอุปกรณ์ทั้งทัพ</button></span></div>
+  <div class="glist">${team.map(row).join('')}</div>
+  <div class="note">เงิน ${fmt(S.gold)} · EXP ${fmt(S.exp)} · ยา EXP ${S.potions} ขวด (ใช้ได้ในกระเป๋า)</div>`;
+}
+
+// ---------- weekly event ranking ----------
+function evBoard(){
+  const wk=weekNo(), rnd=mulberry32(wk*977+3), d=new Date(), dayFrac=Math.min(1,((d.getDay()+6)%7+d.getHours()/24)/7+0.05);
+  const rows=BOTS.slice(0,20).map((b,i)=>({name:b.name, pts:Math.round((900-i*35)*(0.6+rnd()*0.8)*dayFrac)}));
+  for(const p of realPlayers()) if(p.evw===wk) rows.push({name:pname(p.uid), pts:+p.evp||0, real:true});
+  rows.push({name:'ท่าน', pts:S.evw.pts, me:true});
+  return rows.sort((a,b)=>b.pts-a.pts);
+}
+const evReward = r => r<=1?{gems:1000,chest:1}:r<=3?{gems:600}:r<=10?{gems:300}:{gems:100};
+function viewEvRank(){
+  const rows=evBoard(), myRank=rows.findIndex(r=>r.me)+1, rw=evReward(myRank), lastDay=new Date().getDay()===0;
+  return `${back()}
+  <h1 class="h">อันดับกิจกรรมสัปดาห์ <span class="sub">${eventLeft()}</span></h1>
+  <div class="arena-top"><div><b>${myRank}</b><span>อันดับของท่าน</span></div><div><b>${fmt(S.evw.pts)}</b><span>แต้มสัปดาห์นี้</span></div><div><b>${fmt(rw.gems)}</b><span>หยกถ้าจบตอนนี้</span></div></div>
+  <div class="panel rates">${rows.slice(0,15).map((r,i)=>`<div class="bond ${r.me?'on':''}" style="opacity:1"><span>${i+1}. ${esc(r.name)}${r.real?' (ผู้เล่น)':''}</span><em>${fmt(r.pts)}</em></div>`).join('')}
+    ${myRank>15?`<div class="bond on" style="opacity:1"><span>${myRank}. ท่าน</span><em>${fmt(S.evw.pts)}</em></div>`:''}</div>
+  <button class="btn red" style="width:100%;margin-top:10px" data-act="evclaim" ${lastDay&&!S.evw.claimed?'':'disabled'}>${S.evw.claimed?'รับรางวัลสัปดาห์นี้แล้ว':lastDay?`รับรางวัลอันดับ ${myRank}`:'รับรางวัลได้วันอาทิตย์'}</button>
+  <div class="note">แต้มได้จาก: ผ่านด่าน +10 · หอท้า +15 · เนื้อเรื่อง +10 · ชนะประลอง +10 · ตีบอสกิลด์ +5 · ลานฝึก +5 · อัญเชิญ +5 ต่อครั้ง · รางวัล: อันดับ 1 หยก 1,000 + หีบเลือก S+ · อันดับ 2–3 หยก 600 · 4–10 หยก 300 · อื่น ๆ 100 · คู่แข่งที่ไม่ได้ระบุว่าเป็นผู้เล่นคือ NPC</div>`;
+}
+
 // ---------- login & shop ----------
 function viewLogin(){
   const label=r=>r.gems?`หยก ${r.gems}`:r.tickets?`ตั๋วทะลวง ${r.tickets}`:r.gold?`เงิน ${fmt(r.gold)}`:r.fish?`ปลา ${r.fish} แต้ม`:r.exp?`EXP ${fmt(r.exp)}`:'หีบเลือกขุนพล S+';
@@ -1863,7 +1945,7 @@ function render(){
   checkDaily();
   if(tab!=='fish' && fishG){ cancelAnimationFrame(fishG.raf); fishG=null; fishMsg='ปลาหลุดไปตอนออกจากบ่อ' }
   const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
-    arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap}[tab]();
+    arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap, train:viewTrain, evrank:viewEvRank}[tab]();
   sendTab();
   $('#view').innerHTML=v; renderTop(); tutorial();
 }
@@ -1874,7 +1956,7 @@ const TUT = [
   {t:'กวนอูวัยหนุ่มเข้าร่วมทัพแล้ว! ท้าทายด่าน 1-2 ต่อเลย', tab:'camp', sel:'[data-act="fight"]', done:()=>S.stage>2},
   {t:'เตียวหุยวัยหนุ่มมาแล้ว สามพี่น้องครบ เปิดมิตรภาพ "สามพี่น้องวัยหนุ่ม" HP/ATK +15% ไปหน้า "ขุนพล" แตะเล่าปี่วัยหนุ่ม แล้วกด "+1 เลเวล"', tab:'heroes', sel:'[data-hero="liubei_y"]', done:()=>H('liubei_y')&&H('liubei_y').lv>1},
   {t:'ทัพลาดตระเวนเองแม้ปิดเกม กด "เก็บ" ที่หีบในหน้า "พิชิตศึก" เพื่อรับรางวัลออฟไลน์', tab:'camp', sel:'[data-act="afk"]', done:()=>S.daily.afk>0},
-  {t:'อัญเชิญขุนพลได้ฟรีวันละครั้ง ไปหน้า "อัญเชิญ" แล้วกด "อัญเชิญ 1 ครั้ง"', tab:'summon', sel:'[data-act="pull1"]', done:()=>S.pulls>0},
+  {t:'อัญเชิญขุนพลได้ฟรีวันละครั้ง ไปที่ "เมืองหลัก" แตะ "อัญเชิญ" แล้วกด "อัญเชิญ 1 ครั้ง"', tab:'summon', sel:'[data-act="pull1"]', done:()=>S.pulls>0},
   {t:'เยี่ยมมาก ท่านเจ้าเมือง! เมืองหลักยังมีเนื้อเรื่อง หอท้า ประลอง กิลด์ และอีกมาก ค่อย ๆ สำรวจได้เลย', tab:null, sel:null, done:()=>false, last:true}
 ];
 function tutorial(){
@@ -1884,7 +1966,8 @@ function tutorial(){
   while(S.tut<TUT.length && TUT[S.tut].done()){ S.tut++; save() }
   if(S.tut>=TUT.length) return;
   const st=TUT[S.tut];
-  const target = st.tab && tab!==st.tab ? `#nav [data-go="${st.tab}"]` : st.sel;
+  const navHas = st.tab && document.querySelector(`#nav [data-go="${st.tab}"]`);
+  const target = st.tab && tab!==st.tab ? (navHas ? `#nav [data-go="${st.tab}"]` : tab==='city' ? `.evt[data-go="${st.tab}"]` : '#nav [data-go="city"]') : st.sel;
   if(target) document.querySelector(target)?.classList.add('tut-hl');
   const box=document.createElement('div'); box.id='tutor'; box.className='tutor';
   box.innerHTML=`<span class="tok shu">${portrait('liubei_y')}</span><div><b>ขั้นที่ ${S.tut+1}/${TUT.length}</b><p></p>
@@ -1948,8 +2031,10 @@ function openHero(id){
           ${lv<cap?`<div class="cost"><span class="${S.gold<lc.gold?'no':''}">เงิน ${fmt(lc.gold)}</span><span class="${S.exp<lc.exp?'no':''}">EXP ${fmt(lc.exp)}</span></div>`:''}</div>
         <div><button class="btn" style="width:100%" data-act="starup" data-id="${id}" ${canSt?'':'disabled'}>${st>=5?'ดาวเต็มแล้ว':'เลื่อนดาว'}</button>
           ${st<5?`<div class="cost"><span class="${own.copies<sc.copies?'no':''}">สำเนา ${own.copies}/${sc.copies}</span><span class="${S.gold<sc.gold?'no':''}">เงิน ${fmt(sc.gold)}</span></div>`:''}</div>
+        <button class="btn ghost wide" style="color:var(--on-parch)" data-act="trial" data-id="${id}">ทดลองใช้ในสนามรบ</button>
         <button class="btn ${inTeam?'ghost':'red'} wide" data-act="toggleteam" data-id="${id}">${inTeam?'ถอนออกจากทัพ':'ส่งเข้าทัพ'}</button>
       </div>`:''}
+      ${own?'':`<button class="btn red" style="width:100%;margin-top:10px" data-act="trial" data-id="${id}">ทดลองใช้ในสนามรบ</button>`}
       <button class="btn ghost" style="width:100%;margin-top:10px;color:var(--on-parch)" data-act="close">ปิด</button>
     </div>
   </div>`;
@@ -1975,7 +2060,7 @@ function doPull(n){
     if(isNew) S.heroes[h.id]={lv:1,star:1,copies:0,aw:0,eq:{}}; else S.heroes[h.id].copies++;
     got.push({id:h.id,isNew});
   }
-  S.daily.pull+=n; save(); render();
+  S.daily.pull+=n; addEv(5*n); save(); render();
   setTimeout(()=>sfx(got.some(g=>HERO[g.id].rar==='SP')?'sp':'pull'),120);
   $('#layer').innerHTML=`<div class="reveal" role="dialog" aria-label="ผลการอัญเชิญ">
     <div class="h" style="margin:0">ผลการอัญเชิญ</div>
@@ -2013,16 +2098,29 @@ function fight(mode='stage', bot=null){
   const tower=mode==='tower', arena=mode==='arena', raid=mode==='raid', story=mode==='story';
   if(arena){ if(S.arena.left<1) return toast('สิทธิ์ประลองวันนี้หมดแล้ว'); S.arena.left-- }
   if(raid){ if(S.guild.raid<1) return toast('ตีบอสครบ 3 ครั้งแล้ววันนี้'); S.guild.raid-- }
+  const train=mode==='train', trial=mode==='trial';
+  if(train){ if(S.train.left<1) return toast('ลานฝึกวันนี้ครบ 3 รอบแล้ว'); S.train.left-- }
   const A=myTeam();
-  const E=story?storyTeam(bot.c,bot.s):raid?raidBoss():tower?towerTeam(S.tower):arena?(bot.real?bot.team.map(x=>x&&HERO[x.id]?{id:x.id,lv:+x.lv||1,star:+x.star||1,aw:+x.aw||0,bonus:x.bonus||{}}:null):botTeam(bot,S.arena.pts,avgTeamLv(),S.arena.ref)):enemyTeam(S.stage);
-  const res=simulate(A,E,(story?300000+bot.c*100+bot.s*10:raid?700000+hashStr(today())%1000:tower?500000+S.tower*1000:arena?900000+S.arena.ref*100:S.stage*1000)+S.battleSeed++);
+  // assist hero (ช่วยสู้) joins stage, tower and story battles in an empty slot
+  let assisted=false;
+  if(['stage','tower','story'].includes(mode) && S.assist.pick && S.assist.uses>0){
+    const a=S.assist.pick, pref=['war','cav'].includes(HERO[a.id].role)?[0,1,2,3,4,5]:[3,4,5,0,1,2], j=pref.find(i=>!A[i]);
+    if(j!==undefined){ A[j]={...a, assist:true}; S.assist.uses--; assisted=true }
+  }
+  if(trial){
+    const t={id:bot.id, lv:Math.max(10,Math.round(avgTeamLv())), star:3, aw:0, trial:true};
+    const pref=['war','cav'].includes(HERO[t.id].role)?[0,1,2,3,4,5]:[3,4,5,0,1,2], j=pref.find(i=>!A[i]);
+    A[j!==undefined?j:5]=t;
+  }
+  const E=train?trainTeam():trial?enemyTeam(Math.max(1,S.stage)):story?storyTeam(bot.c,bot.s):raid?raidBoss():tower?towerTeam(S.tower):arena?(bot.real?bot.team.map(x=>x&&HERO[x.id]?{id:x.id,lv:+x.lv||1,star:+x.star||1,aw:+x.aw||0,bonus:x.bonus||{}}:null):botTeam(bot,S.arena.pts,avgTeamLv(),S.arena.ref)):enemyTeam(S.stage);
+  const res=simulate(A,E,(train?800000+S.train.left:trial?850000:story?300000+bot.c*100+bot.s*10:raid?700000+hashStr(today())%1000:tower?500000+S.tower*1000:arena?900000+S.arena.ref*100:S.stage*1000)+S.battleSeed++);
   save();
   const unitHTML=u=>`<div class="u ${u.side==='e'?'foe':''}" id="u-${u.uid}">
-     ${tok(u.id,'',u.side==='p'&&isMech(u.id))}<div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${esc(HERO[u.id].th)} ${u.lv}</div></div>`;
+     ${tok(u.id,'',u.side==='p'&&isMech(u.id))}<div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}${esc(HERO[u.id].th)} ${u.lv}</div></div>`;
   const by=(side,slots)=>res.start.filter(u=>u.side===side&&slots.includes(u.slot)).map(unitHTML).join('');
   $('#layer').innerHTML=`<div class="battle" role="dialog" aria-label="การต่อสู้">
     <div class="field">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}
-      <div class="bhead"><span class="rnd" id="rnd">รอบ 1</span><span class="sub">${story?`เนื้อเรื่อง ${bot.c+1}-${bot.s+1}`:raid?'บอสกิลด์':tower?`หอท้าขุนพล ชั้น ${S.tower}`:arena?`ประลองกับ ${esc(bot.name)}`:`ด่าน ${stageLabel(S.stage)}`}</span>
+      <div class="bhead"><span class="rnd" id="rnd">รอบ 1</span><span class="sub">${train?'ลานฝึก':trial?`ทดลองใช้ ${esc(HERO[bot.id].th)}`:story?`เนื้อเรื่อง ${bot.c+1}-${bot.s+1}`:raid?'บอสกิลด์':tower?`หอท้าขุนพล ชั้น ${S.tower}`:arena?`ประลองกับ ${esc(bot.name)}`:`ด่าน ${stageLabel(S.stage)}`}</span>
         <span style="display:flex;gap:6px"><button class="btn ghost" data-act="speed" id="spd">x1</button><button class="btn ghost" data-act="skip">ข้าม</button></span></div>
       <div class="side"><div class="line">${by('e',[3,4,5])}</div><div class="line">${by('e',[0,1,2])}</div></div>
       <div class="vs" aria-hidden="true">战</div>
@@ -2099,11 +2197,16 @@ function step(){
 function skip(){ if(!B||B.done) return; clearTimeout(B.timer); while(B.i<B.res.actions.length) applyHits(B.res.actions[B.i++],false); finish() }
 function finish(){
   if(B.done) return; B.done=true;
-  const win=B.res.winner==='p', tower=B.mode==='tower', arena=B.mode==='arena', raid=B.mode==='raid', story=B.mode==='story';
+  const win=B.res.winner==='p', tower=B.mode==='tower', arena=B.mode==='arena', raid=B.mode==='raid', story=B.mode==='story', train=B.mode==='train', trial=B.mode==='trial';
   let rwHTML='';
   const drop = g => g?`<span style="color:${QUAL[g.q].c}">${esc(gearName(g))}</span>`:'';
-  if(story){
-    if(win){
+  if(trial){
+    rwHTML=`<p>${win?'ชนะ':'แพ้'} ในการทดลอง ไม่มีรางวัลและไม่เสียอะไร ${H(B.bot.id)?'':'ถูกใจแล้วไปอัญเชิญได้ที่เมืองหลัก'}</p>`;
+  } else if(train){
+    const lv=Math.round(avgTeamLv()), pot=win?3:1, ex=win?200*lv:50*lv; S.potions+=pot; S.exp+=ex; addEv(win?5:0); save();
+    rwHTML=`<div class="rw"><span>ยา EXP ×${pot}</span><span><i class="coin x"></i>+${fmt(ex)}</span></div><p>เหลือรอบฝึกวันนี้ ${S.train.left} รอบ</p>`;
+  } else if(story){
+    if(win){ addEv(10);
       const k=storyKey(B.bot.c,B.bot.s), first=!S.story[k]; S.story[k]=1; S.daily.win++;
       let extra='';
       if(first){ S.gems+=100; S.gold+=2000*(B.bot.c+1); extra=`<span><i class="coin j"></i>+100</span><span><i class="coin g"></i>+${fmt(2000*(B.bot.c+1))}</span>`;
@@ -2116,13 +2219,13 @@ function finish(){
     const boss=B.res.start.find(u=>u.side==='e'); let hp=boss.max;
     for(const a of B.res.actions) for(const h of a.hits) if(h.tgt===boss.uid) hp=h.hp;
     const dmg=boss.max-hp, pct=dmg/boss.max, coins=20+Math.round(pct*1000), gems=Math.min(300,30+Math.round(pct*1000));
-    S.guild.best=Math.max(S.guild.best,dmg); S.guild.coins+=coins; S.gems+=gems; S.friend+=10; guildExp(20); save();
+    S.guild.best=Math.max(S.guild.best,dmg); S.guild.coins+=coins; S.gems+=gems; S.friend+=10; addEv(5); guildExp(20); save();
     rwHTML=`<div class="rw"><span>ดาเมจ ${fmt(dmg)} (${(pct*100).toFixed(1)}%)</span><span><i class="coin j"></i>+${gems}</span><span>เหรียญกิลด์ +${coins}</span></div><p>เหลือสิทธิ์ตีบอสวันนี้ ${S.guild.raid} ครั้ง</p>`;
   } else if(arena){
     const bot=B.bot, d=win?20+Math.max(0,Math.round((bot.pts-S.arena.pts)/20)):-10;
     S.arena.pts=Math.max(0,S.arena.pts+d); S.arena.ref++;
     if(bot.real) NET.hits=[...NET.hits, {to:bot.uid, win, ts:Date.now()}].slice(-8);
-    if(win){S.gems+=40; S.friend+=10; S.daily.win++}
+    if(win){S.gems+=40; S.friend+=10; S.daily.win++; addEv(10)}
     rwHTML=`<div class="rw"><span>แต้มประลอง ${d>0?'+':''}${d}</span>${win?'<span><i class="coin j"></i>+40</span>':''}</div><p>อันดับตอนนี้ ${arenaRank()}</p>`;
     save();
   } else if(win && tower){
@@ -2131,9 +2234,9 @@ function finish(){
     const tsh=HEROES.filter(h=>h.rar!=='A'), tpick=tsh[Math.floor(rng()*tsh.length)]; addShards(tpick.id,5);
     rwHTML=`<div class="rw"><span><i class="coin j"></i>+${rw.gems}</span><span><i class="coin t"></i>ตั๋วทะลวง +${rw.tickets}</span>${rw.chest?'<span>หีบเลือกขุนพล S+ ×1</span>':''}${drop(g)}<span>เศษ${esc(tpick.th)} ×5</span></div>
       <p>ผ่านชั้น ${S.tower} แล้ว${rw.chest?' หีบอยู่ในกระเป๋าที่เมืองหลัก':''}</p>`;
-    S.tower++; S.daily.win++; save();
+    S.tower++; S.daily.win++; addEv(15); save();
   } else if(win){
-    const rw=stageReward(S.stage); S.gold+=rw.gold; S.exp+=rw.exp; S.gems+=rw.gems;
+    const rw=stageReward(S.stage); S.gold+=rw.gold; S.exp+=rw.exp; S.gems+=rw.gems; addEv(10);
     const pot=1+(S.stage%5===0?2:0); S.potions+=pot;
     const chapterDone=S.stage%10===0; if(chapterDone){ S.gems+=200; S.potions+=5 }
     const g=rng()<0.7?newGear(S.stage):null;
@@ -2149,12 +2252,12 @@ function finish(){
   setTimeout(()=>{
     const box=document.createElement('div'); box.className='result';
     box.innerHTML=`<div class="panel" role="alertdialog" aria-label="${win?'ชนะ':'แพ้'}">
-      <h2 class="${win||raid?'win':'lose'}">${raid?'จบการโจมตีบอส':win?'ชนะ!':'พ่ายแพ้'}</h2>
-      ${win||raid||arena?rwHTML
+      <h2 class="${win||raid||trial||train?'win':'lose'}">${raid?'จบการโจมตีบอส':trial?'จบการทดลอง':train?'จบการฝึก':win?'ชนะ!':'พ่ายแพ้'}</h2>
+      ${win||raid||arena||trial||train?rwHTML
         :`<p>ลองเลื่อนระดับขุนพล เลื่อนดาวด้วยสำเนา ใช้มิตรภาพ หรือจัดทัพให้ก๊กข่มศัตรู นักรบไว้แถวหน้า หมอไว้แถวหลัง</p>`}
       <div style="display:flex;gap:8px;justify-content:center">
         <button class="btn" data-act="endbattle">${win?'กลับ':'ไปพัฒนาขุนพล'}</button>
-        ${arena||raid||story?'':win?`<button class="btn red" data-act="next">${tower?'ชั้นต่อไป':'ด่านต่อไป'}</button>`:'<button class="btn ghost" style="color:var(--on-parch)" data-act="next">สู้อีกครั้ง</button>'}
+        ${arena||raid||story||train||trial?'':win?`<button class="btn red" data-act="next">${tower?'ชั้นต่อไป':'ด่านต่อไป'}</button>`:'<button class="btn ghost" style="color:var(--on-parch)" data-act="next">สู้อีกครั้ง</button>'}
       </div></div>`;
     $('.battle')?.appendChild(box);
     sfx(win||raid?'win':'lose');
@@ -2221,6 +2324,14 @@ document.addEventListener('click',e=>{
       case 'sh10': closeLayer(); shrinePull(10); return;
       case 'buyticket': if(S.gems<200) return; S.gems-=200; S.tickets++; save(); render(); toast('แลกตั๋วทะลวง 1 ใบแล้ว'); return;
       case 'region': { const i=+act.dataset.i; toast(i<regionOf(S.stage)?`แคว้น${REGIONS[i%REGIONS.length].n} พิชิตแล้ว`:`กำลังบุกแคว้น${REGIONS[i%REGIONS.length].n}`); return }
+      case 'assistpick': { const o=ASSIST_OPTS&&ASSIST_OPTS[+act.dataset.i]; if(!o||S.assist.uses<1) return; S.assist.pick=o.e; save(); render(); toast(`ยืม ${HERO[o.e.id].th} มาช่วยสู้แล้ว`); return }
+      case 'assistclear': S.assist.pick=null; save(); render(); return;
+      case 'train': fight('train'); return;
+      case 'trial': closeLayer(); fight('trial',{id}); return;
+      case 'lvall': { let n=0, moved=true; const ids=S.team.filter(Boolean); while(moved && n<300){ moved=false; for(const id of ids){ if(levelUp(id,1)){ n++; moved=true } } }
+        save(); render(); toast(n?`เลื่อนระดับรวม ${n} ครั้ง`:'เงินหรือ EXP ไม่พอ'); return }
+      case 'gearall': S.team.filter(Boolean).forEach(autoGear); save(); render(); toast('สวมอุปกรณ์ที่ดีที่สุดให้ทั้งทัพแล้ว'); return;
+      case 'evclaim': { if(S.evw.claimed||new Date().getDay()!==0) return; const r=evBoard().findIndex(x=>x.me)+1, rw=evReward(r); S.gems+=rw.gems; if(rw.chest) S.bag.selSP=(S.bag.selSP||0)+1; S.evw.claimed=true; save(); render(); toast(`อันดับ ${r}: หยก +${rw.gems}${rw.chest?' และหีบเลือก S+':''}`); return }
       case 'potion': { if(!S.potions) return; const n=S.potions; S.exp+=n*POTION_EXP; S.potions=0; sfx('coin'); save(); render(); toast(`ใช้ยา EXP ${n} ขวด ได้ EXP +${fmt(n*POTION_EXP)}`); return }
       case 'fbuy': { const it=FSHOP.find(x=>x.k===act.dataset.k); if(!it||S.friend<it.cost) return; S.friend-=it.cost; sfx('coin');
         if(it.give.potions) S.potions+=it.give.potions; if(it.give.tickets) S.tickets+=it.give.tickets; if(it.give.casts) S.fishing.casts+=it.give.casts;
