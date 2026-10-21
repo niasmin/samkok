@@ -680,10 +680,18 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .day.big>b{grid-column:1/-1}.day.big .dimg{grid-row:2/4;height:96px}
 .day.ready{box-shadow:0 0 0 3px #ffd36a,0 0 16px rgba(255,200,90,.8)}
 .pond.pic{aspect-ratio:852/677;background-image:url(ui/sc-fish.webp)}
-.fishrow{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(160,120,60,.3)}
-.fishrow img{width:96px;height:44px;object-fit:contain}
+.fishrow{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(160,120,60,.3)}
+.fishrow img{width:80px;height:80px;object-fit:contain;margin:-14px 0}
 .fishrow b{display:block;font-size:15px}.fishrow small{font-size:13px;color:var(--muted)}
 .fishrow>span{font-size:13px;background:rgba(160,120,60,.15);border-radius:8px;padding:4px 8px;white-space:nowrap}
+
+/* transparent item / gear art */
+.item img.ic,.beast img.ic{object-fit:contain;padding:4px;background:radial-gradient(circle at 50% 45%,#fff6e0,#ead2a4 70%);border:2px solid var(--gold);border-radius:12px}
+.item.big img.ic{object-fit:contain;padding:4px}
+.beast img.ic{width:72px;height:72px}.beast.item{grid-template-columns:72px 1fr auto}
+.grow .gi{overflow:hidden}.grow .gi img{width:100%;height:100%;object-fit:contain;padding:2px;background:radial-gradient(circle,rgba(255,255,255,.35),transparent 70%)}
+.gslot i:has(img){display:block;width:40px;height:40px;margin:0 auto}
+.gslot i img{width:100%;height:100%;object-fit:contain}
 </style>
 
 <div id="app">
@@ -1069,6 +1077,8 @@ function newGear(il, minQ=0){
   const g={uid:S.gearSeq++, slot:SLOTS[Math.floor(rng()*4)].k, q, il:Math.max(1,Math.round(il)), enh:0};
   S.gear.push(g); return g;
 }
+const GEAR_ART={wpn:['wp-0','wp-1','wp-2','wp-3','wp-4','wp-5','wp-6','wp-7','wp-8'], arm:['ar-1','ar-4','ar-7','ar-3'], hlm:['ar-0','ar-8']};
+const gearIcon = g => { const a=GEAR_ART[g.slot]; return a?`<img src="ui/${a[hashStr(String(g.uid))%a.length]}.webp" alt="">`:SLOTS.find(s=>s.k===g.slot).ch };
 const gearName = g => `${SLOTS.find(s=>s.k===g.slot).th}${QUAL[g.q].th} iLv.${g.il}`;
 const gearText = g => { const s=gearStats(g); return [s.hp?`HP +${fmt(s.hp)}`:'', s.atk?`ATK +${fmt(s.atk)}`:'', s.def?`DEF +${fmt(s.def)}`:'', s.spd?`SPD +${s.spd}`:''].filter(Boolean).join(' · ') };
 // Hero shards (เศษขุนพล): collect enough to recruit a general, or turn them into a copy for star-ups.
@@ -1343,7 +1353,7 @@ function viewSummon(){
     <button data-act="stab" data-k="friend" aria-pressed="${fr}">${portrait(ART.has('diaochan')?'diaochan':pick('S'))}<span>มิตรภาพ</span></button></div>`;
   if(fr) return `${tabs}
   <div class="panel" style="margin:10px 0">แต้มมิตรภาพ <b>${fmt(S.friend)}</b></div>
-  ${FSHOP.map(it=>`<div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#ffb0c8,#c4325a)">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
+  ${FSHOP.map(it=>`<div class="panel item"><img class="ic pic-ic" src="ui/fx-${it.k}.webp" alt=""><div><b>${it.th}</b><p>${it.desc}</p></div>
     <button class="btn" data-act="fbuy" data-k="${it.k}" ${S.friend<it.cost?'disabled':''}>${it.cost} แต้ม</button></div>`).join('')}
   <div class="note">แต้มมิตรภาพได้จากชนะประลอง (+10) เช็กอินกิลด์ (+20) และตีบอสกิลด์ (+10)</div>`;
   return `${tabs}
@@ -1541,7 +1551,7 @@ function viewTower(){
 
 function gearRow(g, acts){
   const owner=gearOwner(g.uid), sl=SLOTS.find(s=>s.k===g.slot);
-  return `<div class="grow" style="--q:${QUAL[g.q].c}"><span class="gi">${sl.ch}</span>
+  return `<div class="grow" style="--q:${QUAL[g.q].c}"><span class="gi">${gearIcon(g)}</span>
     <div><b>${esc(gearName(g))}${g.enh?` +${g.enh}`:''}</b><p>${gearText(g)}${owner?` · ใช้อยู่: ${esc(HERO[owner].th)}`:''}</p></div>
     <div class="acts">${acts}</div></div>`;
 }
@@ -1787,7 +1797,7 @@ function viewGuild(){
   <div class="row" style="margin:0 0 8px"><span>ผู้เล่นจริงในกิลด์ ${mates.length} คน</span><button class="btn ghost small" data-go="chat">แชตกิลด์</button></div>
   <div class="panel rates"><b>อันดับดาเมจวันนี้</b>${rank.map((r,i)=>`<div class="bond ${r.me?'on':''}" style="opacity:1"><span>${i+1}. ${esc(r.name)}</span><em>${fmt(r.dmg)}</em></div>`).join('')}</div>
   <h2 class="h" style="font-size:17px;margin-top:14px">ร้านกิลด์</h2>
-  ${GSHOP.map(it=>`<div class="panel item"><span class="ic">${it.ch}</span><div><b>${it.th}</b><p>ใช้เหรียญกิลด์ ${fmt(it.cost)}</p></div><button class="btn" data-act="gbuy" data-k="${it.k}" ${S.guild.coins<it.cost?'disabled':''}>แลก</button></div>`).join('')}
+  ${GSHOP.map(it=>`<div class="panel item"><img class="ic pic-ic" src="ui/fx-${it.k}.webp" alt=""><div><b>${it.th}</b><p>ใช้เหรียญกิลด์ ${fmt(it.cost)}</p></div><button class="btn" data-act="gbuy" data-k="${it.k}" ${S.guild.coins<it.cost?'disabled':''}>แลก</button></div>`).join('')}
   <div class="note"><button class="btn ghost small" data-act="gleave">ออกจากกิลด์</button></div>`;
 }
 function guildExp(n){ S.guild.exp+=n; while(S.guild.exp>=guildNeed(S.guild.lv)){ S.guild.exp-=guildNeed(S.guild.lv); S.guild.lv++ } }
@@ -2034,7 +2044,7 @@ function viewShop(){
   if(fr) return `${back()}
   <div class="pic fshoph"><h1 class="vh">ร้านมิตรภาพ</h1><div class="ov o-fpts"><span>แต้มมิตรภาพ</span><b>${fmt(S.friend)}</b></div></div>
   ${tabs}
-  ${FSHOP.map(it=>`<div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#ffb0c8,#c4325a)">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
+  ${FSHOP.map(it=>`<div class="panel item"><img class="ic pic-ic" src="ui/fx-${it.k}.webp" alt=""><div><b>${it.th}</b><p>${it.desc}</p></div>
     <button class="btn" data-act="fbuy" data-k="${it.k}" ${S.friend<it.cost?'disabled':''}>${it.cost} แต้ม</button></div>`).join('')}
   <div class="note">แต้มมิตรภาพได้จากชนะประลอง (+10) เช็กอินกิลด์ (+20) และตีบอสกิลด์ (+10) ทุกอย่างในเกมใช้เงิน หยก หรือแต้มในเกมเท่านั้น</div>`;
   return `${back()}
@@ -2234,7 +2244,7 @@ function openHero(id){
       ${myBonds.length?`<div class="bonds"><h4>มิตรภาพ</h4>${myBonds.map(b=>{const on=b.ids.every(i=>teamIds.includes(i));
         return `<div class="bond ${on?'on':''}"><span>${b.name}: ${b.ids.map(i=>HERO[i].th).join(' ')}</span><em>${on?'✓ ':''}${bondText(b)}</em></div>`}).join('')}</div>`:''}
       ${own?`<div class="gear"><h4>อุปกรณ์</h4><div class="gslots">${SLOTS.map(sl=>{const g=own.eq[sl.k]?gearById(own.eq[sl.k]):null;
-          return `<button class="gslot" data-act="gearslot" data-id="${id}" data-slot="${sl.k}" style="--q:${g?QUAL[g.q].c:'#b9a57a'}"><i class="${g?'':'e'}">${sl.ch}</i><small>${g?`+${g.enh} iLv.${g.il}`:'ว่าง'}</small><span>${sl.th}</span></button>`}).join('')}</div>
+          return `<button class="gslot" data-act="gearslot" data-id="${id}" data-slot="${sl.k}" style="--q:${g?QUAL[g.q].c:'#b9a57a'}"><i class="${g?'':'e'}">${g?gearIcon(g):sl.ch}</i><small>${g?`+${g.enh} iLv.${g.il}`:'ว่าง'}</small><span>${sl.th}</span></button>`}).join('')}</div>
         <div class="actions" style="margin-top:8px"><button class="btn small" data-act="autogear" data-id="${id}">สวมอัตโนมัติ</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="ungear" data-id="${id}">ถอดทั้งหมด</button></div></div>`:''}
       ${own?`<div class="awk mechbox"><h4>ร่างจักรกล</h4>
         <p>${aw>=3?'สวมเกราะจักรกลแห่งสามก๊ก ค่า HP และ ATK +12% เปลี่ยนรูปลักษณ์ทั้งในการ์ดและสนามรบ':'ปลดล็อกเมื่อตื่นจิตขั้น 3 แปลงร่างเป็นขุนพลจักรกล HP และ ATK +12%'}</p>
