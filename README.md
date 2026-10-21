@@ -37,3 +37,10 @@ Inside Claude the game keeps using the artifact's own storage instead.
 - `coupons` / `coupon_redemptions`: server-checked codes via `redeem_coupon`; admins create and list codes with `admin_create_coupons` / `admin_list_coupons` using a passphrase stored hashed in `private.admin_secret` (`admin_change_pass` rotates it).
 - Players sign in anonymously, so **Authentication → Sign In / Providers → Allow anonymous sign-ins** must be on.
 - The publishable key in `web/index.html` is meant to be public; all access is enforced by row-level security.
+
+### Building and running the web build
+
+- `python3 tools/build_web.py <kunphon-samkok.html>` writes `web/index.html` with the PWA, share-card and favicon tags and stamps `web/sw.js` with a new cache version.
+- The web build installs as an app ("Add to Home Screen") and keeps working offline after the first visit; Supabase features need a connection.
+- The coupon admin form is hidden from players; open the game at `…/web/#admin` to use it.
+- `tools/sql/insights.sql` has queries for the play funnel, hardest stages, daily players and feedback; `tools/sql/cleanup_test_accounts.sql` removes the accounts made during testing.
