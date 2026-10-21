@@ -873,6 +873,7 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .hbart .r,.hbart .hst{z-index:3}
 .fig .liveart{border-radius:50%;overflow:hidden}
 @media (prefers-reduced-motion:reduce){.liveart,.liveart i{animation:none!important}}
+.evt .evi{display:block;width:44px;height:44px;margin:0 auto 2px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1746,23 +1747,23 @@ function viewCity(){
     <button data-act="more" aria-expanded="${!!UI.more}"><img src="ui/q-more.webp" alt="">เพิ่มเติม${dot(S.guild.id!==null&&!S.guild.checked)}</button>
   </div>
   <div class="events" id="cmore"${UI.more?'':' hidden'}>
-    <button class="evt" data-go="shrine"><i>魂</i>ตื่นจิต<small>${eventLeft()}</small></button>
-    <button class="evt" data-go="tower"><i>塔</i>หอท้า<small>ชั้น ${S.tower}</small></button>
-    <button class="evt" data-go="arena"><i>擂</i>ประลอง<small>${S.arena.left}/5</small></button>
-    <button class="evt" data-go="beasts"><i>兽</i>สัตว์เทพ<small>ปลา ${S.fishPts}</small></button>
-    <button class="evt" data-go="fish"><i>渔</i>ตกปลา<small>${S.fishing.casts} ครั้ง</small></button>
-    <button class="evt" data-go="login"><i>礼</i>7 วัน<small>วันที่ ${S.login.days}</small>${loginReady()?'<span class="dot"></span>':''}</button>
-    <button class="evt" data-go="shop"><i>商</i>ร้านค้า<small>เงิน/หยก</small></button>
-    <button class="evt" data-go="tasks"><i>令</i>ภารกิจ<small>${TASKS.filter(taskDone).length}/${TASKS.length}</small>${tasksClaimable()?'<span class="dot"></span>':''}</button>
-    <button class="evt" data-go="bag"><i>囊</i>กระเป๋า<small>${S.gear.length} ชิ้น</small>${bagCount()?'<span class="dot"></span>':''}</button>
-    <button class="evt" data-go="formation"><i>阵</i>จัดทีม<small>${fmt(teamPower())}</small></button>
-    <button class="evt" data-go="summon"><i>召</i>อัญเชิญ<small>${S.freeDate!==today()?'ฟรีวันนี้':`หยก ${fmt(S.gems)}`}</small>${S.freeDate!==today()?'<span class="dot"></span>':''}</button>
-    <button class="evt" data-go="evrank"><i>榜</i>อันดับ<small>${fmt(S.evw.pts)} แต้ม</small></button>
-    <button class="evt" data-go="story"><i>史</i>เนื้อเรื่อง<small>${Object.keys(S.story).length}/${STORY.length*3}</small></button>
-    <button class="evt" data-go="chat"><i>话</i>แชต<small>${NET.room?`ออนไลน์ ${NET.online.length}`:'ออฟไลน์'}</small></button>
-    <button class="evt" data-go="coupon"><i>券</i>ใส่โค้ด<small>คูปอง</small></button>
-    <button class="evt" data-go="savegame"><i>存</i>บันทึก<small>อัตโนมัติ</small></button>
-    <button class="evt" data-go="guild"><i>盟</i>กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
+    <button class="evt" data-go="shrine"><img class="evi" src="ui/sh-ticket.webp" alt="">ตื่นจิต<small>${eventLeft()}</small></button>
+    <button class="evt" data-go="tower"><img class="evi" src="ui/n-city.webp" alt="">หอท้า<small>ชั้น ${S.tower}</small></button>
+    <button class="evt" data-go="arena"><img class="evi" src="ui/tk-win.webp" alt="">ประลอง<small>${S.arena.left}/5</small></button>
+    <button class="evt" data-go="beasts"><img class="evi" src="ui/bst-dragon.webp" alt="">สัตว์เทพ<small>ปลา ${S.fishPts}</small></button>
+    <button class="evt" data-go="fish"><img class="evi" src="ui/fish-1.webp" alt="">ตกปลา<small>${S.fishing.casts} ครั้ง</small></button>
+    <button class="evt" data-go="login"><img class="evi" src="ui/q-login.webp" alt="">7 วัน<small>วันที่ ${S.login.days}</small>${loginReady()?'<span class="dot"></span>':''}</button>
+    <button class="evt" data-go="shop"><img class="evi" src="ui/sh-gear.webp" alt="">ร้านค้า<small>เงิน/หยก</small></button>
+    <button class="evt" data-go="tasks"><img class="evi" src="ui/q-tasks.webp" alt="">ภารกิจ<small>${TASKS.filter(taskDone).length}/${TASKS.length}</small>${tasksClaimable()?'<span class="dot"></span>':''}</button>
+    <button class="evt" data-go="bag"><img class="evi" src="ui/q-bag.webp" alt="">กระเป๋า<small>${S.gear.length} ชิ้น</small>${bagCount()?'<span class="dot"></span>':''}</button>
+    <button class="evt" data-go="formation"><img class="evi" src="ui/n-heroes.webp" alt="">จัดทีม<small>${fmt(teamPower())}</small></button>
+    <button class="evt" data-go="summon"><img class="evi" src="ui/tk-pull.webp" alt="">อัญเชิญ<small>${S.freeDate!==today()?'ฟรีวันนี้':`หยก ${fmt(S.gems)}`}</small>${S.freeDate!==today()?'<span class="dot"></span>':''}</button>
+    <button class="evt" data-go="evrank"><img class="evi" src="ui/medal1.webp" alt="">อันดับ<small>${fmt(S.evw.pts)} แต้ม</small></button>
+    <button class="evt" data-go="story"><img class="evi" src="ui/sh-exp.webp" alt="">เนื้อเรื่อง<small>${Object.keys(S.story).length}/${STORY.length*3}</small></button>
+    <button class="evt" data-go="chat"><img class="evi" src="ui/tk-lvl.webp" alt="">แชต<small>${NET.room?`ออนไลน์ ${NET.online.length}`:'ออฟไลน์'}</small></button>
+    <button class="evt" data-go="coupon"><img class="evi" src="ui/sh-arena.webp" alt="">ใส่โค้ด<small>คูปอง</small></button>
+    <button class="evt" data-go="savegame"><img class="evi" src="ui/chest.webp" alt="">บันทึก<small>อัตโนมัติ</small></button>
+    <button class="evt" data-go="guild"><img class="evi" src="ui/flag.webp" alt="">กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
   </div>
   <div class="city pic c2">
     ${CITY_HS.map(([k,l])=>`<button class="hs h2-${k}" data-go="${k}"><span class="lbl">${l}${k==='shrine'?`<small>${eventLeft()}</small>`:''}</span>${dot(k==='summon'?S.freeDate!==today():k==='guild'?S.guild.id!==null&&!S.guild.checked:false)}</button>`).join('')}
