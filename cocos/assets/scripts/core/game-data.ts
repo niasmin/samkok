@@ -126,7 +126,9 @@ function stats(id, lv, star, aw=0){
 }
 const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(1+aw*0.1)).toFixed(2);
 function power(id, lv, star, aw=0){const s=stats(id,lv,star,aw);return Math.round(s.hp*0.25+s.atk*3+s.def*2)}
-const lvCost = lv => ({gold:Math.floor(60*Math.pow(lv,1.35)), exp:Math.floor(40*Math.pow(lv,1.3))});
+// Front-liners are cheap to train, strategists cost the most.
+const ROLE_COST = {war:0.85, cav:0.95, arch:1.0, heal:1.05, strat:1.15};
+const lvCost = (lv, role='arch') => { const m=ROLE_COST[role]||1; return {gold:Math.floor(60*Math.pow(lv,1.35)*m), exp:Math.floor(40*Math.pow(lv,1.3)*m)} };
 const starCost = star => ({copies:star, gold:4000*star});
 const awCost = aw => ({soul:aw+1, gold:20000*(aw+1)});
 const stageLabel = s => `${Math.floor((s-1)/10)+1}-${(s-1)%10+1}`;
@@ -355,6 +357,14 @@ function storyTeam(c, si){
   return team;
 }
 
+// ---------- world map ----------
+const REGIONS = [
+  {n:'ตุ้นก้วน', ch:'涿'}, {n:'ลกเอี๋ยง', ch:'洛'}, {n:'ซิจิ๋ว', ch:'徐'}, {n:'กัวต๋อ', ch:'官'}, {n:'ซินเอี๋ย', ch:'新'},
+  {n:'เตียงปัน', ch:'长'}, {n:'ผาแดง', ch:'赤'}, {n:'เกงจิ๋ว', ch:'荆'}, {n:'เสฉวน', ch:'蜀'}, {n:'ฮันต๋ง', ch:'汉'},
+  {n:'อิเหลง', ch:'夷'}, {n:'ลำเต๋ง', ch:'南'}, {n:'กิสาน', ch:'祁'}, {n:'อู่จั้ง', ch:'五'}, {n:'เตียงอัน', ch:'安'}
+];
+const regionOf = stage => Math.floor((stage-1)/10);
+
 // ---------- placeholder portraits ----------
 // Chibi portraits drawn from simple shapes: role decides the headgear, LOOK adds beards, hair and details.
 const ARMOR = {wei:'#20446b', shu:'#285c35', wu:'#7d2219', qun:'#4a3270'};
@@ -451,8 +461,8 @@ function portrait(id, mech=false){
 
 
 export {
-  FAC, BEATS, ROLE, RAR, HEROES, HERO, LOOK, TALENT, BONDS, SLOTS, QUAL, BEASTS, BOTS, LOGIN7, FISH, STORY, EVENTS, OPENING, FIRST_HERO,
-  mulberry32, levelCap, stats, skillMult, power, lvCost, starCost, awCost, stageLabel, comboChance,
+  FAC, BEATS, ROLE, RAR, HEROES, HERO, LOOK, TALENT, BONDS, SLOTS, QUAL, BEASTS, BOTS, LOGIN7, FISH, STORY, EVENTS, OPENING, FIRST_HERO, REGIONS, ROLE_COST,
+  mulberry32, levelCap, stats, skillMult, power, lvCost, starCost, awCost, stageLabel, comboChance, regionOf,
   activeBonds, bondBonus, pickTeam, enemyTeam, towerTeam, stageReward, towerReward,
   gearStats, gearScore, enhCost, beastCost, beastPct, finalStats, powerOf, botTeam, arenaRankReward,
   simulate, storyTeam, storyKey, STORY_END_REWARD, curEvent, featuredSP, evMul, weekNo, portrait

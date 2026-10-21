@@ -474,6 +474,19 @@ img.art{display:block;width:100%;height:100%;object-fit:cover;object-position:50
 .grow.shard small{font-size:11px;color:var(--muted)}
 .slots .card,.slots .slot-empty{max-width:96px}
 
+/* phase 9: map, currencies */
+.maprow{display:flex;justify-content:flex-end;margin-bottom:8px}
+.wmap{position:relative;width:100%;max-width:100%;border-radius:12px;border:2px solid var(--gold);overflow:hidden;margin-bottom:10px;
+  background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.35),transparent 40%),linear-gradient(160deg,#e8d9ae,#cdb782 60%,#b59a62)}
+.wmap svg{position:absolute;inset:0;width:100%;height:100%}
+.region{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;width:88px;color:var(--on-parch)}
+.region .rch{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:24px/1 var(--f-seal);color:#fff8e6;background:var(--wu);border:2px solid var(--gold);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.region b{font-size:12px;font-weight:700;white-space:nowrap}
+.region small{font-size:10.5px;color:var(--muted)}
+.region.done .rch{background:var(--shu)}
+.region.cur .rch{animation:tutpulse 1.4s infinite;outline:3px solid #ffe066}
+.region.lock{opacity:.45;filter:grayscale(1)}
+
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(26,17,12,.94);border:1px solid var(--gold);color:var(--parchment);padding:8px 14px;border-radius:999px;font-size:13px;z-index:40;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
@@ -630,7 +643,9 @@ function stats(id, lv, star, aw=0){
 }
 const skillMult = (id, aw=0) => +(ROLE[HERO[id].role].mult*RAR[HERO[id].rar].sk*(1+aw*0.1)).toFixed(2);
 function power(id, lv, star, aw=0){const s=stats(id,lv,star,aw);return Math.round(s.hp*0.25+s.atk*3+s.def*2)}
-const lvCost = lv => ({gold:Math.floor(60*Math.pow(lv,1.35)), exp:Math.floor(40*Math.pow(lv,1.3))});
+// Front-liners are cheap to train, strategists cost the most.
+const ROLE_COST = {war:0.85, cav:0.95, arch:1.0, heal:1.05, strat:1.15};
+const lvCost = (lv, role='arch') => { const m=ROLE_COST[role]||1; return {gold:Math.floor(60*Math.pow(lv,1.35)*m), exp:Math.floor(40*Math.pow(lv,1.3)*m)} };
 const starCost = star => ({copies:star, gold:4000*star});
 const awCost = aw => ({soul:aw+1, gold:20000*(aw+1)});
 const stageLabel = s => `${Math.floor((s-1)/10)+1}-${(s-1)%10+1}`;
@@ -817,14 +832,14 @@ function freshState(){
     arena:{pts:1000, date:'', left:5, claimed:false, ref:1},
     login:{days:0, last:'', got:[]},
     guild:{id:null, date:'', checked:false, raid:3, best:0, coins:0, lv:1, exp:0},
-    story:{}
+    story:{}, potions:3, friend:0
   };
 }
 let S;
 // fills fields added after a save was made, so older saves keep working
 function migrate(d){
   const f=freshState();
-  for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story']) if(d[k]===undefined) d[k]=f[k];
+  for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story','potions','friend']) if(d[k]===undefined) d[k]=f[k];
   if(!d.bag) d.bag={selSP:1};
   if(d.tut===undefined) d.tut=99;          // saves from before the tutorial skip it
   if(!d.shards) d.shards={};
@@ -868,6 +883,8 @@ function placeInTeam(id){
   const prefFront=['war','cav'].includes(HERO[id].role), order=prefFront?[0,1,2,3,4,5]:[3,4,5,0,1,2];
   const free=order.find(j=>!S.team[j]); if(free!==undefined) S.team[free]=id;
 }
+// ยา EXP: an item that turns into hero EXP when used; แต้มมิตรภาพ: earned with other players, spent in its own shop.
+const POTION_EXP = 500;
 const bagCount = () => Object.values(S.bag).reduce((a,b)=>a+b,0);
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){} syncSoon()}
 function checkDaily(){
@@ -1038,10 +1055,35 @@ function renderTop(){
   });
 }
 
+// World map: each chapter of 10 stages is a region; the route winds across the land.
+const REGIONS = [
+  {n:'ตุ้นก้วน', ch:'涿'}, {n:'ลกเอี๋ยง', ch:'洛'}, {n:'ซิจิ๋ว', ch:'徐'}, {n:'กัวต๋อ', ch:'官'}, {n:'ซินเอี๋ย', ch:'新'},
+  {n:'เตียงปัน', ch:'长'}, {n:'ผาแดง', ch:'赤'}, {n:'เกงจิ๋ว', ch:'荆'}, {n:'เสฉวน', ch:'蜀'}, {n:'ฮันต๋ง', ch:'汉'},
+  {n:'อิเหลง', ch:'夷'}, {n:'ลำเต๋ง', ch:'南'}, {n:'กิสาน', ch:'祁'}, {n:'อู่จั้ง', ch:'五'}, {n:'เตียงอัน', ch:'安'}
+];
+const regionOf = stage => Math.floor((stage-1)/10);
+function viewMap(){
+  const cur=regionOf(S.stage), shown=Math.max(cur+3, 6), pts=[];
+  const H=Math.ceil(shown/3)*30+6;
+  for(let i=0;i<shown;i++){ const row=Math.floor(i/3), col=row%2? 2-(i%3) : i%3; pts.push([18+col*32, 16+row*30]) }
+  const path=pts.map((p,i)=>`${i?'L':'M'}${p[0]} ${p[1]}`).join(' ');
+  return `<button class="back" data-go="camp">‹ กลับพิชิตศึก</button>
+  <h1 class="h">แผนที่โลก <span class="sub">แคว้นที่ ${cur+1} · ${esc(REGIONS[cur%REGIONS.length].n)}</span></h1>
+  <div class="wmap" style="aspect-ratio:100/${H}">
+    <svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${path}" fill="none" stroke="#8a6a3a" stroke-width="1.6" stroke-dasharray="3 2"/></svg>
+    ${pts.map((p,i)=>{const r=REGIONS[i%REGIONS.length], st=i<cur?'done':i===cur?'cur':'lock';
+      return `<button class="region ${st}" style="left:${p[0]}%;top:${p[1]/H*100}%" data-act="region" data-i="${i}" ${st==='lock'?'disabled':''}>
+        <span class="rch">${r.ch}</span><b>${i+1}. ${esc(r.n)}</b><small>${st==='done'?'พิชิตแล้ว':st==='cur'?`ด่าน ${(S.stage-1)%10+1}/10`:'ล็อก'}</small></button>`}).join('')}
+  </div>
+  <div class="note">พิชิตครบ 10 ด่านของแคว้นได้หยก 200 และยา EXP 5 ขวด แคว้นถัดไปศัตรูแข็งขึ้น</div>
+  <button class="btn red" style="width:100%" data-go="camp">ไปด่าน ${stageLabel(S.stage)}</button>`;
+}
+
 function viewCamp(){
   const foes=enemyTeam(S.stage), a=afkNow(), rw=stageReward(S.stage), fp=foes.reduce((x,f)=>x+power(f.id,f.lv,f.star),0);
   const team=S.team.filter(Boolean);
   return `
+  <div class="maprow"><button class="btn ghost small" data-go="map">แผนที่โลก · แคว้น${esc(REGIONS[regionOf(S.stage)%REGIONS.length].n)}</button></div>
   <div class="scene" id="scene">
     ${campArt(S.stage)}
     <span class="stage-tag">ด่าน ${stageLabel(S.stage)}</span>
@@ -1297,6 +1339,8 @@ function viewBag(){
   <h1 class="h">กระเป๋า</h1>
   ${n?`<div class="panel item"><span class="ic">选</span><div><b>หีบเลือกขุนพล S+ ×${n}</b><p>เปิดแล้วเลือกรับขุนพล S+ 1 คน ถ้ามีแล้วจะได้เป็นสำเนาไว้เลื่อนดาว</p></div>
     <button class="btn" data-act="opensel">ใช้</button></div>`:''}
+  <div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#c9a8ff,#5a3a9a)">药</span><div><b>ยา EXP ×${S.potions}</b><p>ใช้แล้วได้ EXP ขวดละ ${POTION_EXP} ได้จากการผ่านด่าน รางวัลออฟไลน์ และร้านมิตรภาพ</p></div>
+    <button class="btn" data-act="potion" ${S.potions?'':'disabled'}>ใช้ทั้งหมด</button></div>
   ${shardHTML()}
   <div class="row" style="margin:6px 0"><b>อุปกรณ์ที่ยังไม่ได้สวม ${free.length} ชิ้น</b>
     <button class="btn ghost small" data-act="salvagelow" ${low?'':'disabled'}>แยกชิ้นส่วนธรรมดา/ดี (${low})</button></div>
@@ -1395,6 +1439,7 @@ function viewChat(){
 }
 function sendChat(){
   const t=chatDraft.trim(); if(!t||!NET.on||NET.ro) return;
+  if(!S.chatFriendDate || S.chatFriendDate!==today()){ S.chatFriendDate=today(); S.friend+=5; save() } // first chat of the day
   NET.msgs=[...NET.msgs, {c:chatCh, t:t.slice(0,140), ts:Date.now()}].slice(-6);
   chatDraft=''; syncSoon(); clearTimeout(NET.timer);
   // send chat right away rather than after the usual pause
@@ -1693,8 +1738,17 @@ function viewShop(){
   ${SHOP.map(it=>{const c=it.cost, ok=(c.gold||0)<=S.gold&&(c.gems||0)<=S.gems;
     return `<div class="panel item"><span class="ic">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
       <button class="btn" data-act="buy" data-k="${it.k}" ${ok?'':'disabled'}><span style="display:flex;gap:4px;align-items:center"><i class="coin ${c.gold?'g':'j'}"></i>${fmt(c.gold||c.gems)}</span></button></div>`}).join('')}
-  <div class="note">ทุกอย่างซื้อด้วยเงินและหยกในเกมเท่านั้น</div>`;
+  <h2 class="h" style="font-size:17px;margin-top:16px">ร้านมิตรภาพ <span class="sub">แต้มมิตรภาพ ${fmt(S.friend)}</span></h2>
+  ${FSHOP.map(it=>`<div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#ffb0c8,#c4325a)">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
+    <button class="btn" data-act="fbuy" data-k="${it.k}" ${S.friend<it.cost?'disabled':''}>${it.cost} แต้ม</button></div>`).join('')}
+  <div class="note">แต้มมิตรภาพได้จากชนะประลอง (+10) เช็กอินกิลด์ (+20) และตีบอสกิลด์ (+10) ทุกอย่างในเกมใช้เงิน หยก หรือแต้มในเกมเท่านั้น</div>`;
 }
+const FSHOP = [
+  {k:'fpot',  th:'ยา EXP ×5',         ch:'药', desc:'ได้ EXP รวม 2,500',             cost:15, give:{potions:5}},
+  {k:'fshA',  th:'เศษขุนพล A ×5',     ch:'片', desc:'เศษขุนพลระดับ A แบบสุ่ม',          cost:20, give:{shards:5, rar:'A'}},
+  {k:'fbait', th:'เหยื่อตกปลา ×2',     ch:'饵', desc:'ตกปลาเพิ่ม 2 ครั้งวันนี้',           cost:25, give:{casts:2}},
+  {k:'ftix',  th:'ตั๋วทะลวง',          ch:'魂', desc:'ใช้ที่ศาลตื่นจิต 1 ใบ',              cost:50, give:{tickets:1}}
+];
 function buy(k){
   sfx('coin');
   const it=SHOP.find(x=>x.k===k), c=it.cost, g=it.give;
@@ -1711,7 +1765,7 @@ function buy(k){
 // ---------- gear on heroes ----------
 function levelUp(id, n){
   const h=H(id); let k=0;
-  while(k<n){ const c=lvCost(h.lv); if(h.lv>=levelCap(h.star,h.aw)||S.gold<c.gold||S.exp<c.exp) break; S.gold-=c.gold; S.exp-=c.exp; h.lv++; S.daily.lvl++; k++ }
+  while(k<n){ const c=lvCost(h.lv, HERO[id].role); if(h.lv>=levelCap(h.star,h.aw)||S.gold<c.gold||S.exp<c.exp) break; S.gold-=c.gold; S.exp-=c.exp; h.lv++; S.daily.lvl++; k++ }
   return k;
 }
 function autoGear(id){
@@ -1809,7 +1863,7 @@ function render(){
   checkDaily();
   if(tab!=='fish' && fishG){ cancelAnimationFrame(fishG.raf); fishG=null; fishMsg='ปลาหลุดไปตอนออกจากบ่อ' }
   const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
-    arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory}[tab]();
+    arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap}[tab]();
   sendTab();
   $('#view').innerHTML=v; renderTop(); tutorial();
 }
@@ -1843,7 +1897,7 @@ function tutorial(){
 function openHero(id){
   const h=HERO[id], own=S.heroes[id];
   const lv=own?.lv||1, st=own?.star||1, aw=own?.aw||0, s=own?heroFinal(id):stats(id,lv,st,aw), r=ROLE[h.role];
-  const cap=levelCap(st,aw), lc=lvCost(lv), sc=starCost(st), ac=awCost(aw), soul=S.souls[id]||0;
+  const cap=levelCap(st,aw), lc=lvCost(lv, h.role), sc=starCost(st), ac=awCost(aw), soul=S.souls[id]||0;
   const inTeam=S.team.includes(id);
   const canLv = own && lv<cap && S.gold>=lc.gold && S.exp>=lc.exp;
   const canSt = own && st<5 && own.copies>=sc.copies && S.gold>=sc.gold;
@@ -2062,13 +2116,13 @@ function finish(){
     const boss=B.res.start.find(u=>u.side==='e'); let hp=boss.max;
     for(const a of B.res.actions) for(const h of a.hits) if(h.tgt===boss.uid) hp=h.hp;
     const dmg=boss.max-hp, pct=dmg/boss.max, coins=20+Math.round(pct*1000), gems=Math.min(300,30+Math.round(pct*1000));
-    S.guild.best=Math.max(S.guild.best,dmg); S.guild.coins+=coins; S.gems+=gems; guildExp(20); save();
+    S.guild.best=Math.max(S.guild.best,dmg); S.guild.coins+=coins; S.gems+=gems; S.friend+=10; guildExp(20); save();
     rwHTML=`<div class="rw"><span>ดาเมจ ${fmt(dmg)} (${(pct*100).toFixed(1)}%)</span><span><i class="coin j"></i>+${gems}</span><span>เหรียญกิลด์ +${coins}</span></div><p>เหลือสิทธิ์ตีบอสวันนี้ ${S.guild.raid} ครั้ง</p>`;
   } else if(arena){
     const bot=B.bot, d=win?20+Math.max(0,Math.round((bot.pts-S.arena.pts)/20)):-10;
     S.arena.pts=Math.max(0,S.arena.pts+d); S.arena.ref++;
     if(bot.real) NET.hits=[...NET.hits, {to:bot.uid, win, ts:Date.now()}].slice(-8);
-    if(win){S.gems+=40; S.daily.win++}
+    if(win){S.gems+=40; S.friend+=10; S.daily.win++}
     rwHTML=`<div class="rw"><span>แต้มประลอง ${d>0?'+':''}${d}</span>${win?'<span><i class="coin j"></i>+40</span>':''}</div><p>อันดับตอนนี้ ${arenaRank()}</p>`;
     save();
   } else if(win && tower){
@@ -2080,6 +2134,8 @@ function finish(){
     S.tower++; S.daily.win++; save();
   } else if(win){
     const rw=stageReward(S.stage); S.gold+=rw.gold; S.exp+=rw.exp; S.gems+=rw.gems;
+    const pot=1+(S.stage%5===0?2:0); S.potions+=pot;
+    const chapterDone=S.stage%10===0; if(chapterDone){ S.gems+=200; S.potions+=5 }
     const g=rng()<0.7?newGear(S.stage):null;
     let joined='';
     const fh=FIRST_HERO[S.stage];
@@ -2087,7 +2143,7 @@ function finish(){
     let shardTxt='';
     if(S.stage%3===0){ const pool=HEROES.filter(h=>h.rar!=='SP'), sh=pool[Math.floor(rng()*pool.length)]; addShards(sh.id,3); shardTxt=`<span>เศษ${esc(sh.th)} ×3</span>` }
     S.stage++; S.daily.win++; save();
-    rwHTML=`<div class="rw"><span><i class="coin g"></i>+${fmt(rw.gold)}</span><span><i class="coin x"></i>+${fmt(rw.exp)}</span><span><i class="coin j"></i>+${rw.gems}</span>${drop(g)}${shardTxt}</div>
+    rwHTML=`<div class="rw"><span><i class="coin g"></i>+${fmt(rw.gold)}</span><span><i class="coin x"></i>+${fmt(rw.exp)}</span><span><i class="coin j"></i>+${rw.gems}</span>${drop(g)}${shardTxt}<span>ยา EXP ×${pot}</span>${chapterDone?`<span>พิชิตแคว้น${esc(REGIONS[(Math.floor((S.stage-2)/10))%REGIONS.length].n)}: หยก +200 · ยา EXP ×5</span>`:''}</div>
       ${joined}<p>เปิดด่าน ${stageLabel(S.stage)} แล้ว รางวัลออฟไลน์เพิ่มขึ้น</p>`;
   }
   setTimeout(()=>{
@@ -2118,7 +2174,7 @@ document.addEventListener('click',e=>{
     const a=act.dataset.act, id=act.dataset.id;
     switch(a){
       case 'close': closeLayer(); return;
-      case 'afk': { sfx('coin'); const r=afkNow(); S.gold+=r.gold; S.exp+=r.exp; S.gems+=r.gems; S.afkSince=Date.now(); S.daily.afk++; save(); render(); toast(`เก็บแล้ว เงิน +${fmt(r.gold)} · EXP +${fmt(r.exp)}${r.gems?` · หยก +${r.gems}`:''}`); return }
+      case 'afk': { sfx('coin'); const r=afkNow(); S.gold+=r.gold; S.exp+=r.exp; S.gems+=r.gems; S.potions+=Math.floor(r.mins/120); S.afkSince=Date.now(); S.daily.afk++; save(); render(); toast(`เก็บแล้ว เงิน +${fmt(r.gold)} · EXP +${fmt(r.exp)}${r.gems?` · หยก +${r.gems}`:''}`); return }
       case 'fight': fight(); return;
       case 'speed': B.speed=B.speed===1?2:B.speed===2?4:1; act.textContent='x'+B.speed; return;
       case 'skip': skip(); return;
@@ -2154,7 +2210,7 @@ document.addEventListener('click',e=>{
       case 'mech': { const h=H(id); if(h.aw<3) return; h.mech=!h.mech; save(); render(); openHero(id); toast(h.mech?`${HERO[id].th} แปลงร่างจักรกลแล้ว`:'กลับร่างปกติแล้ว'); return }
       case 'gjoin': S.guild={...S.guild, id:+act.dataset.i, lv:1, exp:0, coins:0}; save(); render(); toast(`เข้าร่วม ${GUILDS[S.guild.id].name} แล้ว`); return;
       case 'gleave': S.guild={...S.guild, id:null}; save(); render(); return;
-      case 'gcheck': if(S.guild.checked) return; S.guild.checked=true; S.gems+=100; S.guild.coins+=100; guildExp(50); save(); render(); toast('เช็กอินกิลด์แล้ว'); return;
+      case 'gcheck': if(S.guild.checked) return; S.guild.checked=true; S.gems+=100; S.friend+=20; S.guild.coins+=100; guildExp(50); save(); render(); toast('เช็กอินกิลด์แล้ว'); return;
       case 'raid': fight('raid'); return;
       case 'gbuy': { const it=GSHOP.find(x=>x.k===act.dataset.k); if(S.guild.coins<it.cost) return; S.guild.coins-=it.cost;
         if(it.give.tickets) S.tickets+=it.give.tickets; if(it.give.fish) S.fishPts+=it.give.fish; if(it.give.chest) S.bag.selSP=(S.bag.selSP||0)+1;
@@ -2164,6 +2220,13 @@ document.addEventListener('click',e=>{
       case 'sh1': closeLayer(); shrinePull(1); return;
       case 'sh10': closeLayer(); shrinePull(10); return;
       case 'buyticket': if(S.gems<200) return; S.gems-=200; S.tickets++; save(); render(); toast('แลกตั๋วทะลวง 1 ใบแล้ว'); return;
+      case 'region': { const i=+act.dataset.i; toast(i<regionOf(S.stage)?`แคว้น${REGIONS[i%REGIONS.length].n} พิชิตแล้ว`:`กำลังบุกแคว้น${REGIONS[i%REGIONS.length].n}`); return }
+      case 'potion': { if(!S.potions) return; const n=S.potions; S.exp+=n*POTION_EXP; S.potions=0; sfx('coin'); save(); render(); toast(`ใช้ยา EXP ${n} ขวด ได้ EXP +${fmt(n*POTION_EXP)}`); return }
+      case 'fbuy': { const it=FSHOP.find(x=>x.k===act.dataset.k); if(!it||S.friend<it.cost) return; S.friend-=it.cost; sfx('coin');
+        if(it.give.potions) S.potions+=it.give.potions; if(it.give.tickets) S.tickets+=it.give.tickets; if(it.give.casts) S.fishing.casts+=it.give.casts;
+        let msg=`แลก ${it.th} แล้ว`;
+        if(it.give.shards){ const pool=HEROES.filter(h=>h.rar===it.give.rar), sh=pool[Math.floor(rng()*pool.length)]; addShards(sh.id,it.give.shards); msg=`ได้เศษ${sh.th} ×${it.give.shards}` }
+        save(); render(); toast(msg); return }
       case 'shard': { const h=HERO[id], own=!!H(id), need=SHARD_NEED[h.rar][own?'own':'neu']; if((S.shards[id]||0)<need) return;
         S.shards[id]-=need; if(own) H(id).copies++; else { S.heroes[id]={lv:1,star:1,copies:0,aw:0,eq:{}}; placeInTeam(id) }
         save(); render(); toast(own?`ได้สำเนา ${h.th} +1`:`ได้รับขุนพล ${h.th}!`); return }

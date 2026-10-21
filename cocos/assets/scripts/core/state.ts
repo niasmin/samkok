@@ -15,6 +15,8 @@ export interface GameState {
   fishPts: number;
   shards: Record<string, number>;
   tut: number;
+  potions: number;   // ยา EXP
+  friend: number;    // แต้มมิตรภาพ
 }
 
 const starter = (lv: number): HeroOwned => ({ lv, star: 1, copies: 0, aw: 0, eq: {} });
@@ -26,7 +28,7 @@ export function newGame(now = Date.now()): GameState {
     // new players start alone as young Liu Bei; stages 1-1 and 1-2 bring the sworn brothers
     heroes: { liubei_y: starter(1) },
     team: ['liubei_y', null, null, null, null, null],   // 0-2 front row, 3-5 back row
-    pityS: 0, pitySP: 0, pulls: 0, souls: {}, story: {}, gear: [], gearSeq: 1, beasts: {}, fishPts: 0, shards: {}, tut: 0,
+    pityS: 0, pitySP: 0, pulls: 0, souls: {}, story: {}, gear: [], gearSeq: 1, beasts: {}, fishPts: 0, shards: {}, tut: 0, potions: 3, friend: 0,
   };
 }
 

@@ -44,3 +44,13 @@ test('strategists deal magic damage and see magic defence', () => {
   const s = G.stats('zhuge', 10, 1);
   assert.ok(s.mdef > s.def);
 });
+
+test('front-liners level up cheaper than strategists', () => {
+  assert.ok(G.lvCost(20, 'war').gold < G.lvCost(20, 'strat').gold);
+});
+
+test('every stage belongs to a named region', () => {
+  assert.equal(G.regionOf(1), 0);
+  assert.equal(G.regionOf(11), 1);
+  assert.ok(G.REGIONS.length >= 10);
+});
