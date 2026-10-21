@@ -572,6 +572,43 @@ nav button[aria-current="page"] .nvi{filter:drop-shadow(0 0 8px rgba(242,216,142
 .card.SP .rar{color:#ffd36a!important}
 .card .lv{top:auto;bottom:35px;right:4px;z-index:1}
 .card.in-team::after{bottom:auto;top:3px;right:3px}
+
+/* mockup pass 3: painted scenes for camp, tower, shrine, arena, beasts, train, heroes */
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}
+.pic{position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--gold);background-size:100% 100%;background-repeat:no-repeat}
+.pic .ov{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center}
+.scene.pic{aspect-ratio:852/860;background-image:url(ui/sc-camp.webp)}
+.o-stage{left:4.7%;top:20.9%;width:30.3%;height:9.3%;border-radius:8px;background:linear-gradient(180deg,#4a2a14,#2a160a);border:2px solid #d4a446;color:#fbe7b0;font:clamp(16px,5vw,22px) var(--f-display)}
+.o-map{left:52.2%;top:20.9%;width:45.8%;height:9.3%;border-radius:8px;background:linear-gradient(180deg,#3a2210,#22140a);border:2px solid #d4a446;color:#fbe7b0;font-size:clamp(10px,2.9vw,13px);font-weight:700;padding:0 4px;white-space:nowrap;overflow:hidden}
+.chestimg{width:64px;height:50px;object-fit:contain}
+.afk{grid-template-columns:64px 1fr auto}
+.altar.pic{width:100%;max-width:none;aspect-ratio:852/1010;margin:0;background-image:url(ui/sc-shrine.webp)}
+.o-time{left:61%;top:5.4%;width:34.6%;height:5.4%;border-radius:8px;background:linear-gradient(180deg,#3a1030,#1e0818);border:1.5px solid #d4a446;color:#fbe7b0;font-size:12px;font-weight:700}
+.orb{position:absolute;left:var(--x);top:var(--y);width:14.6%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%}
+.orb.on{background:radial-gradient(circle at 45% 40%,rgba(255,190,240,.85),rgba(170,70,220,.75) 55%,rgba(80,20,120,.2) 72%,transparent 74%);box-shadow:0 0 18px rgba(255,150,230,.8);mix-blend-mode:screen}
+.altar.pic .pick{left:50%;top:60.4%;width:23.8%}
+.altar.pic .pick .card,.altar.pic .pick .plus{width:100%}
+.altar.pic .pick .plus{opacity:0;aspect-ratio:203/322}
+.altar.pic .pick:has(.plus)>span{display:none}
+.altar.pic .pick>span{position:absolute;top:100%;font-size:10.5px;white-space:nowrap;background:rgba(30,8,24,.85);border-radius:6px;padding:1px 6px}
+.shrine:has(.altar.pic){padding:0;border:0;background:none}
+.shrine .pity{margin-top:10px}
+.tower.pic{aspect-ratio:852/1125;background-image:url(ui/sc-tower.webp);display:block}
+.tf{left:55%;width:25%;height:7.6%;flex-direction:column;border-radius:6px;background:linear-gradient(180deg,#2a1a10,#160c06);border:1.5px solid #d4a446;color:#fbe7b0;line-height:1.15}
+.tf b{font:clamp(13px,4vw,17px) var(--f-display)}.tf small{font-size:clamp(9px,2.6vw,11px)}
+.tf0{top:17.2%}.tf1{top:38.8%}.tf2{top:60.9%}.tf3{top:83.6%;height:8.4%}
+.tf.cur{background:linear-gradient(180deg,#fff3d0,#f0d48a);color:#3a1a08;box-shadow:0 0 14px rgba(255,220,130,.9)}
+.shead{position:relative;height:150px;border-radius:14px;border:2px solid var(--gold);background:center/cover no-repeat;display:flex;align-items:flex-end;justify-content:center;margin-bottom:10px}
+.shead.tall{height:190px}
+.ribbon{margin:0 0 -2px;font:clamp(24px,7vw,32px)/1.2 var(--f-display);color:#ffe9a8;text-shadow:0 2px 0 #4a1a08,0 0 8px rgba(0,0,0,.6);background:linear-gradient(180deg,#8a1e14,#5a1008);border:2px solid #d4a446;border-bottom:0;border-radius:12px 12px 0 0;padding:4px 26px 2px}
+.beast img.ic{object-fit:cover;padding:0}
+.trainsc.pic{aspect-ratio:852/560;background-image:url(ui/sc-train.webp);margin-bottom:10px}
+.o-tcard{left:4.7%;top:46.4%;width:61%;height:51%;flex-direction:column;align-items:flex-start!important;justify-content:flex-end!important;text-align:left!important;padding:6px 8px;border-radius:10px;background:linear-gradient(180deg,#fff8e8,#f6e8ce);border:1.5px solid #d4a446;color:#3a1a08}
+.o-tcard .ic{position:absolute;left:6px;top:6px;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;font:26px/1 var(--f-seal);color:#fff;background:linear-gradient(160deg,#5fc06a,#1f7a32);border:2px solid #d4a446}
+.o-tcard b{font-size:clamp(12px,3.6vw,15px)}.o-tcard p{margin:2px 0 0;font-size:clamp(8.5px,2.4vw,11px);line-height:1.25;color:#6a4a32}
+.o-tbtn{left:67.8%;top:75%;width:27.8%;height:19.6%;font:clamp(18px,5.5vw,24px) var(--f-display);padding:0}
+.hhead.pic{aspect-ratio:852/175;background-image:url(ui/sc-heroes.webp);margin-bottom:10px}
+.o-own{left:39.5%;top:50%;width:20.5%;height:28%;border-radius:6px;background:linear-gradient(180deg,#6a1a10,#4a0e08);color:#ffe9a8;font-weight:700;font-size:clamp(11px,3.3vw,14px)}
 </style>
 
 <div id="app">
@@ -1171,17 +1208,13 @@ function viewCamp(){
   const foes=enemyTeam(S.stage), a=afkNow(), rw=stageReward(S.stage), fp=foes.reduce((x,f)=>x+power(f.id,f.lv,f.star),0);
   const team=S.team.filter(Boolean);
   return `
-  <div class="maprow"><button class="btn ghost small" data-go="map">แผนที่โลก · แคว้น${esc(REGIONS[regionOf(S.stage)%REGIONS.length].n)}</button></div>
-  <div class="scene" id="scene">
-    ${campArt(S.stage)}
-    <span class="stage-tag">ด่าน ${stageLabel(S.stage)}</span>
-    <div class="march">${team.map(id=>tok(id)).join('')}</div>
-    <div class="march foe-march">${foes.slice(0,3).map(f=>tok(f.id,'',false)).join('')}</div>
-    <span class="clash" aria-hidden="true"></span>
+  <div class="scene pic" id="scene">
+    <span class="ov o-stage">ด่าน ${stageLabel(S.stage)}</span>
+    <button class="ov o-map" data-go="map">แผนที่โลก · แคว้น${esc(REGIONS[regionOf(S.stage)%REGIONS.length].n)} ›</button>
   </div>
 
   <div class="panel afk">
-    <div class="chest" aria-hidden="true"></div>
+    <img class="chestimg" src="ui/chest.webp" alt="">
     <div>
       <div class="t" id="afkT">${hms(a.mins)}</div>
       <div class="r"><span>เงิน +<b id="afkG">${fmt(a.gold)}</b></span><span>EXP +<b id="afkX">${fmt(a.exp)}</b></span><span>หยก +<b id="afkJ">${a.gems}</b></span></div>
@@ -1210,7 +1243,7 @@ function viewHeroes(){
   const owned=Object.keys(S.heroes).length;
   const chip=(k,label,seal)=>`<button class="chip" data-fac="${k}" aria-pressed="${roster.fac===k}">${seal?`<span class="s">${seal}</span>`:''}${label}</button>`;
   return `
-  <h1 class="h">ขุนพล <span class="sub">มีแล้ว ${owned}/${HEROES.length}</span></h1>
+  <div class="hhead pic"><h1 class="vh">ขุนพล</h1><span class="ov o-own">มีแล้ว ${owned}/${HEROES.length}</span></div>
   <div class="search">
     <input id="q" type="search" placeholder="ค้นหาชื่อ ไทย/อังกฤษ บทบาท หรือสกิล" value="${esc(roster.q)}" aria-label="ค้นหาขุนพล">
     <select id="sort" aria-label="เรียงตาม">
@@ -1386,14 +1419,13 @@ function campArt(stage){
   </svg>`;
 }
 const NODES=[[50,9],[90,38],[75,86],[25,86],[10,38]];
+const SHRINE_ORBS=[[49.9,33.9],[80.8,52.3],[69.2,81.2],[30.3,81.2],[19,52.3]];
 function viewShrine(){
   const pick=S.shrinePick, left=10-S.shrinePity, lit=Math.floor(S.shrinePity/2), soul=pick?(S.souls[pick]||0):0;
   return `${back()}
   <div class="shrine">
-    <div class="sh-head"><h1 class="h" style="margin:0">ศาลตื่นจิต</h1><span class="sub">${eventLeft()}</span></div>
-    <div class="altar">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="${NODES.map(n=>n.join(',')).join(' ')}" fill="none" stroke="rgba(242,216,142,.45)" stroke-width=".8"/></svg>
-      ${NODES.map((n,i)=>`<span class="node ${i<lit?'on':''}" style="--x:${n[0]}%;--y:${n[1]}%">魂</span>`).join('')}
+    <div class="altar pic"><h1 class="vh">ศาลตื่นจิต</h1><span class="ov o-time">${eventLeft()}</span>
+      ${SHRINE_ORBS.map((n,i)=>`<span class="orb ${i<lit?'on':''}" style="--x:${n[0]}%;--y:${n[1]}%"></span>`).join('')}
       <div class="pick">${pick?cardHTML(pick,{team:false,force:true,act:'shrinepick'}):'<button class="plus" data-act="shrinepick" aria-label="เลือกขุนพล">+</button>'}
         <span>${pick?`ผลึกจิตที่มี ${soul} · แตะเพื่อเปลี่ยน`:'เลือกขุนพล S+ เอง'}</span></div>
     </div>
@@ -1416,8 +1448,7 @@ function viewTower(){
   const f=S.tower, foes=towerTeam(f), rw=towerReward(f), fp=foes.reduce((a,x)=>a+power(x.id,x.lv,x.star,x.aw),0);
   const fl=n=>{const r=towerReward(n); return `<div class="floor ${n===f?'cur':n<f?'done':''}"><span>ชั้น ${n}</span><small>${n<f?'ผ่านแล้ว':`หยก ${r.gems} · ตั๋ว ${r.tickets}${r.chest?' · หีบเลือก S+':''}`}</small></div>`};
   return `${back()}
-  <h1 class="h">หอท้าขุนพล</h1>
-  <div class="tower">${[f+3,f+2,f+1,f,f-1].filter(n=>n>0).map(fl).join('')}</div>
+  <div class="tower pic"><h1 class="vh">หอท้าขุนพล</h1>${[f+3,f+2,f+1,f].map((n,i)=>{const r=towerReward(n);return `<span class="ov tf tf${i} ${n===f?'cur':''}"><b>ชั้น ${n}</b><small>หยก ${r.gems} · ตั๋ว ${r.tickets}${r.chest?' · หีบ S+':''}</small></span>`}).join('')}</div>
   <div class="challenge">
     <button class="btn red" data-act="fighttower">ท้าทายชั้น ${f}</button>
     <div><div class="foes">${foes.map(x=>tok(x.id)).join('')}</div>
@@ -1571,7 +1602,7 @@ function arenaOpps(){
 function viewArena(){
   const r=arenaRank(), lv=avgTeamLv();
   return `${back()}
-  <h1 class="h">สนามประลอง</h1>
+  <div class="shead" style="background-image:url(ui/sc-arena.webp)"><h1 class="ribbon">สนามประลอง</h1></div>
   <div class="arena-top"><div><b>${r}</b><span>อันดับ / ${BOTS.length+realPlayers().length+1}</span></div><div><b>${fmt(S.arena.pts)}</b><span>แต้มประลอง</span></div><div><b>${S.arena.left}/5</b><span>สิทธิ์วันนี้</span></div></div>
   ${arenaOpps().map(b=>{const t=botTeam(b,S.arena.pts,lv,S.arena.ref), pw=t.reduce((a,x)=>a+power(x.id,x.lv,x.star),0);
     return `<div class="panel opp"><div><b>${esc(b.name)}</b> <span style="font-size:12px;color:var(--muted)">แต้ม ${fmt(b.pts)} · พลัง ${fmt(pw)}</span>
@@ -1601,12 +1632,12 @@ function realArenaHTML(){
 function viewBeasts(){
   const p=beastPct(S.beasts);
   return `${back()}
-  <h1 class="h">บ้านสัตว์เทพ</h1>
+  <div class="shead tall" style="background-image:url(ui/sc-beasts.webp)"><h1 class="ribbon">บ้านสัตว์เทพ</h1></div>
   <div class="panel rates">โบนัสทั้งทัพ: ATK +${(p.atk*100).toFixed(1)}% · HP +${(p.hp*100).toFixed(1)}% · DEF +${(p.def*100).toFixed(1)}%
     <div style="margin-top:4px">อาหารสัตว์เทพ (ปลา) ที่มี <b>${S.fishPts}</b> แต้ม · <button class="btn ghost small" style="color:var(--on-parch)" data-go="fish">ไปตกปลา</button></div></div>
   <div style="margin-top:10px">${BEASTS.map(b=>{const lv=S.beasts[b.k]||0, c=beastCost(lv), max=lv>=BEAST_MAX;
     const eff=[b.atk?`ATK +${(b.atk*100).toFixed(1)}%`:'', b.hp?`HP +${(b.hp*100).toFixed(1)}%`:'', b.def?`DEF +${(b.def*100).toFixed(1)}%`:''].filter(Boolean).join(' · ');
-    return `<div class="panel item beast ${b.k} ${lv?'':'locked'}"><span class="ic">${b.ch}</span>
+    return `<div class="panel item beast ${b.k} ${lv?'':'locked'}"><img class="ic" src="ui/bst-${b.k}.webp" alt="">
       <div><b>${b.th} ${lv?`Lv.${lv}/${BEAST_MAX}`:'(ยังไม่ปลุก)'}</b><p>ทุกเลเวล: ${eff}</p>
         ${max?'':`<p>ใช้ปลา ${c.fish} · เงิน ${fmt(c.gold)}</p>`}</div>
       <button class="btn" data-act="beastup" data-k="${b.k}" ${max||S.fishPts<c.fish||S.gold<c.gold?'disabled':''}>${max?'เต็ม':lv?'ให้อาหาร':'ปลุก'}</button></div>`}).join('')}</div>`;
@@ -1865,9 +1896,9 @@ function viewTrain(){
     return `<div class="grow shard" style="--q:var(--${HERO[id].fac})">${tok(id)}<div><b>${esc(HERO[id].th)} <small>Lv.${h.lv}/${cap} · ${h.aw?'☾'.repeat(h.aw):'★'.repeat(h.star)}</small></b>
       <p>เลื่อนระดับ: เงิน ${fmt(c.gold)} · EXP ${fmt(c.exp)}${canSt?' · <b style="color:var(--shu)">เลื่อนดาวได้</b>':''}${canAw?' · <b style="color:var(--wu)">ตื่นจิตได้</b>':''}</p></div>
       <div class="acts"><button class="btn small" data-act="lvup" data-id="${id}" ${canLv?'':'disabled'}>+1</button><button class="btn small" data-act="lvup10" data-id="${id}" ${canLv?'':'disabled'}>+10</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="hero" data-id="${id}">ดู</button></div></div>`};
-  return `<h1 class="h">ฝึกฝน</h1>
-  <div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#9ad48a,#2e6a32)">练</span><div><b>ลานฝึก ${S.train.left}/3 รอบวันนี้</b><p>ซ้อมรบกับหุ่นฝึกระดับเดียวกับทัพ ชนะได้ยา EXP 3 ขวดและ EXP ตามเลเวลทัพ แพ้ก็ยังได้ยา 1 ขวด</p></div>
-    <button class="btn red" data-act="train" ${S.train.left?'':'disabled'}>ฝึก</button></div>
+  return `<div class="trainsc pic"><h1 class="vh">ฝึกฝน</h1>
+    <div class="ov o-tcard"><span class="ic">练</span><b>ลานฝึก ${S.train.left}/3 รอบวันนี้</b><p>ซ้อมรบกับหุ่นฝึกระดับเดียวกับทัพ ชนะได้ยา EXP 3 ขวดและ EXP ตามเลเวลทัพ แพ้ก็ยังได้ยา 1 ขวด</p></div>
+    <button class="ov o-tbtn btn red" data-act="train" ${S.train.left?'':'disabled'}>ฝึก</button></div>
   <div class="row" style="margin:10px 0 6px"><b>ขุนพลในทัพ ${team.length} คน</b>
     <span style="display:flex;gap:6px"><button class="btn small" data-act="lvall">เลื่อนระดับทั้งทัพ</button><button class="btn ghost small" data-act="gearall">สวมอุปกรณ์ทั้งทัพ</button></span></div>
   <div class="glist">${team.map(row).join('')}</div>
