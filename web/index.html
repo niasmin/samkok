@@ -752,6 +752,21 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .slotrow p{margin:2px 0 0;font-size:13px;color:var(--muted)}
 .code{width:100%;box-sizing:border-box;font:12px ui-monospace,monospace;border-radius:8px;border:1.5px solid #d4a446;padding:6px;background:#fffaf0;color:#3a2416;word-break:break-all;resize:vertical}
 .avatar[data-go]{cursor:pointer}
+
+/* training page v2 */
+.trainsc2.pic{aspect-ratio:852/395;background:url(ui/sc-train2.webp) center/cover no-repeat;margin-bottom:-14px}
+.trainsc2.pic::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22%;background:linear-gradient(transparent,rgba(42,11,8,.85))}
+.traincard{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;margin:0 6px 12px}
+.traincard b{font:17px var(--f-display);color:#3a1a08}.traincard b em{font-style:normal;color:#c4321f}
+.traincard p{margin:4px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
+.traincard .btn{font:22px var(--f-display);padding:12px 22px}
+.trainadd{display:block;width:100%;text-align:center;padding:12px;margin-top:8px;border:2px dashed #d4a446;background:rgba(255,248,232,.08);color:#f2d88e;font-weight:700}
+.resbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.resbar>span{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.3);border:1px solid rgba(212,164,70,.5);color:#fff3d6;font-weight:700;font-size:13px}
+.resbar img{width:22px;height:22px}
+.resbar .link{color:#ffe066;text-decoration:underline;font-weight:700}
+.glist .grow b small{display:block;font-weight:600;color:#8a1e14;margin-top:1px}
+.glist .grow p{margin-top:2px}
 </style>
 
 <div id="app">
@@ -2071,13 +2086,14 @@ function viewTrain(){
     return `<div class="grow shard" style="--q:var(--${HERO[id].fac})">${tok(id)}<div><b>${esc(HERO[id].th)} <small>Lv.${h.lv}/${cap} · ${h.aw?'☾'.repeat(h.aw):'★'.repeat(h.star)}</small></b>
       <p>เลื่อนระดับ: เงิน ${fmt(c.gold)} · EXP ${fmt(c.exp)}${canSt?' · <b style="color:var(--shu)">เลื่อนดาวได้</b>':''}${canAw?' · <b style="color:var(--wu)">ตื่นจิตได้</b>':''}</p></div>
       <div class="acts"><button class="btn small" data-act="lvup" data-id="${id}" ${canLv?'':'disabled'}>+1</button><button class="btn small" data-act="lvup10" data-id="${id}" ${canLv?'':'disabled'}>+10</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="hero" data-id="${id}">ดู</button></div></div>`};
-  return `<div class="trainsc pic"><h1 class="vh">ฝึกฝน</h1>
-    <div class="ov o-tcard"><span class="ic">练</span><b>ลานฝึก ${S.train.left}/3 รอบวันนี้</b><p>ซ้อมรบกับหุ่นฝึกระดับเดียวกับทัพ ชนะได้ยา EXP 3 ขวดและ EXP ตามเลเวลทัพ แพ้ก็ยังได้ยา 1 ขวด</p></div>
-    <button class="ov o-tbtn btn red" data-act="train" ${S.train.left?'':'disabled'}>ฝึก</button></div>
+  return `<div class="trainsc2 pic"><h1 class="vh">ฝึกฝน</h1></div>
+  <div class="panel traincard"><div><b>ลานฝึก <em>${S.train.left}/3</em> รอบวันนี้</b><p>ซ้อมรบกับหุ่นฝึกระดับเดียวกับทัพ ชนะได้ยา EXP 3 ขวดและ EXP ตามเลเวลทัพ แพ้ก็ยังได้ยา 1 ขวด</p></div>
+    <button class="btn red" data-act="train" ${S.train.left?'':'disabled'}>${S.train.left?'ฝึก':'ครบแล้ว'}</button></div>
   <div class="row" style="margin:10px 0 6px"><b>ขุนพลในทัพ ${team.length} คน</b>
     <span style="display:flex;gap:6px"><button class="btn small" data-act="lvall">เลื่อนระดับทั้งทัพ</button><button class="btn ghost small" data-act="gearall">สวมอุปกรณ์ทั้งทัพ</button></span></div>
   <div class="glist">${team.map(row).join('')}</div>
-  <div class="note">เงิน ${fmt(S.gold)} · EXP ${fmt(S.exp)} · ยา EXP ${S.potions} ขวด (ใช้ได้ในกระเป๋า)</div>`;
+  ${team.length<6?`<button class="panel trainadd" data-go="formation">＋ ทัพยังว่าง ${6-team.length} ช่อง แตะเพื่อจัดทีม</button>`:''}
+  <div class="resbar"><span><i class="coin g"></i>${fmt(S.gold)}</span><span><i class="coin x"></i>${fmt(S.exp)}</span><span><img src="ui/it-potion.webp" alt="">ยา EXP ${S.potions} <button class="link" data-go="bag">ใช้</button></span></div>`;
 }
 
 // ---------- weekly event ranking ----------
