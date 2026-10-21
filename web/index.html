@@ -874,6 +874,17 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .fig .liveart{border-radius:50%;overflow:hidden}
 @media (prefers-reduced-motion:reduce){.liveart,.liveart i{animation:none!important}}
 .evt .evi{display:block;width:44px;height:44px;margin:0 auto 2px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+
+/* auto play */
+.apbox{margin-top:12px;padding:12px 14px}
+.aphead b{font:17px var(--f-display);color:#8a1e14;display:block}.aphead small{font-size:12.5px;color:var(--muted)}
+.apopts{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.apbox .chip{color:#5a1008;background:#fff3d0}.apbox .chip[aria-pressed="true"]{background:var(--gold);color:#3a1f08}
+.apbox .chip[aria-pressed="true"]::before{content:"✓ "}
+.aptag{color:#ffe066!important;border-color:#ffe066!important;animation:pulse 1.6s ease-in-out infinite}
+.apnext{margin:12px 0 0;font-size:13px;color:#2e7a3a;font-weight:600}
+.bhead .btn{padding:8px 10px;white-space:nowrap}.bhead .rnd,.bhead .sub{white-space:nowrap}
+.aptag{font-size:13px}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1233,6 +1244,7 @@ function migrate(d){
   for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story','potions','friend','assist','train','evw']) if(d[k]===undefined) d[k]=f[k];
   if(!d.bag) d.bag={selSP:1};
   if(!d.coupons) d.coupons=[];
+  if(!d.autoCfg) d.autoCfg={lv:true, gear:true, team:true, speed:4};
   if(d.tut===undefined) d.tut=99;          // saves from before the tutorial skip it
   if(!d.shards) d.shards={};
   if(d.team.length===5) d.team=[d.team[0],d.team[1],null,d.team[2],d.team[3],d.team[4]]; // old 2+3 layout → 3+3
@@ -1633,7 +1645,10 @@ function viewCamp(){
       <div class="sub" style="text-align:right;margin-top:4px">ทัพศัตรู Lv.${foes[0].lv} · พลัง ${fmt(fp)}</div>
     </div>
   </div>
-  <div class="note">ชนะแล้วได้ เงิน ${fmt(rw.gold)} · EXP ${fmt(rw.exp)} · หยก ${rw.gems}${S.stage%5===0?' (ด่านบอส)':''} และรางวัลออฟไลน์ต่อนาทีจะเพิ่มขึ้น</div>`;
+  <div class="note">ชนะแล้วได้ เงิน ${fmt(rw.gold)} · EXP ${fmt(rw.exp)} · หยก ${rw.gems}${S.stage%5===0?' (ด่านบอส)':''} และรางวัลออฟไลน์ต่อนาทีจะเพิ่มขึ้น</div>
+  <div class="panel apbox"><div class="aphead"><b>เล่นอัตโนมัติ</b><small>สู้ต่อเนื่อง ระหว่างด่านจะพัฒนาทัพให้เอง หยุดเมื่อแพ้ 3 ครั้งติด</small></div>
+    <div class="apopts">${[['lv','อัปเลเวล'],['gear','ใส่ของ'],['team','เลือกตัวละคร']].map(([k,t])=>`<button class="chip" data-act="apcfg" data-k="${k}" aria-pressed="${apCfg()[k]!==false}">${t}</button>`).join('')}</div>
+    <button class="gbtn big" style="width:100%" data-act="apstart" data-m="stage">▶ เริ่มเล่นอัตโนมัติ</button></div>`;
 }
 
 function viewHeroes(){
@@ -1860,7 +1875,10 @@ function viewTower(){
     <div><div class="foes">${foes.map(x=>tok(x.id)).join('')}</div>
       <div class="sub" style="text-align:right;margin-top:4px">Lv.${foes[0].lv}${foes[0].aw?` · ตื่นจิต ${foes[0].aw}`:''} · พลัง ${fmt(fp)}</div></div>
   </div>
-  <div class="note">หอแยกจากด่านหลักและยากขึ้นเร็วกว่า ตั้งแต่ชั้น 60 ศัตรูจะตื่นจิตแล้ว ชั้นที่ลงท้ายด้วย 0 ได้หีบเลือกขุนพล S+</div>`;
+  <div class="note">หอแยกจากด่านหลักและยากขึ้นเร็วกว่า ตั้งแต่ชั้น 60 ศัตรูจะตื่นจิตแล้ว ชั้นที่ลงท้ายด้วย 0 ได้หีบเลือกขุนพล S+</div>
+  <div class="panel apbox"><div class="aphead"><b>เล่นอัตโนมัติ</b><small>สู้ต่อเนื่อง ระหว่างด่านจะพัฒนาทัพให้เอง หยุดเมื่อแพ้ 3 ครั้งติด</small></div>
+    <div class="apopts">${[['lv','อัปเลเวล'],['gear','ใส่ของ'],['team','เลือกตัวละคร']].map(([k,t])=>`<button class="chip" data-act="apcfg" data-k="${k}" aria-pressed="${apCfg()[k]!==false}">${t}</button>`).join('')}</div>
+    <button class="gbtn big" style="width:100%" data-act="apstart" data-m="tower">▶ เริ่มเล่นอัตโนมัติ</button></div>`;
 }
 
 function gearRow(g, acts){
@@ -2654,14 +2672,14 @@ function doPull(n){
   </div>`;
 }
 
-function autoTeam(){
+function autoTeam(quiet){
   const owned=Object.keys(S.heroes).sort((a,b)=>heroPower(b)-heroPower(a));
   const fronters=owned.filter(id=>['war','cav'].includes(HERO[id].role));
   const team=[null,null,null,null,null,null];
   fronters.slice(0,3).forEach((id,i)=>team[i]=id);
   const rest=owned.filter(id=>!team.includes(id));
   let k=0; for(let i=0;i<6;i++){ if(!team[i] && rest[k]) team[i]=rest[k++] }
-  S.team=team; save(); render(); toast('จัดทัพจากขุนพลที่แรงที่สุดแล้ว');
+  S.team=team; save(); if(quiet) return; render(); toast('จัดทัพจากขุนพลที่แรงที่สุดแล้ว');
 }
 
 function toggleTeam(id){
@@ -2706,7 +2724,7 @@ function fight(mode='stage', bot=null){
   $('#layer').innerHTML=`<div class="battle" role="dialog" aria-label="การต่อสู้">
     <div class="field">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}
       <div class="bhead"><span class="rnd" id="rnd">รอบ 1</span><span class="sub">${train?'ลานฝึก':trial?`ทดลองใช้ ${esc(HERO[bot.id].th)}`:story?`เนื้อเรื่อง ${bot.c+1}-${bot.s+1}`:raid?'บอสกิลด์':tower?`หอท้าขุนพล ชั้น ${S.tower}`:arena?`ประลองกับ ${esc(bot.name)}`:`ด่าน ${stageLabel(S.stage)}`}</span>
-        <span style="display:flex;gap:6px"><button class="btn ghost" data-act="speed" id="spd">x1</button><button class="btn ghost" data-act="skip">ข้าม</button></span></div>
+        <span style="display:flex;gap:6px">${UI.autoplay?`<button class="btn ghost aptag" data-act="apstop">■ ออโต้</button>`:''}<button class="btn ghost" data-act="speed" id="spd">x1</button><button class="btn ghost" data-act="skip">ข้าม</button></span></div>
       <div class="side"><div class="line">${by('e',[3,4,5])}</div><div class="line">${by('e',[0,1,2])}</div></div>
       <div class="vs" aria-hidden="true">战</div>
       <div class="side"><div class="line">${by('p',[0,1,2])}</div><div class="line">${by('p',[3,4,5])}</div></div>
@@ -2853,9 +2871,46 @@ function finish(){
       </div></div>`;
     $('.battle')?.appendChild(box);
     sfx(win||raid?'win':'lose');
+    if(UI.autoplay) autoContinue(win);
   }, 500/B.speed);
 }
-function endBattle(){ if(B){clearTimeout(B.timer);B.done=true} closeLayer(); render(); setMusic('city') }
+// ---------- auto play: keep fighting, upgrading between battles, until stuck ----------
+const AP_MODES=['stage','tower'];
+const apCfg = () => S.autoCfg||(S.autoCfg={lv:true, gear:true, team:true, speed:4});
+function autoPrep(){
+  const c=apCfg(), log=[];
+  if(c.team){ const before=S.team.join(); autoTeam(true); if(S.team.join()!==before) log.push('จัดทัพใหม่') }
+  if(c.lv){ let n=0, moved=true; const ids=S.team.filter(Boolean);
+    while(moved && n<500){ moved=false; for(const id of ids){ if(levelUp(id,1)){ n++; moved=true } } }
+    if(S.potions>0 && n===0){ S.exp+=S.potions*POTION_EXP; S.potions=0; moved=true; while(moved && n<500){ moved=false; for(const id of ids){ if(levelUp(id,1)){ n++; moved=true } } } }
+    if(n) log.push(`เลื่อนระดับ ${n} ครั้ง`) }
+  if(c.gear){ S.team.filter(Boolean).forEach(autoGear); }
+  for(const id of Object.keys(S.heroes)){ const h=H(id), sc=starCost(h.star); if(h.star<5 && h.copies>=sc.copies && S.gold>=sc.gold){ h.copies-=sc.copies; S.gold-=sc.gold; h.star++; log.push(`${HERO[id].th} ขึ้น ${h.star} ดาว`) } }
+  save(); return log;
+}
+function startAuto(mode){
+  UI.autoplay={mode, wins:0, loss:0, start:S.stage, startTower:S.tower};
+  try{ navigator.wakeLock?.request('screen').then(l=>UI.wl=l).catch(()=>{}) }catch(e){}
+  autoPrep(); closeLayer(); fight(mode); if(B) B.speed=apCfg().speed; const sp=$('#spd'); if(sp) sp.textContent='x'+B.speed;
+}
+function stopAuto(msg){
+  const ap=UI.autoplay; if(!ap) return; clearTimeout(UI.apT); UI.autoplay=null;
+  try{ UI.wl?.release() }catch(e){} UI.wl=null;
+  const gained=ap.mode==='tower'?`ผ่านหอ ${S.tower-ap.startTower} ชั้น`:`ผ่าน ${S.stage-ap.start} ด่าน`;
+  toast(`${msg?msg+' · ':''}หยุดเล่นอัตโนมัติ (${gained})`);
+  $('.aptag')?.remove(); $('.apnext')?.remove();
+}
+function autoContinue(win){
+  const ap=UI.autoplay; if(!ap) return;
+  if(!B || B.mode!==ap.mode){ stopAuto(); return }
+  if(win){ ap.wins++; ap.loss=0 } else ap.loss++;
+  if(ap.loss>=3){ stopAuto(`ติด${ap.mode==='tower'?`หอชั้น ${S.tower}`:`ด่าน ${stageLabel(S.stage)}`} แพ้ 3 ครั้งติด`); return }
+  const log=autoPrep();
+  const box=$('.result .panel');
+  if(box) box.insertAdjacentHTML('beforeend',`<p class="apnext">${log.length?esc(log.join(' · '))+'<br>':''}เล่นอัตโนมัติ: ${win?'ด่านต่อไป':'ลองใหม่'}ใน 2 วินาที… <button class="btn ghost small" data-act="apstop">หยุด</button></p>`);
+  UI.apT=setTimeout(()=>{ if(!UI.autoplay||!B||!B.done) return; clearTimeout(B.timer); fight(ap.mode); }, 2000);
+}
+function endBattle(){ if(UI.autoplay) stopAuto(); if(B){clearTimeout(B.timer);B.done=true} closeLayer(); render(); setMusic('city') }
 
 // ---------- events ----------
 document.addEventListener('click',e=>{
@@ -2886,6 +2941,9 @@ document.addEventListener('click',e=>{
         f.out=Array.from({length:n},(_,i)=>makeCoupon({...f, until, nonce:(base+i)%256})).join('\n')+`\n(${couponText(f)}${until?` · ใช้ได้ถึง ${new Date(CP_EPOCH+until*864e5).toLocaleDateString('th-TH')}`:''})`;
         render(); return }
       case 'cpcopy': { const ta=$('#cpout'); ta.select(); (navigator.clipboard?.writeText(ta.value)||Promise.reject()).then(()=>toast('คัดลอกแล้ว')).catch(()=>{ try{document.execCommand('copy');toast('คัดลอกแล้ว')}catch(e){toast('กดค้างที่ช่องแล้วเลือกคัดลอก')} }); return }
+      case 'apstart': startAuto(act.dataset.m); return;
+      case 'apstop': stopAuto(); return;
+      case 'apcfg': { const c=apCfg(), k=act.dataset.k; c[k]=!c[k]; save(); act.setAttribute('aria-pressed',c[k]); return }
       case 'shtab': UI.shtab=act.dataset.k; render(); return;
       case 'savenow': save(); if(SB) cloudSave().then(render); toast('บันทึกแล้ว'); render(); return;
       case 'setname': { const n=$('#pnamein').value.trim().slice(0,24); if(!n) return toast('ใส่ชื่ออย่างน้อย 1 ตัวอักษร'); S.pname=n; save(); NET.lastJSON=''; syncSoon(); render(); toast('ตั้งชื่อแล้ว'); return }
@@ -2906,7 +2964,7 @@ document.addEventListener('click',e=>{
         { const h=$('#skHint'); if(h) h.textContent=S.autoSkill?'ขุนพลใช้สกิลเองเมื่อพลังโกรธเต็ม':'พลังโกรธเต็มแล้วแตะ "ใช้สกิล" หรือแตะรูปขุนพลที่เรืองแสง' }
         if(S.autoSkill && B && B.wait) { fireSkill() } return;
       case 'useskill': if(B && B.wait) fireSkill(); return;
-      case 'speed': B.speed=B.speed===1?2:B.speed===2?4:1; act.textContent='x'+B.speed; return;
+      case 'speed': B.speed=B.speed===1?2:B.speed===2?4:1; act.textContent='x'+B.speed; if(UI.autoplay){ apCfg().speed=B.speed; save() } return;
       case 'skip': skip(); return;
       case 'endbattle': endBattle(); return;
       case 'next': { const md=B?.mode||'stage'; if(B){clearTimeout(B.timer)} fight(md); return }
