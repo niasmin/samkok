@@ -767,8 +767,58 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .resbar .link{color:#ffe066;text-decoration:underline;font-weight:700}
 .glist .grow b small{display:block;font-weight:600;color:#8a1e14;margin-top:1px}
 .glist .grow p{margin-top:2px}
+
+/* boot screen */
+#boot{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(circle at 50% 40%,#8a1e14,#2a0b08 70%);transition:opacity .4s}
+#boot.gone{opacity:0;pointer-events:none}
+#boot .bt{font:clamp(30px,9vw,42px) var(--f-display);color:#ffe9a8;text-shadow:0 3px 0 #3a0c06,0 0 20px rgba(255,200,90,.5)}
+#boot img{width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.5));animation:breathe 2.4s ease-in-out infinite}
+#boot .bbar{width:min(260px,70vw);height:10px;border-radius:999px;background:rgba(0,0,0,.4);border:1.5px solid #d4a446;overflow:hidden}
+#boot .bbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffe066,#e0aa3e);transition:width .2s}
+#boot small{color:#f2d88e;font-size:13px}
+/* camp: clean battlefield + live march */
+.scene.pic.live{aspect-ratio:4/3;background:url(ui/bf-stage.webp) center 22%/cover no-repeat}
+.scene.live .o-stage{left:3%;top:4%;width:auto;height:auto;padding:4px 12px}
+.scene.live .o-map{left:auto;right:3%;top:4%;width:auto;height:auto;padding:6px 10px}
+.scene.live .march .tok{width:64px;height:64px}
+.scene.live .foe-march .tok{width:52px;height:52px}
+/* fishing message plaque */
+.pond .msg{left:8%;right:8%;bottom:6%;font:600 14px/1.4 system-ui,sans-serif;background:rgba(26,8,4,.72);border:1.5px solid #d4a446;border-radius:10px;padding:6px 10px;text-shadow:none}
+/* chat empty state */
+.chatwelcome{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center;background:rgba(255,250,240,.85);border:1.5px solid #d4a446;border-radius:12px;padding:8px}
+.chatwelcome img{width:72px;height:72px;object-fit:contain}
+.chatwelcome p{margin:2px 0 0;font-size:13px;line-height:1.5;color:#5a3a22}
+.chathints{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chathints .chip{color:#5a1008;background:#fff3d0}
+/* battle: livelier units */
+@keyframes breathe{50%{transform:translateY(-3px)}}
+.u .tok{animation:breathe 2.4s ease-in-out infinite}
+.u:nth-child(2) .tok{animation-delay:.4s}.u:nth-child(3) .tok{animation-delay:.8s}
+.u::after{content:"";position:absolute;left:10%;right:10%;top:64px;height:14px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.55),transparent 70%);z-index:-1}
+.u{z-index:1}
+.u.lunge-up{transform:translateY(-38px) scale(1.16);z-index:3}
+.u.lunge-down{transform:translateY(38px) scale(1.16);z-index:3}
+.u.hit .tok{animation:shake .25s,hitflash .3s}
+@keyframes hitflash{0%{filter:brightness(2.6) saturate(0)}100%{filter:none}}
+.u.dead{animation:die .5s ease-in forwards}
+@keyframes die{to{opacity:.25;filter:grayscale(1);transform:translateY(10px) rotate(-10deg)}}
+.field.flash::after{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(255,240,200,.8),rgba(255,200,120,.2) 70%);animation:fl .4s ease-out forwards;pointer-events:none;z-index:6}
+@keyframes fl{from{opacity:1}to{opacity:0}}
+.skillcall{animation:callIn 1.05s ease-out forwards;padding:14px 16px}
+.skillcall.theirs{animation-name:callInR}
+@keyframes callIn{0%{transform:translateX(-100%);opacity:0}14%{transform:none;opacity:1}82%{transform:translateX(3%);opacity:1}100%{transform:translateX(8%);opacity:0}}
+@keyframes callInR{0%{transform:translateX(100%);opacity:0}14%{transform:none;opacity:1}82%{transform:translateX(-3%);opacity:1}100%{transform:translateX(-8%);opacity:0}}
+.skillcall .cut{width:124px;height:124px;border-radius:16px;box-shadow:0 0 24px rgba(255,210,120,.8)}
+.skillcall .cut img.art{object-fit:cover;object-position:50% 10%}
+.skillcall b{font-size:clamp(28px,9vw,42px)}
+.num{font-size:22px}.num.crit{font-size:28px}
+/* readability */
+.tf small{font-size:clamp(10.5px,2.9vw,12px)}
+.gslot small,.card .lv{font-size:11.5px}
+.region small{font-size:11.5px}
 </style>
 
+<div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
 <div id="app">
   <header class="top">
     <div class="avatar" data-go="savegame" role="button" aria-label="บันทึกเกม" title="บันทึกเกม"><img src="ui/avatar.webp" alt="" draggable="false"></div>
@@ -966,8 +1016,9 @@ function enemyTeam(stage){
     return ids.map(id=>({id, lv:1, star:1, aw:0, bonus:{hpPct:-op.weak, atkPct:-op.weak}}));
   }
   const ids = pickTeam(rnd, HEROES.filter(h => h.rar==='A' || (h.rar==='S' && stage>=8) || (h.rar==='SP' && stage>=20)).map(h=>h.id));
-  const star = Math.min(5, 1+Math.floor((stage-1)/20));
-  const lv = Math.min(levelCap(star), stage);
+  const star = Math.min(5, 1+Math.floor((stage-1)/30));
+  // each star step comes with a small level dip so the jump is not a wall
+  const lv = Math.min(levelCap(star), stage-8*(star-1));
   return ids.map(id=>({id, lv, star, aw:0}));
 }
 // Trial tower (หอท้าขุนพล): its own ladder, harder and with awakened enemies from floor 60.
@@ -980,7 +1031,7 @@ function towerTeam(floor){
   return ids.map(id=>({id, lv, star, aw}));
 }
 const FIRST_HERO = {1:'guanyu_y', 2:'zhangfei_y', 3:'huatuo', 4:'huangzhong', 6:'ganning'};
-const stageReward = s => ({gold:300+s*60, exp:200+s*40, gems: s%5===0 ? 120 : 20});
+const stageReward = s => ({gold:450+s*100, exp:200+s*40, gems: s%5===0 ? 120 : 20});
 const towerReward = f => ({gems:30, tickets:2, chest: f%10===0});
 
 // Gear (อุปกรณ์): flat stats scaled by item level (il), quality and enhancement.
@@ -1033,6 +1084,9 @@ const LOGIN7 = [{gems:300},{tickets:5},{gold:50000},{fish:15},{gems:500},{exp:30
 const FISH = [{th:'ปลาตะเพียน',pts:1},{th:'ปลาคาร์ปทอง',pts:3},{th:'ปลามังกรหยก',pts:8,gems:100}];
 
 // Deterministic auto-battle. A and B are 5-slot arrays (slots 0-1 front row, 2-4 back row), null = empty.
+// Long fights tip over: from round 9 hits grow harder and heals weaker, so healer stacks can't stall to the 20-round limit.
+const fatigue = r => r<=8 ? 1 : 1+0.2*(r-8);
+const healDecay = r => r<=8 ? 1 : Math.max(0.2, 1-0.12*(r-8));
 function simulate(A, B, seed){
   const rnd = mulberry32(seed);
   const units = [];
@@ -1062,7 +1116,7 @@ function simulate(A, B, seed){
       const strike = (t, mult, combo=false) => {
         const adv = BEATS[u.fac]===t.fac ? 1.25 : BEATS[t.fac]===u.fac ? 0.85 : 1;
         const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12);
-        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)));
+        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)*fatigue(round)));
         t.hp = Math.max(0, t.hp-dmg);
         if(t.hp===0) t.alive=false; else t.rage=Math.min(100,t.rage+10);
         hits.push({tgt:t.uid, dmg, crit, adv, combo, hp:t.hp, dead:!t.alive});
@@ -1073,7 +1127,7 @@ function simulate(A, B, seed){
           hits.push({tgt:t.uid, heal:amt, divine:true, hp:t.hp});
         }
       };
-      const heal = (t, amt) => { t.hp=Math.min(t.max,t.hp+amt); hits.push({tgt:t.uid, heal:amt, hp:t.hp}) };
+      const heal = (t, amt) => { amt=Math.round(amt*healDecay(round)); t.hp=Math.min(t.max,t.hp+amt); hits.push({tgt:t.uid, heal:amt, hp:t.hp}) };
       if(kind==='heal'){
         for(const t of allies) heal(t, Math.round(u.atk*m*(0.95+rnd()*0.1)));
       } else {
@@ -1238,7 +1292,7 @@ function portrait(id, mech=false){
   const key=id+(mech?'#m':'');
   if(PCACHE[key]) return PCACHE[key];
   const h=HERO[id];
-  if(!mech && ART.has(id)) return PCACHE[key]=`<img class="art" src="art/${id}.webp" alt="" draggable="false" decoding="async">`;
+  if(!mech && ART.has(id)) return PCACHE[key]=`<img class="art" src="art/${id}.webp" alt="" draggable="false" decoding="async" loading="lazy">`;
   if(h.boss) return PCACHE[key]=`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="56" r="40" fill="#ff6a2a" opacity=".25"/><path d="M14 40 L26 6 L38 34Z M86 40 L74 6 L62 34Z" fill="#e8c45a" stroke="#6b4a10"/><circle cx="50" cy="54" r="34" fill="#4a0e08"/><path d="M20 50 Q50 30 80 50 Q66 42 50 44 Q34 42 20 50Z" fill="#2a0604"/><ellipse cx="37" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="63" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="37" cy="52" rx="2" ry="5" fill="#2a0604"/><ellipse cx="63" cy="52" rx="2" ry="5" fill="#2a0604"/><path d="M30 70 L38 64 L44 72 L50 64 L56 72 L62 64 L70 70 L62 80 L38 80Z" fill="#fff4dc"/></svg>`;
   const L=LOOK[id]||{}, f=!!L.f, hv=hashN(id);
   const skin=L.skin||'#f9d8b9', skinS=L.skin?'#b07a52':'#eab894', hair=L.old?'#dcd6cc':(L.hair||'#22170f'), bc=L.old?'#efebe3':(L.beardColor||hair);
@@ -1341,12 +1395,12 @@ const featuredSP = () => { const sp=HEROES.filter(h=>h.rar==='SP'); return sp[we
 const evMul = k => curEvent().k===k ? 2 : 1;
 function afkNow(){
   const mins = Math.min(AFK_CAP, (Date.now()-S.afkSince)/60000);
-  return {mins, gold:Math.floor(mins*(20+S.stage*5)*evMul('afk')), exp:Math.floor(mins*(15+S.stage*4)), gems:Math.floor(mins/60)*10};
+  return {mins, gold:Math.floor(mins*(30+S.stage*7)*evMul('afk')), exp:Math.floor(mins*(15+S.stage*4)), gems:Math.floor(mins/60)*10};
 }
 const hms = m => { const s=Math.floor(m*60); return [Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(x=>String(x).padStart(2,'0')).join(':') };
 
 // ---------- views ----------
-let tab='city', selPick=null, roster={q:'', fac:'all', sort:'power', showAll:false};
+let tab='city', selPick=null, roster={q:'', fac:'all', sort:'power', showAll:true};
 const TASKS=[
   {k:'afk', th:'เก็บรางวัลออฟไลน์', goal:1, gems:100},
   {k:'win', th:'ชนะการต่อสู้', goal:3, gems:150},
@@ -1395,8 +1449,11 @@ function viewCamp(){
   const foes=enemyTeam(S.stage), a=afkNow(), rw=stageReward(S.stage), fp=foes.reduce((x,f)=>x+power(f.id,f.lv,f.star),0);
   const team=S.team.filter(Boolean);
   return `
-  <div class="scene pic" id="scene">
+  <div class="scene pic live" id="scene">
     <span class="ov o-stage">ด่าน ${stageLabel(S.stage)}</span>
+    <div class="march">${team.map(id=>tok(id)).join('')}</div>
+    <div class="march foe-march">${foes.slice(0,3).map(f=>tok(f.id,'',false)).join('')}</div>
+    <span class="clash" aria-hidden="true"></span>
     <button class="ov o-map" data-go="map">แผนที่โลก · แคว้น${esc(REGIONS[regionOf(S.stage)%REGIONS.length].n)} ›</button>
   </div>
 
@@ -1487,7 +1544,7 @@ function viewFormation(){
   const fig=i=>{const id=S.team[i]; return id?`<button class="fig f${i}" data-hero="${id}"><span class="lvb">Lv.${S.heroes[id].lv}</span>${portrait(id,isMech(id))}</button>`:''};
   return `${heroTabs()}
   <div class="tstage">${[3,4,5,0,1,2].map(fig).join('')}<div class="tpow">⚔ พลังทัพ ${fmt(teamPower())}</div></div>
-  <div class="pic formh"><h1 class="vh">จัดทีมขุนพล</h1></div>
+  <h1 class="vh">จัดทีมขุนพล</h1>
   <div class="rowlabel">แถวหน้า 3 ช่อง · รับดาบก่อน เหมาะกับนักรบและทหารม้า</div>
   <div class="slots front">${slot(0)}${slot(1)}${slot(2)}</div>
   <div class="rowlabel">แถวหลัง 3 ช่อง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
@@ -1751,7 +1808,8 @@ function chatLines(){
 }
 function chatLogHTML(){
   const ls=chatLines();
-  if(!ls.length) return `<div class="empty">ยังไม่มีข้อความ${chatCh==='g'?'ในกิลด์':''} ทักทายเป็นคนแรกได้เลย</div>`;
+  if(!ls.length) return `<div class="chatwelcome"><img src="art/liubei_y.webp" alt=""><div><b>เล่าปี่วัยหนุ่ม</b><p>ยินดีต้อนรับสู่ห้อง${chatCh==='g'?'กิลด์':'แชตโลก'}! ยังไม่มีใครพูดเลย ทักทายเป็นคนแรก หรือชวนเพื่อนมาตั้งกิลด์ด้วยกัน</p></div></div>
+    <div class="chathints">${['สวัสดีทุกคน!','ใครอยู่ด่านไหนแล้ว?','หาเพื่อนเข้ากิลด์'].map(t=>`<button class="chip" data-act="chathint" data-t="${t}">${t}</button>`).join('')}</div>`;
   return ls.map(l=>`<div class="msg ${l.id===NET.me?'mine':''}"><b>${esc(l.id===NET.me?'ท่าน':pname(l.id))}</b><span>${esc(l.t)}</span><small>${new Date(l.ts).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</small></div>`).join('');
 }
 function viewChat(){
@@ -2509,7 +2567,7 @@ function step(){
     const c=document.createElement('div'); c.className='skillcall '+(a.src[0]==='p'?'mine':'theirs');
     c.innerHTML=`<span class="cut tok ${HERO[su.id].fac}">${portrait(su.id, a.src[0]==='p'&&isMech(su.id))}</span><b></b>`; c.querySelector('b').textContent=a.skill;
     document.body.appendChild(c); setTimeout(()=>c.remove(),1000/B.speed+200);
-    const fld=$('.field'); if(fld){ fld.classList.add('shake'); setTimeout(()=>fld.classList.remove('shake'),420) }
+    const fld=$('.field'); if(fld){ fld.classList.add('shake','flash'); setTimeout(()=>fld.classList.remove('shake','flash'),420) }
   }
   // visual effects per role: arrows and orbs fly, blades slash, healers glow
   for(const h of a.hits){
@@ -2614,6 +2672,7 @@ document.addEventListener('click',e=>{
       case 'close': closeLayer(); return;
       case 'more': UI.more=!UI.more; render(); return;
       case 'stab': UI.stab=act.dataset.k; render(); return;
+      case 'chathint': { const i=$('#chatin'); if(i&&!i.disabled){ chatDraft=act.dataset.t; i.value=chatDraft; i.focus() } else toast('เปิดในโหมดออนไลน์เพื่อแชต'); return }
       case 'shtab': UI.shtab=act.dataset.k; render(); return;
       case 'savenow': save(); toast('บันทึกแล้ว'); render(); return;
       case 'slotsave': { const i=+act.dataset.i; try{ localStorage.setItem(SLOT_KEY(i),JSON.stringify({ts:Date.now(),data:S})); toast(`บันทึกลงช่อง ${i+1} แล้ว`) }catch(e){ toast('บันทึกไม่ได้ เบราว์เซอร์ไม่อนุญาต') } UI.ask=null; render(); return }
@@ -2738,7 +2797,15 @@ setInterval(()=>{
   l.style.left=(30+Math.random()*40)+'%'; l.style.bottom=(30+Math.random()*10)+'%'; sc.appendChild(l); setTimeout(()=>l.remove(),1600);
 },2500);
 
-function start(data){ load(data); render(); initNet(); const sb=$('#sndbtn'); if(sb){ sb.classList.toggle('off',!SND.on); sb.setAttribute('aria-pressed',SND.on) }
+function boot(){
+  const el=$('#boot'); if(!el||typeof Image==='undefined') { el?.remove?.(); return }
+  const list=['ui/city2.webp','ui/avatar.webp',...['city','heroes','team','train','camp'].map(k=>`ui/n-${k}.webp`),...['tasks','login','bag','more'].map(k=>`ui/q-${k}.webp`),'ui/bf-stage.webp',...S.team.filter(Boolean).filter(id=>ART.has(id)).map(id=>`art/${id}.webp`)];
+  let n=0; const done=()=>{ el.classList.add('gone'); setTimeout(()=>el.remove(),450) };
+  const tick=()=>{ n++; const b=$('#bootbar'); if(b) b.style.width=Math.round(n/list.length*100)+'%'; if(n>=list.length) done() };
+  list.forEach(src=>{ const im=new Image(); im.onload=im.onerror=tick; im.src=src });
+  setTimeout(done,6000);
+}
+function start(data){ load(data); render(); boot(); initNet(); const sb=$('#sndbtn'); if(sb){ sb.classList.toggle('off',!SND.on); sb.setAttribute('aria-pressed',SND.on) }
   // browsers only allow audio after a tap, so a saved 'on' waits for the first one
   if(SND.on){ SND.on=false; document.addEventListener('pointerdown',e=>{ if(!SND.ctx && !e.target.closest('#sndbtn')) toggleSound() },{once:true}) } }
 window.claude?.hot?.snapshot?.(()=>S);

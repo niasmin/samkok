@@ -171,8 +171,9 @@ function enemyTeam(stage){
     return ids.map(id=>({id, lv:1, star:1, aw:0, bonus:{hpPct:-op.weak, atkPct:-op.weak}}));
   }
   const ids = pickTeam(rnd, HEROES.filter(h => h.rar==='A' || (h.rar==='S' && stage>=8) || (h.rar==='SP' && stage>=20)).map(h=>h.id));
-  const star = Math.min(5, 1+Math.floor((stage-1)/20));
-  const lv = Math.min(levelCap(star), stage);
+  const star = Math.min(5, 1+Math.floor((stage-1)/30));
+  // each star step comes with a small level dip so the jump is not a wall
+  const lv = Math.min(levelCap(star), stage-8*(star-1));
   return ids.map(id=>({id, lv, star, aw:0}));
 }
 // Trial tower (หอท้าขุนพล): its own ladder, harder and with awakened enemies from floor 60.
@@ -185,7 +186,7 @@ function towerTeam(floor){
   return ids.map(id=>({id, lv, star, aw}));
 }
 const FIRST_HERO = {1:'guanyu_y', 2:'zhangfei_y', 3:'huatuo', 4:'huangzhong', 6:'ganning'};
-const stageReward = s => ({gold:300+s*60, exp:200+s*40, gems: s%5===0 ? 120 : 20});
+const stageReward = s => ({gold:450+s*100, exp:200+s*40, gems: s%5===0 ? 120 : 20});
 const towerReward = f => ({gems:30, tickets:2, chest: f%10===0});
 
 // Gear (อุปกรณ์): flat stats scaled by item level (il), quality and enhancement.
@@ -238,6 +239,9 @@ const LOGIN7 = [{gems:300},{tickets:5},{gold:50000},{fish:15},{gems:500},{exp:30
 const FISH = [{th:'ปลาตะเพียน',pts:1},{th:'ปลาคาร์ปทอง',pts:3},{th:'ปลามังกรหยก',pts:8,gems:100}];
 
 // Deterministic auto-battle. A and B are 5-slot arrays (slots 0-1 front row, 2-4 back row), null = empty.
+// Long fights tip over: from round 9 hits grow harder and heals weaker, so healer stacks can't stall to the 20-round limit.
+const fatigue = r => r<=8 ? 1 : 1+0.2*(r-8);
+const healDecay = r => r<=8 ? 1 : Math.max(0.2, 1-0.12*(r-8));
 function simulate(A, B, seed){
   const rnd = mulberry32(seed);
   const units = [];
@@ -267,7 +271,7 @@ function simulate(A, B, seed){
       const strike = (t, mult, combo=false) => {
         const adv = BEATS[u.fac]===t.fac ? 1.25 : BEATS[t.fac]===u.fac ? 0.85 : 1;
         const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12);
-        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)));
+        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)*fatigue(round)));
         t.hp = Math.max(0, t.hp-dmg);
         if(t.hp===0) t.alive=false; else t.rage=Math.min(100,t.rage+10);
         hits.push({tgt:t.uid, dmg, crit, adv, combo, hp:t.hp, dead:!t.alive});
@@ -278,7 +282,7 @@ function simulate(A, B, seed){
           hits.push({tgt:t.uid, heal:amt, divine:true, hp:t.hp});
         }
       };
-      const heal = (t, amt) => { t.hp=Math.min(t.max,t.hp+amt); hits.push({tgt:t.uid, heal:amt, hp:t.hp}) };
+      const heal = (t, amt) => { amt=Math.round(amt*healDecay(round)); t.hp=Math.min(t.max,t.hp+amt); hits.push({tgt:t.uid, heal:amt, hp:t.hp}) };
       if(kind==='heal'){
         for(const t of allies) heal(t, Math.round(u.atk*m*(0.95+rnd()*0.1)));
       } else {

@@ -54,3 +54,8 @@ test('every stage belongs to a named region', () => {
   assert.equal(G.regionOf(11), 1);
   assert.ok(G.REGIONS.length >= 10);
 });
+
+test('healer-heavy enemy teams cannot stall a much stronger team to the round limit', () => {
+  const strong = ['liubei_y', 'guanyu_y', 'zhangfei_y', 'huatuo', 'huangzhong', 'ganning'].map(id => ({ id, lv: 80, star: 2, aw: 0 }));
+  for (const s of [44, 55]) assert.equal(G.simulate(strong, G.enemyTeam(s), s * 1000).winner, 'p');
+});
