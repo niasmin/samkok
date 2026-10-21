@@ -492,11 +492,40 @@ img.art{display:block;width:100%;height:100%;object-fit:cover;object-position:50
 
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(26,17,12,.94);border:1px solid var(--gold);color:var(--parchment);padding:8px 14px;border-radius:999px;font-size:13px;z-index:40;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* painted city (art from user-supplied mockup) */
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
+.avatar{padding:0;overflow:hidden;background:#2a0d09}
+nav button .nvi{width:46px;height:40px;object-fit:contain;filter:saturate(.75) brightness(.85)}
+nav button[aria-current="page"] .nvi{filter:drop-shadow(0 0 8px rgba(242,216,142,.7))}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 10px;padding:8px 6px;border-radius:12px;background:linear-gradient(180deg,#5a1a12,#3b100b);border:1px solid var(--gold)}
+.quick button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12.5px;font-weight:700;color:#fff3d6;text-shadow:0 1px 2px #000}
+.quick img{width:54px;height:54px;border-radius:50%;border:2px solid var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.45)}
+.quick .dot{top:0;right:calc(50% - 30px)}
+.city.pic{aspect-ratio:852/1105;background:#e9d9b8 url(ui/city.webp) center/cover no-repeat}
+.city.pic .hs{position:absolute;border-radius:14px}
+.city.pic .hs:focus-visible{outline:3px solid var(--gold-hi)}
+.city.pic .hs:active{background:rgba(255,230,160,.18)}
+.city.pic .hs .dot{top:2%;right:4%}
+.events[hidden]{display:none}
+.h-summon{left:0;top:9%;width:30%;height:24%}
+.h-tower{left:30%;top:13%;width:40%;height:28%}
+.h-arena{left:70%;top:21%;width:30%;height:23%}
+.h-shop{left:2%;top:46%;width:36%;height:20%}
+.h-beasts{left:62%;top:48%;width:38%;height:22%}
+.h-guild{left:14%;top:66%;width:40%;height:20%}
+.h-story{left:56%;top:74%;width:42%;height:23%}
+.bld.h-shrine{right:3%;top:2%;display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.bld.h-shrine small{font-size:10px;font-weight:400;color:var(--gold-hi)}
+.evbanner2{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:12px;background:linear-gradient(180deg,#fbf1dc,#ecd9b1);border:2px solid var(--gold);color:#3a1a0e}
+.evbanner2 img{width:56px;height:52px;object-fit:contain}
+.evbanner2 b{font-size:15px}.evbanner2 p{margin:2px 0;font-size:12px;line-height:1.4;color:#6a4a32}.evbanner2 small{font-size:11.5px;color:#a3321f;font-weight:600}
+.gbtn{padding:8px 14px;border-radius:10px;font-weight:700;color:#4a1a08;background:linear-gradient(180deg,#ffe9a8,#e0aa3e);border:2px solid #9b6a1c;box-shadow:0 2px 0 #7a4a10}
 </style>
 
 <div id="app">
   <header class="top">
-    <div class="avatar" aria-hidden="true">帅</div>
+    <div class="avatar" aria-hidden="true"><img src="ui/avatar.webp" alt="" draggable="false"></div>
     <div class="who">
       <b id="pname">ท่านเจ้าเมือง</b>
       <div class="power"><small>พลังทัพ</small><span id="ppower">0</span></div>
@@ -510,11 +539,11 @@ img.art{display:block;width:100%;height:100%;object-fit:cover;object-position:50
   </header>
   <main id="view"></main>
   <nav id="nav" aria-label="เมนูหลัก">
-    <button data-go="city"><i>城</i>เมืองหลัก</button>
-    <button data-go="heroes"><i>将</i>ขุนพล</button>
-    <button data-go="team"><i>援</i>ช่วยสู้</button>
-    <button data-go="train"><i>练</i>ฝึกฝน</button>
-    <button data-go="camp"><i>战</i>พิชิตศึก</button>
+    <button data-go="city"><img class="nvi" src="ui/n-city.webp" alt="" draggable="false">เมืองหลัก</button>
+    <button data-go="heroes"><img class="nvi" src="ui/n-heroes.webp" alt="" draggable="false">ขุนพล</button>
+    <button data-go="team"><img class="nvi" src="ui/n-team.webp" alt="" draggable="false">ช่วยสู้</button>
+    <button data-go="train"><img class="nvi" src="ui/n-train.webp" alt="" draggable="false">ฝึกฝน</button>
+    <button data-go="camp"><img class="nvi" src="ui/n-camp.webp" alt="" draggable="false">พิชิตศึก</button>
   </nav>
 </div>
 <div id="layer"></div>
@@ -1203,10 +1232,18 @@ function eventLeft(){
   const ms=end-d; return `เหลือ ${Math.floor(ms/864e5)}วัน${Math.floor(ms%864e5/36e5)}ชม.`;
 }
 
+const UI={more:false};
 function viewCity(){
-  const goal=Math.ceil(S.tower/10)*10;
+  const goal=Math.ceil(S.tower/10)*10, ev=curEvent();
+  const dot=c=>c?'<span class="dot"></span>':'';
   return `
-  <div class="events">
+  <div class="quick">
+    <button data-go="tasks"><img src="ui/q-tasks.webp" alt="">ภารกิจ${dot(tasksClaimable())}</button>
+    <button data-go="login"><img src="ui/q-login.webp" alt="">รางวัล 7 วัน${dot(loginReady())}</button>
+    <button data-go="bag"><img src="ui/q-bag.webp" alt="">กระเป๋า${dot(bagCount())}</button>
+    <button data-act="more" aria-expanded="${!!UI.more}"><img src="ui/q-more.webp" alt="">เพิ่มเติม${dot(S.guild.id!==null&&!S.guild.checked)}</button>
+  </div>
+  <div class="events" id="cmore"${UI.more?'':' hidden'}>
     <button class="evt" data-go="shrine"><i>魂</i>ตื่นจิต<small>${eventLeft()}</small></button>
     <button class="evt" data-go="tower"><i>塔</i>หอท้า<small>ชั้น ${S.tower}</small></button>
     <button class="evt" data-go="arena"><i>擂</i>ประลอง<small>${S.arena.left}/5</small></button>
@@ -1223,18 +1260,21 @@ function viewCity(){
     <button class="evt" data-go="chat"><i>话</i>แชต<small>${NET.room?`ออนไลน์ ${NET.online.length}`:'ออฟไลน์'}</small></button>
     <button class="evt" data-go="guild"><i>盟</i>กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
   </div>
-  <div class="city">
-    ${cityArt()}
-    <button class="bld b1" data-go="shrine">ศาลตื่นจิต</button>
-    <button class="bld b2" data-go="tower">หอท้าขุนพล</button>
-    <button class="bld b3" data-go="summon">แท่นอัญเชิญ${S.freeDate!==today()?'<span class="dot"></span>':''}</button>
-    <button class="bld b4" data-go="arena">สนามประลอง</button>
-    <button class="bld b5" data-go="shop">ร้าน</button>
-    <button class="bld b6" data-go="beasts">บ้านสัตว์เทพ</button>
-    <button class="bld b7" data-go="guild">กิลด์</button>
-    <button class="bld b8" data-go="story">หอพงศาวดาร</button>
+  <div class="city pic">
+    <button class="hs h-summon" data-go="summon" aria-label="แท่นอัญเชิญ">${dot(S.freeDate!==today())}</button>
+    <button class="hs h-arena" data-go="arena" aria-label="สนามประลอง"></button>
+    <button class="hs h-tower" data-go="tower" aria-label="หอท้าขุนพล"></button>
+    <button class="hs h-shop" data-go="shop" aria-label="ร้านค้า"></button>
+    <button class="hs h-beasts" data-go="beasts" aria-label="บ้านสัตว์เทพ"></button>
+    <button class="hs h-guild" data-go="guild" aria-label="กิลด์">${dot(S.guild.id!==null&&!S.guild.checked)}</button>
+    <button class="hs h-story" data-go="story" aria-label="หอพงศาวดาร"></button>
+    <button class="bld h-shrine" data-go="shrine">ศาลตื่นจิต<small>${eventLeft()}</small></button>
   </div>
-  ${(()=>{const ev=curEvent(); return `<div class="panel evbanner"><span class="ic">${ev.ch}</span><div><b>กิจกรรมสัปดาห์นี้: ${ev.th}</b><p>${ev.desc}${ev.k==='rateup'?` · ขุนพลประจำสัปดาห์: ${esc(HERO[featuredSP()].th)}`:''} · ${eventLeft()}</p></div>${ev.k==='rateup'?tok(featuredSP()):''}</div>`})()}
+  <div class="evbanner2">
+    <img src="ui/flag.webp" alt="">
+    <div><b>${ev.th}</b><p>${ev.desc}${ev.k==='rateup'?` · ขุนพลประจำสัปดาห์: ${esc(HERO[featuredSP()].th)}`:''}</p><small>⏱ ${eventLeft()}</small></div>
+    <button class="gbtn" data-go="evrank">อันดับ</button>
+  </div>
   <button class="goal panel" data-go="tower">เป้าหมาย: ผ่านหอท้าขุนพลชั้น ${goal} (${S.tower-1}/${goal})
     <small>รางวัล หีบเลือกขุนพล S+ ทุก 10 ชั้น</small></button>`;
 }
@@ -1967,7 +2007,7 @@ function tutorial(){
   if(S.tut>=TUT.length) return;
   const st=TUT[S.tut];
   const navHas = st.tab && document.querySelector(`#nav [data-go="${st.tab}"]`);
-  const target = st.tab && tab!==st.tab ? (navHas ? `#nav [data-go="${st.tab}"]` : tab==='city' ? `.evt[data-go="${st.tab}"]` : '#nav [data-go="city"]') : st.sel;
+  const target = st.tab && tab!==st.tab ? (navHas ? `#nav [data-go="${st.tab}"]` : tab==='city' ? `.city [data-go="${st.tab}"]` : '#nav [data-go="city"]') : st.sel;
   if(target) document.querySelector(target)?.classList.add('tut-hl');
   const box=document.createElement('div'); box.id='tutor'; box.className='tutor';
   box.innerHTML=`<span class="tok shu">${portrait('liubei_y')}</span><div><b>ขั้นที่ ${S.tut+1}/${TUT.length}</b><p></p>
@@ -2277,6 +2317,7 @@ document.addEventListener('click',e=>{
     const a=act.dataset.act, id=act.dataset.id;
     switch(a){
       case 'close': closeLayer(); return;
+      case 'more': UI.more=!UI.more; render(); return;
       case 'afk': { sfx('coin'); const r=afkNow(); S.gold+=r.gold; S.exp+=r.exp; S.gems+=r.gems; S.potions+=Math.floor(r.mins/120); S.afkSince=Date.now(); S.daily.afk++; save(); render(); toast(`เก็บแล้ว เงิน +${fmt(r.gold)} · EXP +${fmt(r.exp)}${r.gems?` · หยก +${r.gems}`:''}`); return }
       case 'fight': fight(); return;
       case 'speed': B.speed=B.speed===1?2:B.speed===2?4:1; act.textContent='x'+B.speed; return;
