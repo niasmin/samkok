@@ -521,6 +521,57 @@ nav button[aria-current="page"] .nvi{filter:drop-shadow(0 0 8px rgba(242,216,142
 .evbanner2 img{width:56px;height:52px;object-fit:contain}
 .evbanner2 b{font-size:15px}.evbanner2 p{margin:2px 0;font-size:12px;line-height:1.4;color:#6a4a32}.evbanner2 small{font-size:11.5px;color:#a3321f;font-weight:600}
 .gbtn{padding:8px 14px;border-radius:10px;font-weight:700;color:#4a1a08;background:linear-gradient(180deg,#ffe9a8,#e0aa3e);border:2px solid #9b6a1c;box-shadow:0 2px 0 #7a4a10}
+
+/* mockup pass 2: battle, summon, team, cards */
+.bfbg.pic{background:url(ui/bwall.webp) top center/100% auto no-repeat,linear-gradient(180deg,#6f6250 0,#9c8a70 30%,#b7a283 60%,#8f7b5f 100%)}
+.bfbg.pic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 18%,transparent 70%,rgba(30,10,6,.55))}
+.bfbg.pic.tower{filter:hue-rotate(220deg) saturate(.7) brightness(.8)}
+.bfbg.pic.raid{filter:hue-rotate(-20deg) saturate(1.4) brightness(.6)}
+.bhead .rnd,.bhead .sub{background:rgba(26,17,12,.75);border:1px solid var(--gold);border-radius:999px;padding:3px 10px}
+.bhead .sub{font-size:12.5px;font-weight:600;color:#fff3d6}
+.u .tok{box-shadow:0 6px 8px -2px rgba(0,0,0,.55)}
+.bpanel{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:10px 8px;border-radius:14px;background:linear-gradient(180deg,#4a140e,#2a0b08);border:2px solid var(--gold)}
+.skr{display:flex;justify-content:center;gap:4px}
+.sk{box-sizing:border-box;--c:#d9a441;width:min(48px,13vw);height:min(48px,13vw);border-radius:50%;padding:4px;background:conic-gradient(var(--c) calc(var(--r)*1%),rgba(255,255,255,.12) 0);position:relative;flex:none}
+.sk{display:block}
+.sk>*{display:block;box-sizing:border-box;min-width:0;max-width:100%;width:100%;height:100%;border-radius:50%;overflow:hidden;display:grid;place-items:center;font:26px/1 var(--f-seal);background:#2a0b08}
+.sk img.art{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sk.r-war{--c:#f0a23a}.sk.r-cav{--c:#3fa0ff}.sk.r-arch{--c:#e8574a}.sk.r-strat{--c:#b06cff}.sk.r-heal{--c:#47d16a}
+.sk.full{box-shadow:0 0 12px var(--c)}.sk.dead{filter:grayscale(1) brightness(.5)}
+.auto{display:flex;align-items:center;gap:8px;justify-content:center;font-size:13px;font-weight:700;color:#fff3d6}
+.auto b{background:linear-gradient(180deg,#5fe07a,#1f9a3a);color:#fff;border-radius:999px;padding:2px 12px}
+.auto small{font-weight:400;font-size:11px;color:var(--parchment-2)}
+.stabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.stabs button{display:flex;align-items:center;gap:8px;height:58px;border-radius:10px;overflow:hidden;border:2px solid rgba(212,164,70,.5);background:linear-gradient(90deg,#3a2a4a,#6a2a3a);font:17px var(--f-display);color:#fff3d6;text-shadow:0 1px 2px #000}
+.stabs button>:first-child{width:62px;height:100%;flex:none;object-fit:cover;display:grid;place-items:center;font:30px/1 var(--f-seal)}
+.stabs button[aria-pressed="true"]{border-color:var(--gold-hi);background:linear-gradient(90deg,#7a2a14,#c4501f);box-shadow:0 0 10px rgba(242,216,142,.5)}
+.portal{position:relative;aspect-ratio:853/925;border-radius:14px;overflow:hidden;border:2px solid var(--gold);background:#3a2a50 url(ui/portal.webp) center/cover;display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.portal .rateup{position:absolute;top:8px;left:8px;right:8px;text-align:center;font-size:12px;font-weight:700;color:#fff3d6;background:rgba(60,20,80,.75);border:1px solid var(--gold);border-radius:999px;padding:4px 8px}
+.ptitle{align-self:center;font:17px var(--f-display);color:#4a1a08;background:linear-gradient(180deg,#fbf1dc,#e9d3a6);border:2px solid var(--gold);border-radius:999px;padding:5px 18px;margin-bottom:10px}
+.portal .pullrow{margin-top:0;grid-template-columns:1fr 1fr;row-gap:4px}
+.portal .cost{justify-self:center;display:flex;align-items:center;gap:5px;font-weight:700;color:#fff;text-shadow:0 1px 3px #000;font-size:15px}
+.gbtn.big{padding:12px 6px;font:clamp(14px,4vw,17px) var(--f-display);white-space:nowrap;border-radius:12px}
+.gbtn:disabled{filter:grayscale(.7);opacity:.7}
+.preview{margin-top:10px;padding:10px;border-radius:12px;background:linear-gradient(180deg,#4a140e,#2a0b08);border:2px solid var(--gold)}
+.preview .ph{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:13px;color:#fff3d6}.preview .ph span{font-size:11px;color:var(--gold-hi)}
+.pv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pcard{position:relative;aspect-ratio:4/3.4;border-radius:8px;overflow:hidden;border:2px solid var(--gold);background:#2a1a12;display:grid;place-items:center;font:36px/1 var(--f-seal);color:#fff8e6}
+.pcard img.art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pcard span{position:absolute;left:0;right:0;bottom:0;font:11.5px system-ui;font-weight:700;background:rgba(26,17,12,.8);padding:2px}
+.pcard .r{position:absolute;top:4px;left:4px;z-index:1;font:italic 800 15px/1 var(--f-display);padding:4px 5px;border-radius:50%;color:#fff;background:#6a3ab0;border:1.5px solid #ffe9a8}
+.pcard .r.S{background:#c4501f}.pcard .r.SP{background:#b02020}
+.tstage{position:relative;height:250px;border-radius:14px;overflow:hidden;border:2px solid var(--gold);background:url(ui/bwall.webp) top center/auto 62% no-repeat,linear-gradient(180deg,#6f6250 0,#9c8a70 40%,#b7a283 70%,#8f7b5f 100%)}
+.fig{position:absolute;width:70px;height:70px;border-radius:50%;border:2px solid var(--gold);background:#2a1a12;overflow:visible;display:grid;place-items:center;font:34px/1 var(--f-seal);color:#fff8e6;box-shadow:0 10px 10px -4px rgba(0,0,0,.6)}
+.fig img.art{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.fig .lvb{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;background:rgba(26,17,12,.85);border:1px solid var(--gold);border-radius:999px;padding:0 6px;white-space:nowrap;z-index:1}
+.fig.f3{left:12%;top:28px}.fig.f4{left:calc(50% - 35px);top:18px}.fig.f5{right:12%;top:28px}
+.fig.f0{left:4%;top:118px;width:84px;height:84px}.fig.f1{left:calc(50% - 42px);top:126px;width:84px;height:84px}.fig.f2{right:4%;top:118px;width:84px;height:84px}
+.tpow{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);white-space:nowrap;font:16px var(--f-display);color:var(--gold-hi);background:linear-gradient(180deg,#5a1a12,#2a0b08);border:2px solid var(--gold);border-radius:8px;padding:4px 16px}
+.card .fb{position:absolute;top:3px;left:3px;z-index:1;font-size:9.5px;font-weight:800;color:#fff;padding:3px 3px 5px;border-radius:3px 3px 8px 8px;background:var(--c);border:1px solid #ffe9a8;line-height:1}
+.card .rar{top:auto;bottom:34px;left:4px;z-index:1;background:none!important;font:italic 800 18px/1 var(--f-display);color:#ffe9a8!important;text-shadow:0 2px 0 #4a1a08,0 0 4px #000;padding:0}
+.card.SP .rar{color:#ffd36a!important}
+.card .lv{top:auto;bottom:35px;right:4px;z-index:1}
+.card.in-team::after{bottom:auto;top:3px;right:3px}
 </style>
 
 <div id="app">
@@ -1044,7 +1095,7 @@ function cardHTML(id, opts={}){
   const cls = ['card',h.fac,h.rar, aw>0?'aw':'', (!own && !opts.force)?'off':'', (opts.team!==false && S.team.includes(id))?'in-team':''].join(' ');
   const hook = opts.act ? `data-act="${opts.act}" data-id="${id}"${opts.pressed!==undefined?` aria-pressed="${opts.pressed}"`:''}` : `data-hero="${id}"`;
   return `<button class="${cls}" ${hook} aria-label="${esc(h.th)} ระดับ ${RAR[h.rar].label}">
-    <span class="rar">${RAR[h.rar].label}</span>${lv?`<span class="lv">Lv.${lv}</span>`:''}
+    <span class="fb">${FAC[h.fac].th}</span><span class="rar">${RAR[h.rar].label}</span>${lv?`<span class="lv">Lv.${lv}</span>`:''}
     <span class="seal">${portrait(id, isMech(id))}<em>${h.ch}</em></span>${isMech(id)?'<span class="mechtag">จักรกล</span>':''}
     <span class="stars">${own||opts.force?(aw>0?'☾'.repeat(aw):stars(st)):''}</span>
     <span class="nm">${esc(h.th)}</span>${opts.extra||''}</button>`;
@@ -1177,24 +1228,30 @@ function viewHeroes(){
 }
 
 function viewSummon(){
-  const free=S.freeDate!==today();
-  const feat=HEROES.filter(h=>h.rar==='SP');
-  return `
-  <div class="banner">
-    <span class="big" aria-hidden="true">将</span>
-    <h3>อัญเชิญขุนพลแห่งสามก๊ก</h3>
-    ${curEvent().k==='rateup'?`<p style="color:var(--gold-hi);margin-bottom:4px">เทศกาลอัญเชิญ: ${esc(HERO[featuredSP()].th)} ออกบ่อยขึ้นสัปดาห์นี้</p>`:''}
-    <p>สุ่มขุนพลระดับ A, S และ S+ ได้ซ้ำแล้วจะกลายเป็นสำเนาไว้เลื่อนดาว ทุก 10 ครั้งการันตีระดับ S ขึ้นไป</p>
-    <div class="feat">${feat.map(h=>tok(h.id,`title="${esc(h.th)}"`)).join('')}</div>
+  const free=S.freeDate!==today(), fr=UI.stab==='friend';
+  const pick=r=>r==='SP'?featuredSP():(HEROES.filter(h=>h.rar===r&&ART.has(h.id))[weekNo()%HEROES.filter(h=>h.rar===r&&ART.has(h.id)).length]||HEROES.find(h=>h.rar===r)).id;
+  const tabs=`<div class="stabs">
+    <button data-act="stab" data-k="hi" aria-pressed="${!fr}">${portrait(featuredSP())}<span>พิเศษ</span></button>
+    <button data-act="stab" data-k="friend" aria-pressed="${fr}">${portrait(ART.has('diaochan')?'diaochan':pick('S'))}<span>มิตรภาพ</span></button></div>`;
+  if(fr) return `${tabs}
+  <div class="panel" style="margin:10px 0">แต้มมิตรภาพ <b>${fmt(S.friend)}</b></div>
+  ${FSHOP.map(it=>`<div class="panel item"><span class="ic" style="background:linear-gradient(160deg,#ffb0c8,#c4325a)">${it.ch}</span><div><b>${it.th}</b><p>${it.desc}</p></div>
+    <button class="btn" data-act="fbuy" data-k="${it.k}" ${S.friend<it.cost?'disabled':''}>${it.cost} แต้ม</button></div>`).join('')}
+  <div class="note">แต้มมิตรภาพได้จากชนะประลอง (+10) เช็กอินกิลด์ (+20) และตีบอสกิลด์ (+10)</div>`;
+  return `${tabs}
+  <div class="portal">
+    ${curEvent().k==='rateup'?`<div class="rateup">เทศกาลอัญเชิญ: ${esc(HERO[featuredSP()].th)} ออกบ่อยขึ้นสัปดาห์นี้</div>`:''}
+    <div class="ptitle">อัญเชิญขุนพลระดับสูง</div>
+    <div class="pullrow">
+      <button class="gbtn big" data-act="pull1" ${!free&&S.gems<300?'disabled':''}>อัญเชิญ 1 ครั้ง</button>
+      <button class="gbtn big" data-act="pull10" ${S.gems<2700?'disabled':''}>อัญเชิญ 10 ครั้ง</button>
+      <span class="cost">${free?'ฟรีวันนี้':'<i class="coin j"></i> 300'}</span><span class="cost"><i class="coin j"></i> 2,700</span>
+    </div>
   </div>
-  <div class="pullrow">
-    <button class="btn ghost" data-act="pull1" ${!free&&S.gems<300?'disabled':''}>
-      อัญเชิญ 1 ครั้ง<small>${free?'ฟรีวันนี้':'<i class="coin j"></i> 300'}</small></button>
-    <button class="btn" data-act="pull10" ${S.gems<2700?'disabled':''}>
-      อัญเชิญ 10 ครั้ง<small><i class="coin j"></i> 2,700</small></button>
-  </div>
+  <div class="preview"><div class="ph"><b>ตัวอย่างขุนพลที่ได้รับ</b><span>ทุก 10 ครั้งการันตี S ขึ้นไป</span></div>
+    <div class="pv">${['SP','S','A'].map(r=>{const id=pick(r);return `<button class="pcard" data-hero="${id}"><em class="r ${r}">${RAR[r].label}</em>${portrait(id)}<span>${esc(HERO[id].th)}</span></button>`}).join('')}</div></div>
   <div class="panel rates">
-    <div>อัตรา: <b>S+ 3%</b> · <b>S 20%</b> · <b>A 77%</b></div>
+    <div>อัตรา: <b>S+ 3%</b> · <b>S 20%</b> · <b>A 77%</b> · ได้ซ้ำกลายเป็นสำเนาไว้เลื่อนดาว</div>
     <div style="margin-top:6px">การันตี S ขึ้นไปอีก <b>${10-S.pityS}</b> ครั้ง</div>
     <div class="bar"><i style="width:${S.pityS*10}%"></i></div>
     <div style="margin-top:6px">การันตี S+ อีก <b>${60-S.pitySP}</b> ครั้ง</div>
@@ -1206,16 +1263,18 @@ function viewSummon(){
 function viewTeam(){
   const slot=i=>{const id=S.team[i]; return id?cardHTML(id,{team:false}):`<button class="slot-empty" data-act="pickslot" data-slot="${i}">ว่าง<br>แตะขุนพลในหน้า “ขุนพล”</button>`};
   const facs={}; S.team.filter(Boolean).forEach(id=>facs[HERO[id].fac]=(facs[HERO[id].fac]||0)+1);
+  const fig=i=>{const id=S.team[i]; return id?`<button class="fig f${i}" data-hero="${id}"><span class="lvb">Lv.${S.heroes[id].lv}</span>${portrait(id,isMech(id))}</button>`:''};
   return `
-  ${assistHTML()}
-  <h1 class="h" style="margin-top:14px">จัดทัพ <span class="sub">พลังรวม ${fmt(teamPower())}</span></h1>
+  <div class="tstage">${[3,4,5,0,1,2].map(fig).join('')}<div class="tpow">⚔ พลังทัพ ${fmt(teamPower())}</div></div>
+  <h1 class="h" style="margin-top:14px">จัดทีมขุนพล <span class="sub">แตะขุนพลในหน้า “ขุนพล” เพื่อส่งลงทัพ</span></h1>
   <div class="rowlabel">แถวหน้า 3 ช่อง · รับดาบก่อน เหมาะกับนักรบและทหารม้า</div>
   <div class="slots front">${slot(0)}${slot(1)}${slot(2)}</div>
   <div class="rowlabel">แถวหลัง 3 ช่อง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
   <div class="slots back">${slot(3)}${slot(4)}${slot(5)}</div>
   <div style="display:flex;gap:8px;margin-top:14px">
-    <button class="btn" style="flex:1" data-act="autoteam">จัดทัพอัตโนมัติ</button>
+    <button class="gbtn big" style="flex:1" data-act="autoteam">จัดทีมอัตโนมัติ</button>
   </div>
+  <div style="margin-top:14px">${assistHTML()}</div>
   <div class="panel bonus">
     <b>ก๊กข่มกัน</b> โจมตีก๊กที่ข่ม แรงขึ้น 25% โดนก๊กที่ข่มเรา แรงลดลง 15%
     <div class="cycle"><span class="f" style="background:var(--wei)">วุย</span>ข่ม<span class="f" style="background:var(--shu)">จ๊ก</span>ข่ม<span class="f" style="background:var(--wu)">ง่อ</span>ข่ม<span class="f" style="background:var(--wei)">วุย</span></div>
@@ -1232,7 +1291,7 @@ function eventLeft(){
   const ms=end-d; return `เหลือ ${Math.floor(ms/864e5)}วัน${Math.floor(ms%864e5/36e5)}ชม.`;
 }
 
-const UI={more:false};
+const UI={more:false, stab:'hi'};
 function viewCity(){
   const goal=Math.ceil(S.tower/10)*10, ev=curEvent();
   const dot=c=>c?'<span class="dot"></span>':'';
@@ -2165,6 +2224,8 @@ function fight(mode='stage', bot=null){
       <div class="side"><div class="line">${by('e',[3,4,5])}</div><div class="line">${by('e',[0,1,2])}</div></div>
       <div class="vs" aria-hidden="true">战</div>
       <div class="side"><div class="line">${by('p',[0,1,2])}</div><div class="line">${by('p',[3,4,5])}</div></div>
+      <div class="bpanel"><div class="skr">${res.start.filter(u=>u.side==='p').sort((x,y)=>x.slot-y.slot).map(u=>`<span class="sk r-${HERO[u.id].role}" id="sk-${u.uid}" style="--r:0">${portrait(u.id,isMech(u.id))}</span>`).join('')}</div>
+        <div class="auto"><span>อัตโนมัติ</span><b>ON</b><small>ขุนพลใช้สกิลเองเมื่อพลังโกรธเต็ม</small></div></div>
     </div></div>`;
   const max=Object.fromEntries(res.start.map(u=>[u.uid,u.max]));
   setMusic('battle');
@@ -2173,15 +2234,7 @@ function fight(mode='stage', bot=null){
   step();
 }
 function battleBg(kind){
-  const c={stage:['#3a4a6a','#b89a6a','#7a6440'], tower:['#2a2240','#6a5a8a','#3a3050'], arena:['#4a2a1a','#c48a4a','#8a5a2a'], raid:['#2a0a08','#8a2a12','#3a1208']}[kind];
-  return `<svg class="bfbg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs><linearGradient id="bf-${kind}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset=".45" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient></defs>
-    <rect width="400" height="800" fill="url(#bf-${kind})"/>
-    <path d="M0 250 L60 180 L110 220 L170 150 L230 210 L290 160 L350 210 L400 180 L400 330 L0 330Z" fill="#000" opacity=".18"/>
-    <ellipse cx="200" cy="520" rx="260" ry="250" fill="#fff" opacity=".06"/>
-    <g stroke="#000" stroke-opacity=".12" stroke-width="2">${[0,1,2,3,4,5,6].map(i=>`<path d="M${-200+i*130} 800 L${140+i*20} 330"/>`).join('')}<path d="M0 420 L400 420"/><path d="M0 560 L400 560"/><path d="M0 700 L400 700"/></g>
-    <g fill="#c4321f" opacity=".8"><path d="M30 330 L30 260 L60 270 L30 282Z"/><path d="M370 330 L370 260 L340 270 L370 282Z"/></g>
-  </svg>`;
+  return `<div class="bfbg pic ${kind}" aria-hidden="true"></div>`;
 }
 function fx(el, cls){
   if(!el) return; const f=document.createElement('span'); f.className='fx '+cls; el.appendChild(f); setTimeout(()=>f.remove(),700);
@@ -2206,8 +2259,9 @@ function applyHits(a, animate){
     }
     if(h.dead) el.classList.add('dead');
   }
-  for(const [uid,r] of Object.entries(a.rage)){ const el=$('#u-'+uid); if(el) el.querySelector('.rg i').style.width=r+'%' }
-  $('#rnd').textContent='รอบ '+a.round;
+  for(const [uid,r] of Object.entries(a.rage)){ const el=$('#u-'+uid); if(el) el.querySelector('.rg i').style.width=r+'%'; const sk=$('#sk-'+uid); if(sk){ sk.style.setProperty?.('--r',r); sk.classList.toggle('full',r>=100) } }
+  for(const h of a.hits) if(h.dead) $('#sk-'+h.tgt)?.classList.add('dead');
+  const rn=$('#rnd'); if(rn) rn.textContent='รอบ '+a.round;
 }
 function step(){
   if(!B||B.done) return;
@@ -2318,6 +2372,7 @@ document.addEventListener('click',e=>{
     switch(a){
       case 'close': closeLayer(); return;
       case 'more': UI.more=!UI.more; render(); return;
+      case 'stab': UI.stab=act.dataset.k; render(); return;
       case 'afk': { sfx('coin'); const r=afkNow(); S.gold+=r.gold; S.exp+=r.exp; S.gems+=r.gems; S.potions+=Math.floor(r.mins/120); S.afkSince=Date.now(); S.daily.afk++; save(); render(); toast(`เก็บแล้ว เงิน +${fmt(r.gold)} · EXP +${fmt(r.exp)}${r.gems?` · หยก +${r.gems}`:''}`); return }
       case 'fight': fight(); return;
       case 'speed': B.speed=B.speed===1?2:B.speed===2?4:1; act.textContent='x'+B.speed; return;
