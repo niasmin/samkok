@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=4a72ab56bd').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=44aef13497').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -925,6 +925,26 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 .tierrec{padding:10px 12px;margin-bottom:10px}.tierrec small{display:block;font-size:12px;color:var(--muted)}
 .tag.tier{color:#fff}.tag.tier.T0{background:#c4321f}.tag.tier.T1{background:#6a2aa0}.tag.tier.T2{background:#1a5aa0}.tag.tier.T3{background:#5a6a5a}
 .trait{margin:10px 0 0;padding:8px 10px;border-radius:10px;background:linear-gradient(90deg,#fff3c0,#fff8e8);border:1.5px solid #d4a446;font-size:13.5px;font-weight:600;color:#6a3a08}
+
+/* UX pass 3 */
+.th span{font-size:12px}.th em{font-size:12px}.th{width:66px}
+.power small,.evt small,.tierrow .tl small,.c2 .lbl small,.goal small{font-size:12px}
+.card .fb{font-size:11.5px}.card .lv,.fig .lvb{font-size:12px}
+.pcard span{font-size:12.5px}
+/* 4. speaker button */
+.sndbtn{display:grid;place-items:center;padding:0}
+.sndbtn svg{width:20px;height:20px;fill:none;stroke:var(--gold-hi);stroke-width:2;stroke-linecap:round}
+.sndbtn .x{display:none}.sndbtn.off .x{display:inline}.sndbtn.off .w{display:none}.sndbtn.off{text-decoration:none}
+/* 5. coupon header */
+.cphead{aspect-ratio:852/300;background:url(ui/study-top.webp) center 55%/cover no-repeat;margin-bottom:10px;display:flex;align-items:flex-end;justify-content:center}
+.cphead .ribbon{margin:0}
+.cplist{display:grid;gap:6px;margin-top:8px}
+.cplist button{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:left;padding:8px 10px;border-radius:10px;background:#fff3d0;border:1.5px dashed #d4a446;color:#3a1a08}
+.cplist b{font:700 14px ui-monospace,monospace;letter-spacing:1px;color:#8a1e14}.cplist small{font-size:12.5px;color:#6e5236}
+.cplist button.used{opacity:.5}
+/* 6. training card sits below the scene */
+.trainsc2.pic{margin-bottom:10px}
+.traincard p{font-size:13px}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -935,7 +955,7 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
       <b id="pname">ท่านเจ้าเมือง</b>
       <div class="power"><small>พลังทัพ</small><span id="ppower">0</span></div>
     </div>
-    <button id="sndbtn" class="sndbtn" aria-label="เปิดหรือปิดเสียง" aria-pressed="false">音</button>
+    <button id="sndbtn" class="sndbtn" aria-label="เปิดหรือปิดเสียง" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" style="fill:var(--gold-hi)"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M16 9l6 6M22 9l-6 6"/></svg></button>
     <div class="cur">
       <div class="pill" title="เงิน"><i class="coin g"></i><span id="cgold">0</span></div>
       <div class="pill" title="หยก ใช้อัญเชิญขุนพล"><i class="coin j"></i><span id="cgems">0</span></div>
@@ -1476,10 +1496,11 @@ function viewCoupon(){
   const f=UI.cp||(UI.cp={gems:500,gold:0,exp:0,tickets:0,potions:0,chest:0,days:30,n:5,uses:1,custom:'',note:'',out:''});
   const num=(k,label,max,step=1)=>`<label class="cpf"><span>${label}</span><input type="number" inputmode="numeric" min="0" max="${max}" step="${step}" data-cp="${k}" value="${f[k]}"></label>`;
   return `${back()}
-  <h1 class="h">ใส่โค้ด</h1>
+  <div class="pic cphead"><h1 class="ribbon">ใส่โค้ด</h1></div>
   <div class="panel cpbox">
     <p style="margin:0 0 8px">กรอกโค้ดคูปองเพื่อรับของรางวัล แต่ละโค้ดใช้ได้ครั้งเดียวต่อบัญชี</p>
-    <div class="cprow"><input id="cpin" autocomplete="off" autocapitalize="characters" placeholder="เช่น KP-XXXXX-XXXXX-XXXXX-XXXXX" aria-label="โค้ดคูปอง"><button class="btn red" data-act="redeem">รับรางวัล</button></div>
+    <div class="cprow"><input id="cpin" autocomplete="off" autocapitalize="characters" placeholder="กรอกโค้ด เช่น KUNPHON" aria-label="โค้ดคูปอง"><button class="btn red" data-act="redeem">รับรางวัล</button></div>
+    <div class="cplist"><small style="color:#8a1e14;font-weight:700">โค้ดแจกฟรีตอนนี้ (แตะเพื่อกรอก)</small>${Object.entries(NAMED_CODES).map(([k,r])=>{const used=S.coupons.some(c=>c.k===k);return `<button class="${used?'used':''}" data-act="cpfill" data-k="${k}"><b>${k}</b><small>${couponText(r)}</small><small>${used?'ใช้แล้ว':'🎁'}</small></button>`}).join('')}</div>
   </div>
   ${S.coupons.length?`<h2 class="h" style="font-size:18px">ใช้ไปแล้ว</h2><div class="panel cphistp">${S.coupons.slice(-6).reverse().map(c=>`<div class="cphist"><b>${esc(c.k.length>12?c.k.slice(0,8)+'…':c.k)}</b><span>${esc(c.t)}</span><small>${new Date(c.ts).toLocaleDateString('th-TH')}</small></div>`).join('')}</div>`:''}
   ${isAdminView()?`<h2 class="h" style="font-size:18px">สร้างโค้ดคูปอง <span class="sub">ตรวจที่เซิร์ฟเวอร์</span></h2>
@@ -1501,22 +1522,15 @@ function viewSave(){
   const t=SAVED_AT?new Date(SAVED_AT).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'—';
   return `${back()}
   <h1 class="h">บันทึกเกม</h1>
+  ${(()=>{const k=UI.svtab||'save';return `<div class="subtabs t3">${[['save','บันทึก'],['acct','บัญชี'],['info','ข้อมูล']].map(([x,l])=>`<button data-act="svtab" data-k="${x}" aria-pressed="${k===x}">${l}</button>`).join('')}</div>`})()}
+  ${(UI.svtab||'save')==='save'?`
   <div class="panel item"><span class="ic">存</span><div><b>บันทึกอัตโนมัติ: เปิดอยู่</b><p>เกมบันทึกลงเครื่องทุกครั้งที่ท่านทำอะไร ล่าสุด ${t}</p></div>
     <button class="btn" data-act="savenow">บันทึกเลย</button></div>
-  ${SB?`<h2 class="h" style="font-size:18px">บัญชีออนไลน์</h2>
-  <div class="panel cpbox">
-    <div class="cprow"><input id="pnamein" maxlength="24" value="${esc(S.pname||'')}" aria-label="ชื่อในเกม" placeholder="ชื่อในเกม"><button class="btn" data-act="setname">ตั้งชื่อ</button></div>
-    <p style="margin:8px 0 0">${NET.on?`เซฟคลาวด์: ${CLOUD.at?`ล่าสุด ${new Date(CLOUD.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`:'รอบันทึกครั้งแรก'}${CLOUD.err?` · ผิดพลาด: ${esc(CLOUD.err)}`:''}`:`ออฟไลน์${NET.sbErr?` (${esc(NET.sbErr)})`:''}`}</p>
-    <div class="cprow" style="margin-top:8px"><button class="btn small" data-act="mktransfer" ${NET.on?'':'disabled'}>สร้างรหัสย้ายเครื่อง (8 ตัว)</button>${UI.tcode?`<b class="tcode">${UI.tcode}</b>`:''}</div>
-    <p class="cpnote">ใช้ได้ครั้งเดียวภายใน 24 ชั่วโมง กรอกในเครื่องใหม่ด้านล่าง</p>
-    <div class="cprow"><input id="tclaim" maxlength="12" placeholder="กรอกรหัสย้ายเครื่อง" aria-label="รหัสย้ายเครื่อง"><button class="btn ${UI.ask==='claim'?'red':''}" data-act="claimtransfer" ${NET.on?'':'disabled'}>${UI.ask==='claim'?'ยืนยัน แทนที่เกมนี้':'รับเซฟ'}</button></div>
-  </div>`:''}
   <h2 class="h" style="font-size:18px">ช่องบันทึก</h2>
   ${[0,1,2].map(i=>{const x=slotInfo(i), ask=UI.ask===`load${i}`;
     return `<div class="panel slotrow"><div><b>ช่อง ${i+1}</b><p>${x?`${new Date(x.ts).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})} · ${saveSummary(x.data)}`:'ว่าง'}</p></div>
       <button class="btn small" data-act="slotsave" data-i="${i}">บันทึก</button>
       <button class="btn ${ask?'red':'ghost'} small" data-act="slotload" data-i="${i}" ${x?'':'disabled'}>${ask?'ยืนยันโหลด':'โหลด'}</button></div>`}).join('')}
-  <button class="panel cplink" data-go="coupon">🎟 มีโค้ดคูปอง? แตะเพื่อใส่โค้ดรับรางวัล</button>
   <h2 class="h" style="font-size:18px">ย้ายเครื่อง</h2>
   <div class="panel">
     <p style="margin:0 0 6px">คัดลอกรหัสนี้ไปวางในเครื่องอื่น (เช่น จาก Claude ไปเว็บ GitHub) เพื่อเล่นต่อ</p>
@@ -1526,10 +1540,23 @@ function viewSave(){
     <textarea id="impcode" class="code" rows="3" placeholder="KP1:..."></textarea>
     <button class="btn red small" data-act="importsave" style="margin-top:6px">${UI.ask==='import'?'ยืนยัน แทนที่เกมตอนนี้':'โหลดจากรหัส'}</button>
   </div>
+  <div class="note">ช่องบันทึกเก็บไว้ในเบราว์เซอร์เครื่องนี้ ถ้าล้างข้อมูลเว็บจะหายไป ควรคัดลอกรหัสเก็บไว้ด้วย</div>`:''}
+  ${UI.svtab==='acct'?`
+  ${SB?`<h2 class="h" style="font-size:18px">บัญชีออนไลน์</h2>
+  <div class="panel cpbox">
+    <div class="cprow"><input id="pnamein" maxlength="24" value="${esc(S.pname||'')}" aria-label="ชื่อในเกม" placeholder="ชื่อในเกม"><button class="btn" data-act="setname">ตั้งชื่อ</button></div>
+    <p style="margin:8px 0 0">${NET.on?`เซฟคลาวด์: ${CLOUD.at?`ล่าสุด ${new Date(CLOUD.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`:'รอบันทึกครั้งแรก'}${CLOUD.err?` · ผิดพลาด: ${esc(CLOUD.err)}`:''}`:`ออฟไลน์${NET.sbErr?` (${esc(NET.sbErr)})`:''}`}</p>
+    <div class="cprow" style="margin-top:8px"><button class="btn small" data-act="mktransfer" ${NET.on?'':'disabled'}>สร้างรหัสย้ายเครื่อง (8 ตัว)</button>${UI.tcode?`<b class="tcode">${UI.tcode}</b>`:''}</div>
+    <p class="cpnote">ใช้ได้ครั้งเดียวภายใน 24 ชั่วโมง กรอกในเครื่องใหม่ด้านล่าง</p>
+    <div class="cprow"><input id="tclaim" maxlength="12" placeholder="กรอกรหัสย้ายเครื่อง" aria-label="รหัสย้ายเครื่อง"><button class="btn ${UI.ask==='claim'?'red':''}" data-act="claimtransfer" ${NET.on?'':'disabled'}>${UI.ask==='claim'?'ยืนยัน แทนที่เกมนี้':'รับเซฟ'}</button></div>
+  </div>`:''}
+  <button class="panel cplink" data-go="coupon">🎟 มีโค้ดคูปอง? แตะเพื่อใส่โค้ดรับรางวัล</button>
   ${SB?`<h2 class="h" style="font-size:18px">ส่งความเห็นถึงผู้พัฒนา</h2>
   <div class="panel cpbox"><p style="margin:0 0 6px">ติดด่านไหน เบื่อตรงไหน อยากได้อะไรเพิ่ม เล่าได้เลย</p>
     <textarea id="fbtext" class="code" rows="3" maxlength="1000" placeholder="พิมพ์ความเห็น…" style="font:14px system-ui"></textarea>
     <button class="btn red small" data-act="sendfb" style="margin-top:6px" ${NET.on?'':'disabled'}>ส่งความเห็น</button></div>`:''}
+  ${SB?'':'<div class="note">บัญชีออนไลน์ เซฟคลาวด์ และส่งความเห็น มีในเวอร์ชันเว็บ niasmin.github.io/samkok</div>'}`:''}
+  ${UI.svtab==='info'?`
   <h2 class="h" style="font-size:18px">ความเป็นส่วนตัว</h2>
   <div class="panel privacy">
     <p>เกมนี้เป็นเกมแฟนเมดที่ไม่แสวงหากำไร ไม่มีการซื้อด้วยเงินจริง และไม่ได้เกี่ยวข้องกับผู้พัฒนาเกมสามก๊กเชิงพาณิชย์รายใด</p>
@@ -1537,7 +1564,7 @@ function viewSave(){
     <p><b>สิ่งที่ไม่เก็บ</b>: อีเมล เบอร์โทร ชื่อจริง หรือตำแหน่ง</p>
     <p>ชื่อในเกมและข้อความแชตผู้เล่นคนอื่นมองเห็นได้ อย่าใส่ข้อมูลส่วนตัว ข้อมูลเก็บที่ Supabase (สิงคโปร์) ต้องการลบบัญชี ติดต่อผู้ดูแลเกมพร้อมชื่อในเกม</p>
   </div>
-  <div class="note">ช่องบันทึกเก็บไว้ในเบราว์เซอร์เครื่องนี้ ถ้าล้างข้อมูลเว็บจะหายไป ควรคัดลอกรหัสเก็บไว้ด้วย</div>`;
+`:''}`;
 }
 function checkDaily(){
   const d=today();
@@ -1856,6 +1883,7 @@ function tierTable(){
 }
 const TIER_TXT={T0:'แกนหลักของทัพ ปั้นก่อนได้เลย', T1:'แรงมาก ใช้ได้ยาวถึงท้ายเกม', T2:'ดีในตำแหน่งของตัวเอง เหมาะเติมช่องว่าง', T3:'ใช้ช่วงต้นเกมหรือเอาไว้เปิดมิตรภาพ'};
 function viewTier(){
+  if(!S.seenTier){ S.seenTier=1; save() }
   const T=tierTable(), f=UI.tierRole||'all';
   const chip=(k,l)=>`<button class="chip" data-act="tierrole" data-k="${k}" aria-pressed="${f===k}">${k==='all'?'':roleIcon(k,'ri sm')}${l}</button>`;
   const rows=['T0','T1','T2','T3'].map(t=>{
@@ -2493,7 +2521,10 @@ function assistOptions(){
     const star=Math.min(5,Math.max(1,Math.ceil(lv/100)));
     opts.push({src:bot.name, real:false, e:{id:h.id, lv, star, aw:0}});
   }
-  return opts.slice(0,6);
+  const seen=new Set(), minLv=Math.max(1,Math.round(avgTeamLv()*0.6));
+  return opts.filter(o=>o.e.lv>=minLv || !o.real)
+    .sort((a,b)=>power(b.e.id,b.e.lv,b.e.star,b.e.aw)-power(a.e.id,a.e.lv,a.e.star,a.e.aw))
+    .filter(o=>!seen.has(o.e.id)&&seen.add(o.e.id)).slice(0,6);
 }
 let ASSIST_OPTS=null;
 function assistHTML(){
@@ -2522,7 +2553,7 @@ function viewTrain(){
       <p>เลื่อนระดับ: เงิน ${fmt(c.gold)} · EXP ${fmt(c.exp)}${canSt?' · <b style="color:var(--shu)">เลื่อนดาวได้</b>':''}${canAw?' · <b style="color:var(--wu)">ตื่นจิตได้</b>':''}</p></div>
       <div class="acts"><button class="btn small" data-act="lvup" data-id="${id}" ${canLv?'':'disabled'}>+1</button><button class="btn small" data-act="lvup10" data-id="${id}" ${canLv?'':'disabled'}>+10</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="hero" data-id="${id}">ดู</button></div></div>`};
   return `<div class="trainsc2 pic"><h1 class="vh">ฝึกฝน</h1></div>
-  <div class="panel traincard"><div><b>ลานฝึก <em>${S.train.left}/3</em> รอบวันนี้</b><p>ซ้อมรบกับหุ่นฝึกระดับเดียวกับทัพ ชนะได้ยา EXP 3 ขวดและ EXP ตามเลเวลทัพ แพ้ก็ยังได้ยา 1 ขวด</p></div>
+  <div class="panel traincard"><div><b>ลานฝึก <em>${S.train.left}/3</em> รอบวันนี้</b><p>ชนะได้ยา EXP 3 ขวด + EXP · แพ้ได้ยา 1 ขวด</p></div>
     <button class="btn red" data-act="train" ${S.train.left?'':'disabled'}>${S.train.left?'ฝึก':'ครบแล้ว'}</button></div>
   <div class="row" style="margin:10px 0 6px"><b>ขุนพลในทัพ ${team.length} คน</b>
     <span style="display:flex;gap:6px"><button class="btn small" data-act="lvall">เลื่อนระดับทั้งทัพ</button><button class="btn ghost small" data-act="gearall">สวมอุปกรณ์ทั้งทัพ</button></span></div>
@@ -2719,7 +2750,9 @@ const TUT = [
   {t:'เตียวหุยวัยหนุ่มมาแล้ว สามพี่น้องครบ เปิดมิตรภาพ "สามพี่น้องวัยหนุ่ม" HP/ATK +15% ไปหน้า "ขุนพล" แตะเล่าปี่วัยหนุ่ม แล้วกด "+1 เลเวล"', tab:'heroes', sel:'[data-hero="liubei_y"]', done:()=>H('liubei_y')&&H('liubei_y').lv>1},
   {t:'ทัพลาดตระเวนเองแม้ปิดเกม กด "เก็บ" ที่หีบในหน้า "พิชิตศึก" เพื่อรับรางวัลออฟไลน์', tab:'camp', sel:'[data-act="afk"]', done:()=>S.daily.afk>0},
   {t:'อัญเชิญขุนพลได้ฟรีวันละครั้ง ไปที่ "เมืองหลัก" แตะ "อัญเชิญ" แล้วกด "อัญเชิญ 1 ครั้ง"', tab:'summon', sel:'[data-act="pull1"]', done:()=>S.pulls>0},
-  {t:'เยี่ยมมาก ท่านเจ้าเมือง! เมืองหลักยังมีเนื้อเรื่อง หอท้า ประลอง กิลด์ และอีกมาก ค่อย ๆ สำรวจได้เลย', tab:null, sel:null, done:()=>false, last:true}
+  {t:'ไม่รู้จะปั้นใคร? เปิดหน้า "ขุนพล" แล้วแตะแท็บ "จัดอันดับ" ดูว่าขุนพลตัวไหนเก่ง และตัวไหนควรปั้นก่อน', tab:'tier', sel:null, done:()=>!!S.seenTier},
+  {t:'ไม่ว่างกด? ที่หน้า "พิชิตศึก" กด "เริ่มเล่นอัตโนมัติ" ทัพจะตีด่านต่อเอง พร้อมอัปเลเวลและใส่ของให้ระหว่างด่าน', tab:'camp', sel:'[data-act="apstart"]', done:()=>!!S.seenAuto},
+  {t:'เยี่ยมมาก ท่านเจ้าเมือง! อย่าลืมกรอกโค้ด KUNPHON ที่ "เพิ่มเติม → ใส่โค้ด" รับหยกฟรี เมืองหลักยังมีหอท้า ประลอง กิลด์ และอีกมาก', tab:null, sel:null, done:()=>false, last:true}
 ];
 function tutorial(){
   document.querySelectorAll('.tut-hl').forEach(e=>e.classList.remove('tut-hl'));
@@ -2730,7 +2763,8 @@ function tutorial(){
   const st=TUT[S.tut];
   const navHas = st.tab && document.querySelector(`#nav [data-go="${st.tab}"]`);
   const target = st.tab && tab!==st.tab ? (navHas ? `#nav [data-go="${st.tab}"]` : tab==='city' ? `.city [data-go="${st.tab}"]` : '#nav [data-go="city"]') : st.sel;
-  if(target) document.querySelector(target)?.classList.add('tut-hl');
+  const tgt = st.tab==='tier' && tab!=='tier' ? (['heroes','formation'].includes(tab) ? '.subtabs [data-go="tier"]' : '#nav [data-go="heroes"]') : target;
+  if(tgt) document.querySelector(tgt)?.classList.add('tut-hl');
   const box=document.createElement('div'); box.id='tutor'; box.className='tutor';
   box.innerHTML=`<span class="tok shu">${portrait('liubei_y')}</span><div><b>ขั้นที่ ${S.tut+1}/${TUT.length}</b><p></p>
     <div class="tutbtns">${st.last?'<button class="btn small" data-act="tutnext">เริ่มเล่น</button>':'<button class="btn ghost small" data-act="tutskip">ข้ามการสอน</button>'}</div></div>`;
@@ -3051,6 +3085,7 @@ function autoPrep(){
   save(); return log;
 }
 function startAuto(mode){
+  if(!S.seenAuto){ S.seenAuto=1 }
   UI.autoplay={mode, wins:0, loss:0, start:S.stage, startTower:S.tower};
   try{ navigator.wakeLock?.request('screen').then(l=>UI.wl=l).catch(()=>{}) }catch(e){}
   autoPrep(); closeLayer(); fight(mode); if(B) B.speed=apCfg().speed; const sp=$('#spd'); if(sp) sp.textContent='x'+B.speed;
@@ -3077,7 +3112,7 @@ function endBattle(){ if(UI.autoplay) stopAuto(); if(B){clearTimeout(B.timer);B.
 // ---------- events ----------
 document.addEventListener('click',e=>{
   if(e.target.closest('#sndbtn')){ toggleSound(); return }
-  if(e.target.closest('button')) sfx('click');
+  if(e.target.closest('button')){ sfx('click'); try{ navigator.vibrate?.(8) }catch(_){} }
   const go=e.target.closest('[data-go]'); if(go){tab=go.dataset.go; closeLayer(); render(); $('#view').scrollTop=0; return}
   const fac=e.target.closest('[data-fac]'); if(fac){roster.fac=fac.dataset.fac; render(); return}
   const act=e.target.closest('[data-act]');
@@ -3105,6 +3140,8 @@ document.addEventListener('click',e=>{
       case 'cpcopy': { const ta=$('#cpout'); ta.select(); (navigator.clipboard?.writeText(ta.value)||Promise.reject()).then(()=>toast('คัดลอกแล้ว')).catch(()=>{ try{document.execCommand('copy');toast('คัดลอกแล้ว')}catch(e){toast('กดค้างที่ช่องแล้วเลือกคัดลอก')} }); return }
       case 'sendfb': { const t=$('#fbtext').value.trim(); if(!t) return toast('พิมพ์ความเห็นก่อน'); act.disabled=true;
         SB.from('feedback').insert({message:t.slice(0,1000), name:(S.pname||'').slice(0,24), stage:S.stage}).then(({error})=>{ if(error){ act.disabled=false; toast('ส่งไม่สำเร็จ ลองใหม่') } else { $('#fbtext').value=''; toast('ขอบคุณสำหรับความเห็น!') } }); return }
+      case 'cpfill': { const i=$('#cpin'); if(i){ i.value=act.dataset.k; i.focus() } return }
+      case 'svtab': UI.svtab=act.dataset.k; UI.ask=null; render(); return;
       case 'tierrole': UI.tierRole=act.dataset.k; render(); return;
       case 'apstart': startAuto(act.dataset.m); return;
       case 'apstop': stopAuto(); return;
