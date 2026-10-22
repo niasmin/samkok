@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=0de6dee7aa').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=1c6f5873b2').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1787,6 +1787,8 @@ const liveArt = (id, mech) => (!mech && ART.has(id))
   : portrait(id, mech);
 // Key-pose sprites (ready, windup, action, recover) for generals that have them; Hua Xiong has ready + shield block.
 const POSES={liubei_y:4, guanyu_y:4, zhangfei_y:4, zhaoyun:4, zhuge:4, huatuo:4, huaxiong:2};
+// The rest bend their single portrait into the same four beats until hand-drawn poses arrive (tools/procpose.py).
+for(const id of ["caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guojia", "huanggai", "huangzhong", "jiangwei", "lingtong", "liubei", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei", "zhangjiao", "zhangliao", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhurong", "zuoci"]) POSES[id]=POSES[id]||4;
 const poseSrc = (id,k) => `ui/pose/${id}_${k}.webp`;
 const poseTok = id => `<span class="tok pose ${HERO[id].fac}"><img class="pf" src="${poseSrc(id,0)}" alt="" draggable="false"></span>`;
 function poseAttack(el, dt){
