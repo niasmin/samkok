@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=1c6f5873b2').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=d25f7933f4').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1026,6 +1026,12 @@ div.fslot{display:block;width:100%;max-width:96px;min-width:0}div.fslot>.card{wi
 .u.foe .tok.pose .pf{transform:translateX(-50%) scaleX(-1);animation:none}
 .u.hit .tok.pose{animation:none}
 .u.hit .tok.pose .pf{filter:brightness(2.2) sepia(1) hue-rotate(-30deg) saturate(4)}
+
+/* reaction frames & painted fx */
+.u.dead.fallen{animation:none;opacity:.9;filter:grayscale(.35) brightness(.85)}
+.u.dead.fallen .hp,.u.dead.fallen .rg{opacity:.4}
+.fxi{position:absolute;left:50%;top:40%;width:150px;height:150px;margin:-75px 0 0 -75px;pointer-events:none;z-index:4;transform:rotate(var(--r,0deg)) scale(calc(var(--s,1)*.6));opacity:0;animation:fxi .62s ease-out forwards}
+@keyframes fxi{15%{opacity:1;transform:rotate(var(--r,0deg)) scale(var(--s,1))}100%{opacity:0;transform:rotate(var(--r,0deg)) scale(calc(var(--s,1)*1.25))}}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1796,6 +1802,23 @@ function poseAttack(el, dt){
   const at=[[0,1],[dt*0.28,2],[dt*0.62,3],[dt*0.92,0]];
   clearTimeout(img._pt); at.forEach(([t,k],i)=>{ const f=()=>{ img.src=poseSrc(id,k) }; if(!t) f(); else img._pt=setTimeout(f,t) });
 }
+// Reaction frames (hit, kneel, fallen, rise) for generals that have them.
+const HURT=new Set(['liubei_y','guanyu_y','zhangfei_y','huatuo','zhuge','zhaoyun']);
+function poseHurt(el, kind){
+  const img=el?.querySelector?.('.pf'), id=el?.dataset?.pid; if(!img||!img.style||!HURT.has(id)) return false;
+  clearTimeout(img._pt); clearTimeout(img._ht);
+  if(kind==='hit'){ if(el.classList.contains('dead')) return true; img.src=poseSrc(id,'h0'); img._ht=setTimeout(()=>{ if(!el.classList.contains('dead')) img.src=poseSrc(id,0) },330) }
+  else if(kind==='die'){ el.classList.add('fallen'); img.src=poseSrc(id,'h1'); img._ht=setTimeout(()=>{ img.src=poseSrc(id,'h2') },260) }
+  else if(kind==='down'){ el.classList.add('fallen'); img.src=poseSrc(id,'h2') }
+  else if(kind==='rise'){ el.classList.remove('fallen','dead'); img.src=poseSrc(id,'h3'); img._ht=setTimeout(()=>{ img.src=poseSrc(id,0) },450) }
+  return true;
+}
+// Painted effects, drawn with screen blending so their black backgrounds vanish.
+function fxImg(el, name, rot=0, big=1){
+  if(!el?.appendChild) return; const f=document.createElement('img'); f.className='fxi'; f.src=`ui/fx/${name}.webp`; f.alt='';
+  f.style.setProperty?.('--r',rot+'deg'); f.style.setProperty?.('--s',big); el.appendChild(f); setTimeout(()=>f.remove(),650);
+}
+const SKILL_FX = (id) => id==='guanyu'||id==='guanyu_y' ? 'crescent' : ({war:'slash',cav:'thrust_red',arch:'thrust_ice',strat:'whirl',heal:'lotus'})[HERO[id]?.role]||'slash';
 function poseBlock(el){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||POSES[id]!==2) return;
   img.src=poseSrc(id,1); clearTimeout(img._bt); img._bt=setTimeout(()=>{ img.src=poseSrc(id,0) },380);
@@ -3058,7 +3081,9 @@ function fight(mode='stage', bot=null){
     </div></div>`;
   const max=Object.fromEntries(res.start.map(u=>[u.uid,u.max]));
   setMusic('battle');
-  try{ for(const u of res.start) if(POSES[u.id]) for(let k=0;k<POSES[u.id];k++){ const im=new Image(); im.src=poseSrc(u.id,k) } }catch(e){}
+  try{ const pre=src=>{ const im=new Image(); im.src=src };
+    for(const u of res.start){ if(POSES[u.id]) for(let k=0;k<POSES[u.id];k++) pre(poseSrc(u.id,k)); if(HURT.has(u.id)) for(const k of ['h0','h1','h2','h3']) pre(poseSrc(u.id,k)) }
+    ['slash','crescent','thrust_red','thrust_ice','whirl','lotus','dome','burst'].forEach(n=>pre(`ui/fx/${n}.webp`)) }catch(e){}
   B={wait:null,armed:-1,res,max,mode,bot,units:Object.fromEntries(res.start.map(u=>[u.uid,u])),i:0,speed:B?.speed||1,timer:null,done:false};
   $('#spd').textContent='x'+B.speed;
   step();
@@ -3085,9 +3110,10 @@ function applyHits(a, animate){
     if(animate){
       const n=document.createElement('span'); n.className='num'+(h.heal?' heal':h.crit?' crit':'');
       n.textContent=h.heal?(h.divine?'จิตเทวะ +':'+')+fmt(h.heal):(h.combo?'คอมโบ ':h.crit?'คริ ':'')+fmt(h.dmg)+(h.adv>1?' ▲':''); el.appendChild(n); setTimeout(()=>n.remove(),900);
-      if(!h.heal){el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'),360); poseBlock(el)}
+      if(!h.heal){el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'),360); if(!h.dead && !poseHurt(el,'hit')) poseBlock(el); if(h.crit) fxImg(el,'burst',0,.8)}
+      if(h.divine){ poseHurt(el,'rise'); fxImg(el,'dome',0,1.2) }
     }
-    if(h.dead) el.classList.add('dead');
+    if(h.dead){ el.classList.add('dead'); poseHurt(el, animate?'die':'down') }
   }
   for(const [uid,r] of Object.entries(a.rage)){ const el=$('#u-'+uid); if(el) el.querySelector('.rg i').style.width=r+'%'; const sk=$('#sk-'+uid); if(sk){ sk.style.setProperty?.('--r',r); sk.classList.toggle('full',r>=100) } }
   for(const h of a.hits) if(h.dead) $('#sk-'+h.tgt)?.classList.add('dead');
@@ -3115,7 +3141,8 @@ function step(){
   // visual effects per role: arrows and orbs fly, blades slash, healers glow
   for(const h of a.hits){
     const t=$('#u-'+h.tgt); if(!t) continue;
-    if(h.heal!==undefined){ setTimeout(()=>fx(t, h.divine?'divine':'healfx'), dt*0.25); continue }
+    if(h.heal!==undefined){ setTimeout(()=>{ fx(t, h.divine?'divine':'healfx'); if(a.skill&&!h.divine) fxImg(t,'lotus',0,.9) }, dt*0.25); continue }
+    if(a.skill){ const up=a.src[0]==='p', nm=SKILL_FX(su.id); setTimeout(()=>fxImg(t, nm, nm.startsWith('thrust')?(up?-90:90):(up?0:180), 1.1), dt*0.28) }
     if(role==='arch'){ fly(src,t,'arrow',dt*0.3); setTimeout(()=>fx(t,'pierce'),dt*0.3) }
     else if(role==='strat'){ fly(src,t,a.skill?'fireball':'orb',dt*0.3); setTimeout(()=>fx(t,a.skill?'burst':'spark'),dt*0.3) }
     else setTimeout(()=>fx(t, a.skill?'slash big':'slash'), dt*0.25);
