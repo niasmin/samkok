@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=44aef13497').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=49c6758c32').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -945,6 +945,34 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 /* 6. training card sits below the scene */
 .trainsc2.pic{margin-bottom:10px}
 .traincard p{font-size:13px}
+
+/* celebrations */
+.celeb{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:radial-gradient(circle,rgba(60,14,6,.75),rgba(10,3,2,.92));animation:cfade .25s ease-out}
+.celeb.out{animation:cfade .25s reverse forwards}
+@keyframes cfade{from{opacity:0}to{opacity:1}}
+.celeb .rays{position:absolute;left:50%;top:44%;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--cc) 35%,transparent) 0 8deg,transparent 8deg 22deg);border-radius:50%;mask:radial-gradient(circle,#000 10%,transparent 60%);-webkit-mask:radial-gradient(circle,#000 10%,transparent 60%);animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.celeb>i{position:absolute;top:-20px;left:var(--x);width:8px;height:14px;background:var(--cc);border-radius:2px;animation:conf 2.6s var(--d) ease-in forwards;opacity:.9}
+.celeb>i:nth-child(3n){background:#fff3d0}.celeb>i:nth-child(4n){background:#c4321f}
+@keyframes conf{to{transform:translateY(110vh) rotate(720deg)}}
+.cbox{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;animation:pop3 .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop3{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.cart{width:200px;height:200px;filter:drop-shadow(0 0 24px var(--cc))}
+.cart.SP{filter:drop-shadow(0 0 30px #ff9a3a) drop-shadow(0 0 60px #ffd36a)}
+.cicon img{width:140px;height:140px;object-fit:contain;filter:drop-shadow(0 0 24px var(--cc))}
+.ctitle{font:clamp(28px,9vw,40px)/1.2 var(--f-display);color:var(--cc);text-shadow:0 3px 0 #3a0c06,0 0 20px rgba(0,0,0,.6)}
+.cname{font:22px var(--f-display);color:#fff3d6}.cname em{font-style:italic;color:#ffd36a}
+.csub{font-size:15px;font-weight:600;color:#ffe9a8}
+.cbox small{margin-top:10px;font-size:12px;color:#c9ab88}
+/* dim mode */
+html.dim .panel,html.dim .sheet,html.dim .day,html.dim .tierrow,html.dim .cplist button,html.dim .chatwelcome,html.dim .evbanner2,html.dim .trait,html.dim .grow,html.dim .card,html.dim .slotrow{filter:brightness(.74) contrast(1.06) saturate(.95)}
+html.dim .pic,html.dim .city,html.dim .scene,html.dim .portal,html.dim .tstage,html.dim .shead,html.dim .bfbg{filter:brightness(.8)}
+html.dim .sheet .card,html.dim .panel .card{filter:none}
+html.dim body,html.dim #app{background-color:#120604}
+#dimbtn[aria-pressed="true"]{background:rgba(255,224,102,.18)}
+@media (prefers-reduced-motion:reduce){.celeb .rays,.celeb>i{animation:none}.celeb>i{display:none}}
+.top{gap:6px}.top .who{min-width:0;flex:1}.top .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top .power{white-space:nowrap}
+.top .sndbtn{width:30px;height:30px}.top .cur{flex:none}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -955,6 +983,7 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
       <b id="pname">ท่านเจ้าเมือง</b>
       <div class="power"><small>พลังทัพ</small><span id="ppower">0</span></div>
     </div>
+    <button id="dimbtn" class="sndbtn" aria-label="โหมดลดแสง" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" style="fill:var(--gold-hi);stroke:none"/></svg></button>
     <button id="sndbtn" class="sndbtn" aria-label="เปิดหรือปิดเสียง" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" style="fill:var(--gold-hi)"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M16 9l6 6M22 9l-6 6"/></svg></button>
     <div class="cur">
       <div class="pill" title="เงิน"><i class="coin g"></i><span id="cgold">0</span></div>
@@ -2839,6 +2868,24 @@ function openHero(id){
   $('.sheet .btn')?.focus({preventScroll:true});
 }
 const closeLayer=()=>{$('#layer').innerHTML=''};
+// ---------- celebrations: short full-screen moments for big wins ----------
+const CELEB_Q=[]; let celebOn=false;
+const CELEB_KIND={hero:{t:'ได้รับขุนพลใหม่!', c:'#ffd36a'}, star:{t:'เลื่อนดาวสำเร็จ!', c:'#ffe066'}, awaken:{t:'ตื่นจิตสำเร็จ!', c:'#ff8af0'},
+  rank:{t:'อันดับประลองขึ้น!', c:'#7ad8ff'}, region:{t:'พิชิตแคว้นสำเร็จ!', c:'#ff9a5a'}};
+function celebrate(kind, id, sub){ CELEB_Q.push({kind,id,sub}); if(!celebOn) nextCeleb() }
+function nextCeleb(){
+  const c=CELEB_Q.shift(); if(!c){ celebOn=false; return } celebOn=true;
+  const k=CELEB_KIND[c.kind], h=c.id&&HERO[c.id];
+  const el=document.createElement('div'); el.className='celeb '+c.kind; el.setAttribute('role','alert'); el.style.setProperty('--cc',k.c);
+  el.innerHTML=`<div class="rays"></div>${Array.from({length:24},(_,i)=>`<i style="--i:${i};--x:${(i*37)%100}%;--d:${(i*53)%10/10}s"></i>`).join('')}
+    <div class="cbox">${h?`<div class="cart ${h.rar}">${liveArt(c.id,false)}</div>`:`<div class="cicon">${c.kind==='rank'?'<img src="ui/medal1.webp" alt="">':'<img src="ui/flag.webp" alt="">'}</div>`}
+      <b class="ctitle">${k.t}</b>${h?`<span class="cname">${esc(h.th)} <em>${RAR[h.rar].label}</em></span>`:''}${c.sub?`<span class="csub">${esc(c.sub)}</span>`:''}
+      <small>แตะเพื่อดำเนินต่อ</small></div>`;
+  const close=()=>{ if(!el.isConnected) return; el.classList.add('out'); setTimeout(()=>{ el.remove(); nextCeleb() },250) };
+  el.addEventListener('click',e=>{ e.stopPropagation(); close() });
+  document.body.appendChild(el); sfx('win'); try{ navigator.vibrate?.([30,40,60]) }catch(_){}
+  setTimeout(close, 3200);
+}
 
 // ---------- actions ----------
 function doPull(n){
@@ -2865,6 +2912,7 @@ function doPull(n){
     <div class="grid" style="${n===1?'grid-template-columns:minmax(0,120px);justify-content:center':''}">${got.map((g,i)=>cardHTML(g.id,{team:false,force:true,lv:S.heroes[g.id].lv,star:S.heroes[g.id].star,extra:g.isNew?'<span class="tagnew">ใหม่!</span>':'<span class="tagdup">+1 สำเนา</span>'}).replace('class="card','style="animation-delay:'+(i*0.08)+'s" class="card')).join('')}</div>
     <div style="display:flex;gap:10px"><button class="btn" data-act="close">รับทราบ</button>${S.gems>=cost?`<button class="btn ghost" data-act="${n===10?'pull10':'pull1'}">อีก ${n} ครั้ง</button>`:''}</div>
   </div>`;
+  got.filter(g=>g.isNew&&HERO[g.id].rar==='SP').forEach((g,i)=>setTimeout(()=>celebrate('hero', g.id, 'อัญเชิญได้ขุนพล S+!'), 1100+i*50));
 }
 
 function autoTeam(quiet){
@@ -3028,7 +3076,8 @@ function finish(){
     rwHTML=`<div class="rw"><span>ดาเมจ ${fmt(dmg)} (${(pct*100).toFixed(1)}%)</span><span><i class="coin j"></i>+${gems}</span><span>เหรียญกิลด์ +${coins}</span></div><p>เหลือสิทธิ์ตีบอสวันนี้ ${S.guild.raid} ครั้ง</p>`;
   } else if(arena){
     const bot=B.bot, d=win?20+Math.max(0,Math.round((bot.pts-S.arena.pts)/20)):-10;
-    S.arena.pts=Math.max(0,S.arena.pts+d); S.arena.ref++;
+    const rankBefore=arenaRank(); S.arena.pts=Math.max(0,S.arena.pts+d); S.arena.ref++;
+    if(win && arenaRank()<rankBefore) setTimeout(()=>celebrate('rank', null, `อันดับ ${rankBefore} → ${arenaRank()}`), 900);
     if(bot.real) NET.hits=[...NET.hits, {to:bot.uid, win, ts:Date.now()}].slice(-8);
     if(win){S.gems+=40; S.friend+=10; S.daily.win++; addEv(10)}
     rwHTML=`<div class="rw"><span>แต้มประลอง ${d>0?'+':''}${d}</span>${win?'<span><i class="coin j"></i>+40</span>':''}</div><p>อันดับตอนนี้ ${arenaRank()}</p>`;
@@ -3043,11 +3092,11 @@ function finish(){
   } else if(win){
     const rw=stageReward(S.stage); S.gold+=rw.gold; S.exp+=rw.exp; S.gems+=rw.gems; addEv(10);
     const pot=1+(S.stage%5===0?2:0); S.potions+=pot;
-    const chapterDone=S.stage%10===0; if(chapterDone){ S.gems+=200; S.potions+=5 }
+    const chapterDone=S.stage%10===0; if(chapterDone){ S.gems+=200; S.potions+=5; if(!UI.autoplay){ const rg=REGIONS[Math.floor((S.stage-1)/10)%REGIONS.length].n; setTimeout(()=>celebrate('region', null, `แคว้น${rg} · หยก +200 · ยา EXP ×5`), 1000) } }
     const g=rng()<0.7?newGear(S.stage):null;
     let joined='';
     const fh=FIRST_HERO[S.stage];
-    if(fh && !H(fh)){ S.heroes[fh]={lv:Math.max(1,S.stage),star:1,copies:0,aw:0,eq:{}}; placeInTeam(fh); joined=`<p class="joined">${tok(fh)}<b>${esc(HERO[fh].th)}</b> เข้าร่วมทัพแล้ว!</p>` }
+    if(fh && !H(fh)){ S.heroes[fh]={lv:Math.max(1,S.stage),star:1,copies:0,aw:0,eq:{}}; placeInTeam(fh); if(!UI.autoplay) setTimeout(()=>celebrate('hero', fh, 'เข้าร่วมทัพแล้ว'), 900); joined=`<p class="joined">${tok(fh)}<b>${esc(HERO[fh].th)}</b> เข้าร่วมทัพแล้ว!</p>` }
     let shardTxt='';
     if(S.stage%3===0){ const pool=HEROES.filter(h=>h.rar!=='SP'), sh=pool[Math.floor(rng()*pool.length)]; addShards(sh.id,3); shardTxt=`<span>เศษ${esc(sh.th)} ×3</span>` }
     S.stage++; S.daily.win++; save(); if(typeof track==='function') track('stage_win', S.stage-1);
@@ -3112,6 +3161,7 @@ function endBattle(){ if(UI.autoplay) stopAuto(); if(B){clearTimeout(B.timer);B.
 // ---------- events ----------
 document.addEventListener('click',e=>{
   if(e.target.closest('#sndbtn')){ toggleSound(); return }
+  if(e.target.closest('#dimbtn')){ const n={auto:'on',on:'off',off:'auto'}[dimPref()]; try{ localStorage.setItem(DIM_KEY,n) }catch(_){} applyDim(); toast(`โหมดลดแสง: ${{auto:'ตามเครื่อง',on:'เปิด',off:'ปิด'}[n]}`); return }
   if(e.target.closest('button')){ sfx('click'); try{ navigator.vibrate?.(8) }catch(_){} }
   const go=e.target.closest('[data-go]'); if(go){tab=go.dataset.go; closeLayer(); render(); $('#view').scrollTop=0; return}
   const fac=e.target.closest('[data-fac]'); if(fac){roster.fac=fac.dataset.fac; render(); return}
@@ -3139,9 +3189,9 @@ document.addEventListener('click',e=>{
         render(); return }
       case 'cpcopy': { const ta=$('#cpout'); ta.select(); (navigator.clipboard?.writeText(ta.value)||Promise.reject()).then(()=>toast('คัดลอกแล้ว')).catch(()=>{ try{document.execCommand('copy');toast('คัดลอกแล้ว')}catch(e){toast('กดค้างที่ช่องแล้วเลือกคัดลอก')} }); return }
       case 'sendfb': { const t=$('#fbtext').value.trim(); if(!t) return toast('พิมพ์ความเห็นก่อน'); act.disabled=true;
-        SB.from('feedback').insert({message:t.slice(0,1000), name:(S.pname||'').slice(0,24), stage:S.stage}).then(({error})=>{ if(error){ act.disabled=false; toast('ส่งไม่สำเร็จ ลองใหม่') } else { $('#fbtext').value=''; toast('ขอบคุณสำหรับความเห็น!') } }); return }
+        SB.from('feedback').insert({message:(t+`\n\n[${innerWidth}x${innerHeight} @${devicePixelRatio} · ${navigator.userAgent.slice(0,140)} · หน้า ${UI.lastTab||tab}]`).slice(0,1000), name:(S.pname||'').slice(0,24), stage:S.stage}).then(({error})=>{ if(error){ act.disabled=false; toast('ส่งไม่สำเร็จ ลองใหม่') } else { $('#fbtext').value=''; toast('ขอบคุณสำหรับความเห็น!') } }); return }
       case 'cpfill': { const i=$('#cpin'); if(i){ i.value=act.dataset.k; i.focus() } return }
-      case 'svtab': UI.svtab=act.dataset.k; UI.ask=null; render(); return;
+      case 'svtab': if(tab!=='savegame') UI.lastTab=tab; UI.svtab=act.dataset.k; UI.ask=null; render(); return;
       case 'tierrole': UI.tierRole=act.dataset.k; render(); return;
       case 'apstart': startAuto(act.dataset.m); return;
       case 'apstop': stopAuto(); return;
@@ -3227,16 +3277,16 @@ document.addEventListener('click',e=>{
         save(); render(); toast(msg); return }
       case 'shard': { const h=HERO[id], own=!!H(id), need=SHARD_NEED[h.rar][own?'own':'neu']; if((S.shards[id]||0)<need) return;
         S.shards[id]-=need; if(own) H(id).copies++; else { S.heroes[id]={lv:1,star:1,copies:0,aw:0,eq:{}}; placeInTeam(id) }
-        save(); render(); toast(own?`ได้สำเนา ${h.th} +1`:`ได้รับขุนพล ${h.th}!`); return }
+        save(); render(); if(own) toast(`ได้สำเนา ${h.th} +1`); else celebrate('hero', id, 'รวมเศษขุนพลครบแล้ว'); return }
       case 'tutskip': S.tut=99; save(); render(); return;
       case 'tutnext': S.tut++; save(); render(); return;
       case 'opensel': selPick=null; openSelector(); return;
       case 'selpick': selPick=id; openSelector(); return;
       case 'selconfirm': { if(!selPick||!(S.bag.selSP>0)) return; S.bag.selSP--; if(!S.bag.selSP) delete S.bag.selSP;
         const had=!!H(selPick); if(had) H(selPick).copies++; else S.heroes[selPick]={lv:1,star:1,copies:0,aw:0,eq:{}};
-        save(); closeLayer(); render(); toast(had?`ได้สำเนา ${HERO[selPick].th} +1`:`ได้รับขุนพล ${HERO[selPick].th}!`); return }
+        save(); closeLayer(); render(); if(had) toast(`ได้สำเนา ${HERO[selPick].th} +1`); else celebrate('hero', selPick, 'จากหีบเลือกขุนพล S+'); return }
       case 'awaken': { const h=H(id), c=awCost(h.aw); if(h.star<5||h.aw>=5||(S.souls[id]||0)<c.soul||S.gold<c.gold) return;
-        S.souls[id]-=c.soul; S.gold-=c.gold; h.aw++; save(); render(); openHero(id); toast(`${HERO[id].th} ตื่นจิตขั้น ${h.aw} เลเวลสูงสุดเป็น ${levelCap(h.star,h.aw)}`); return }
+        S.souls[id]-=c.soul; S.gold-=c.gold; h.aw++; save(); render(); openHero(id); celebrate('awaken', id, `ตื่นจิตขั้น ${h.aw} · เลเวลสูงสุด ${levelCap(h.star,h.aw)}`); return }
       case 'pull1': closeLayer(); doPull(1); return;
       case 'pull10': closeLayer(); doPull(10); return;
       case 'showall': roster.showAll=!roster.showAll; render(); return;
@@ -3244,7 +3294,7 @@ document.addEventListener('click',e=>{
       case 'pickslot': tab='heroes'; render(); return;
       case 'toggleteam': toggleTeam(id); return;
       case 'lvup': case 'lvup10': { const n=levelUp(id, a==='lvup10'?10:1); if(!n) return; save(); render(); openHero(id); if(n>1) toast(`+${n} เลเวล`); return }
-      case 'starup': { const h=S.heroes[id], c=starCost(h.star); if(h.star>=5||h.copies<c.copies||S.gold<c.gold) return; S.gold-=c.gold; h.copies-=c.copies; h.star++; save(); render(); openHero(id); toast(`${HERO[id].th} ขึ้นเป็น ${h.star} ดาว ขีดจำกัดเลเวลเป็น ${levelCap(h.star,h.aw)}`); return }
+      case 'starup': { const h=S.heroes[id], c=starCost(h.star); if(h.star>=5||h.copies<c.copies||S.gold<c.gold) return; S.gold-=c.gold; h.copies-=c.copies; h.star++; save(); render(); openHero(id); celebrate('star', id, `${'★'.repeat(h.star)} · เลเวลสูงสุด ${levelCap(h.star,h.aw)}`); return }
       case 'task': { const k=act.dataset.k, t=TASKS.find(x=>x.k===k); const gems=k==='all'?300:t.gems; if(S.daily.got[k]) return; if(k==='all'?!allDone():!taskDone(t)) return; S.daily.got[k]=1; S.gems+=gems; save(); render(); toast(`ได้รับหยก +${gems}`); return }
       case 'reset': $('#layer').innerHTML=`<div class="veil" data-act="close"><div class="sheet" data-stop role="dialog" aria-modal="true" aria-label="เริ่มเกมใหม่">
           <h2>เริ่มเกมใหม่?</h2><p>ขุนพล เงิน หยก และด่านทั้งหมดจะหายไป ย้อนกลับไม่ได้</p>
@@ -3290,7 +3340,13 @@ document.addEventListener('pointermove',e=>{
   c.style.setProperty('--gx',((x+.5)*100).toFixed(0)+'%'); c.style.setProperty('--gy',((y+.5)*100).toFixed(0)+'%');
 });
 document.addEventListener('pointerout',e=>{ const c=e.target.closest?.('[data-tilt]'); if(c&&!c.contains(e.relatedTarget)){ c.style.removeProperty('--rx'); c.style.removeProperty('--ry') } });
-function start(data){ load(data); render(); boot(); initNet(); const sb=$('#sndbtn'); if(sb){ sb.classList.toggle('off',!SND.on); sb.setAttribute('aria-pressed',SND.on) }
+// ---------- dim mode: auto follows the phone's dark setting ----------
+const DIM_KEY='kp-dim';
+function dimPref(){ try{ return localStorage.getItem(DIM_KEY)||'auto' }catch(e){ return 'auto' } }
+function applyDim(){ const p=dimPref(), dark=p==='on'||(p==='auto'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+  document.documentElement?.classList?.toggle('dim', !!dark); const b=$('#dimbtn'); if(b){ b.setAttribute('aria-pressed',!!dark); b.title=`โหมดลดแสง: ${{auto:'อัตโนมัติ',on:'เปิด',off:'ปิด'}[p]}` } }
+try{ window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change',applyDim) }catch(e){}
+function start(data){ load(data); applyDim(); render(); boot(); initNet(); const sb=$('#sndbtn'); if(sb){ sb.classList.toggle('off',!SND.on); sb.setAttribute('aria-pressed',SND.on) }
   // browsers only allow audio after a tap, so a saved 'on' waits for the first one
   if(SND.on){ SND.on=false; document.addEventListener('pointerdown',e=>{ if(!SND.ctx && !e.target.closest('#sndbtn')) toggleSound() },{once:true}) } }
 window.claude?.hot?.snapshot?.(()=>S);
