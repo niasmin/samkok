@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=49c6758c32').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=294a373d82').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -973,6 +973,33 @@ html.dim body,html.dim #app{background-color:#120604}
 @media (prefers-reduced-motion:reduce){.celeb .rays,.celeb>i{animation:none}.celeb>i{display:none}}
 .top{gap:6px}.top .who{min-width:0;flex:1}.top .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.top .power{white-space:nowrap}
 .top .sndbtn{width:30px;height:30px}.top .cur{flex:none}
+
+/* hero sheet: gear first, sticky action bar */
+.hbar{position:sticky;bottom:-16px;z-index:4;display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:6px;margin:12px -16px -16px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,#5a1a12,#2c0c08);border-top:2px solid #d4a446;box-shadow:0 -6px 12px rgba(0,0,0,.25)}
+.hbar>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.hbar .hb1{display:grid;grid-template-columns:1fr auto;gap:4px}.hbar .hb1 small{grid-column:1/-1}
+.hbar .btn{padding:9px 6px;font-size:14px;white-space:nowrap}
+.hbar small{font-size:11.5px;color:#f2d88e;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hbar small .no{color:#ff8a7a}
+/* formation */
+.synbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.syn{display:inline-flex;align-items:center;gap:5px;padding:4px 9px 4px 4px;border-radius:999px;font-size:12.5px;font-weight:700;color:#f2d88e;background:rgba(0,0,0,.3);border:1.5px solid rgba(212,164,70,.4)}
+.syn b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:13px/1 var(--f-seal);color:#fff;background:var(--fc,#8a1e14)}
+.syn.on{border-color:#ffe066;background:rgba(80,40,0,.5);color:#fff3d6}.syn em{font-style:normal;color:#7dff8a}.syn i{font-style:normal;font-weight:500;color:#c9ab88}
+.fhint{font-size:13px;color:#f2d88e;margin:4px 0 6px;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.25)}
+.fhint.on{background:rgba(255,224,102,.15);border:1px solid #ffe066;color:#fff3d6}
+.factions{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.fslot.sel .card,.slot-empty.fslot.sel{outline:3px solid #ffe066;outline-offset:2px;box-shadow:0 0 16px rgba(255,224,102,.7)}
+.fig.sel{outline:3px solid #ffe066;box-shadow:0 0 16px rgba(255,224,102,.8)}
+.slot-empty.fslot{font-size:15px;font-weight:700;color:#f2d88e}
+.bench{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bh{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px;border-radius:10px;background:rgba(255,248,232,.92);border:1.5px solid #d4a446;color:#3a2416}
+.bh .tok{width:52px;height:52px}.bh .ri{position:absolute;top:40px;right:6px;width:20px;height:20px;background:rgba(26,8,4,.75);border-radius:50%;padding:2px;border:1px solid #d4a446}
+.bh em{position:absolute;top:3px;left:3px;font:italic 800 11px/1 var(--f-display);color:#fff;border-radius:4px;padding:2px 3px;background:#5a6a5a}
+.bh em.T0{background:#c4321f}.bh em.T1{background:#6a2aa0}.bh em.T2{background:#1a5aa0}
+.bh span{font-size:12px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bh small{font-size:11px;color:#6e5236}
+html.dim .bh{filter:brightness(.78)}
+div.fslot{display:block;width:100%;max-width:96px;min-width:0}div.fslot>.card{width:100%;max-width:none}
+.hbar .btn.ghost{color:#f2d88e!important;border-color:#d4a446}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1226,7 +1253,12 @@ const BONDS = [
   {name:'ม้าศึกเสเหลียง',      ids:['machao','mayunlu'], hp:.10, atk:.15}
 ];
 const activeBonds = ids => BONDS.filter(b=>b.ids.every(i=>ids.includes(i)));
-function bondBonus(ids, id){let hp=0,atk=0; for(const b of activeBonds(ids)) if(b.ids.includes(id)){hp+=b.hp;atk+=b.atk} return {hp,atk}}
+// Same-faction synergy: 3+ generals of one kingdom in the team lift that kingdom's HP and ATK.
+const FAC_SYN = {3:.06, 4:.10, 5:.14, 6:.18};
+const facCount = (ids, fac) => ids.filter(i=>HERO[i]&&HERO[i].fac===fac).length;
+const facSyn = (ids, fac) => FAC_SYN[Math.min(6,facCount(ids,fac))]||0;
+function bondBonus(ids, id){let hp=0,atk=0; for(const b of activeBonds(ids)) if(b.ids.includes(id)){hp+=b.hp;atk+=b.atk}
+  const f=HERO[id]?facSyn(ids,HERO[id].fac):0; return {hp:hp+f, atk:atk+f}}
 
 function pickTeam(rnd, pool){
   const ids=[];
@@ -1613,7 +1645,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function fmt(n){ n=Math.floor(n); if(n>=1e9) return (n/1e9).toFixed(2)+'B'; if(n>=1e6) return (n/1e6).toFixed(2)+'M'; if(n>=1e5) return (n/1e3).toFixed(1)+'K'; return n.toLocaleString('en-US') }
 const stars = n => '★'.repeat(n);
-const teamPower = () => S.team.reduce((a,id)=>id?a+heroPower(id):a,0);
+const teamPower = () => { const ids=S.team.filter(Boolean); return ids.reduce((a,id)=>a+powerOf(finalStats(heroEntry(id), bondBonus(ids,id))),0) };
 function rng(){ S.seed=(Math.imul(S.seed,1664525)+1013904223)>>>0; return S.seed/4294967296 }
 let toastT;
 function toast(msg){ let t=$('.toast'); if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)} t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2200) }
@@ -1826,7 +1858,7 @@ function viewCamp(){
   </div>
   <div class="note">ชนะแล้วได้ เงิน ${fmt(rw.gold)} · EXP ${fmt(rw.exp)} · หยก ${rw.gems}${S.stage%5===0?' (ด่านบอส)':''} และรางวัลออฟไลน์ต่อนาทีจะเพิ่มขึ้น</div>
   <div class="panel apbox"><div class="aphead"><b>เล่นอัตโนมัติ</b><small>สู้ต่อเนื่อง ระหว่างด่านจะพัฒนาทัพให้เอง หยุดเมื่อแพ้ 3 ครั้งติด</small></div>
-    <div class="apopts">${[['lv','อัปเลเวล'],['gear','ใส่ของ'],['team','เลือกตัวละคร']].map(([k,t])=>`<button class="chip" data-act="apcfg" data-k="${k}" aria-pressed="${apCfg()[k]!==false}">${t}</button>`).join('')}</div>
+    <div class="apopts">${[['lv','อัปเลเวล'],['gear','ใส่ของ'],['team','เติมช่องว่างในทัพ']].map(([k,t])=>`<button class="chip" data-act="apcfg" data-k="${k}" aria-pressed="${apCfg()[k]!==false}">${t}</button>`).join('')}</div>
     <button class="gbtn big" style="width:100%" data-act="apstart" data-m="stage">▶ เริ่มเล่นอัตโนมัติ</button></div>`;
 }
 
@@ -1928,28 +1960,40 @@ function viewTier(){
   ${rows}
   <div class="note">อันดับคิดจากค่าพลัง ความแรงสกิล คริติคอล และความเร็วของแต่ละตัว ยังไม่รวมมิตรภาพและก๊กข่ม ตัวที่ยังไม่มีแสดงเป็นสีจาง แตะเพื่อดูรายละเอียด</div>`;
 }
+function synergyHTML(){
+  const ids=S.team.filter(Boolean), out=[];
+  for(const f of Object.keys(FAC)){ const n=facCount(ids,f); if(!n) continue; const v=facSyn(ids,f), next=Object.keys(FAC_SYN).map(Number).find(k=>k>n);
+    out.push(`<span class="syn ${v?'on':''}" style="--fc:var(--${f})"><b>${FAC[f].ch}</b>${FAC[f].th} ${n}/6 ${v?`<em>HP/ATK +${Math.round(v*100)}%</em>`:`<i>อีก ${next-n} คน +${Math.round(FAC_SYN[next]*100)}%</i>`}</span>`) }
+  for(const bd of activeBonds(ids)) out.push(`<span class="syn on bond"><b>友</b>${bd.name} <em>${bondText(bd)}</em></span>`);
+  return `<div class="synbar">${out.join('')||'<span class="syn">ยังไม่มีโบนัส</span>'}</div>`;
+}
 function viewFormation(){
-  const slot=i=>{const id=S.team[i]; return id?cardHTML(id,{team:false}):`<button class="slot-empty" data-act="pickslot" data-slot="${i}">ว่าง<br>แตะขุนพลในหน้า “ขุนพล”</button>`};
-  const facs={}; S.team.filter(Boolean).forEach(id=>facs[HERO[id].fac]=(facs[HERO[id].fac]||0)+1);
-  const fig=i=>{const id=S.team[i]; return id?`<button class="fig f${i}" data-hero="${id}"><span class="lvb">Lv.${S.heroes[id].lv}</span>${liveArt(id,isMech(id))}</button>`:''};
+  const sel=UI.fsel, T=tierTable();
+  const slot=i=>{const id=S.team[i];
+    return id?`<div class="fslot ${sel===i?'sel':''}">${cardHTML(id,{team:false,act:'fslot'})}</div>`
+             :`<button class="slot-empty fslot ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}">＋<br>ว่าง</button>`};
+  const fig=i=>{const id=S.team[i]; return id?`<button class="fig f${i} ${sel===i?'sel':''}" data-act="fslot" data-id="${id}"><span class="lvb">Lv.${S.heroes[id].lv}</span>${liveArt(id,isMech(id))}</button>`:''};
+  const bench=Object.keys(S.heroes).filter(id=>!S.team.includes(id)).sort((a,b)=>heroPower(b)-heroPower(a));
+  const selId=sel!=null?S.team[sel]:null;
+  const hint=sel==null?'แตะช่องในทัพเพื่อเลือก แล้วแตะขุนพลสำรองด้านล่างเพื่อสลับเข้า · แตะ 2 ช่องในทัพเพื่อสลับตำแหน่ง'
+    :`เลือก${sel<3?'แถวหน้า':'แถวหลัง'} ช่อง ${sel%3+1}${selId?` (${esc(HERO[selId].th)})`:''} · แตะขุนพลสำรองเพื่อใส่ หรือแตะอีกช่องเพื่อสลับ`;
   return `${heroTabs()}
   <div class="tstage">${[3,4,5,0,1,2].map(fig).join('')}<div class="tpow">⚔ พลังทัพ ${fmt(teamPower())}</div></div>
+  ${synergyHTML()}
   <h1 class="vh">จัดทีมขุนพล</h1>
-  <div class="rowlabel">แถวหน้า 3 ช่อง · รับดาบก่อน เหมาะกับนักรบและทหารม้า</div>
+  <div class="fhint ${sel!=null?'on':''}">${hint}</div>
+  ${sel!=null?`<div class="factions">${selId?`<button class="btn small" data-hero="${selId}">ดูขุนพล</button><button class="btn ghost small" data-act="fremove">ถอดออกจากทัพ</button>`:''}<button class="btn ghost small" data-act="fcancel">ยกเลิก</button></div>`:''}
+  <div class="rowlabel">แถวหน้า · รับดาบก่อน เหมาะกับนักรบ ทหารม้า</div>
   <div class="slots front">${slot(0)}${slot(1)}${slot(2)}</div>
-  <div class="rowlabel">แถวหลัง 3 ช่อง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
+  <div class="rowlabel">แถวหลัง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
   <div class="slots back">${slot(3)}${slot(4)}${slot(5)}</div>
-  <div style="display:flex;gap:8px;margin-top:14px">
-    <button class="gbtn big" style="flex:1" data-act="autoteam">จัดทีมอัตโนมัติ</button>
-  </div>
-
+  <h2 class="h" style="font-size:17px;margin-top:14px">ขุนพลสำรอง <span class="sub">${bench.length} คน · ${sel!=null?'แตะเพื่อใส่ช่องที่เลือก':'แตะเพื่อใส่ช่องว่าง'}</span></h2>
+  ${bench.length?`<div class="bench">${bench.map(id=>`<button class="bh" data-act="fbench" data-id="${id}">${tok(id)}${roleIcon(HERO[id].role)}<em class="${T[id]?.t||''}">${T[id]?.t||''}</em><span>${esc(HERO[id].th)}</span><small>Lv.${H(id).lv} · ${fmt(heroPower(id))}</small></button>`).join('')}</div>`:'<div class="note">ขุนพลทุกคนอยู่ในทัพแล้ว</div>'}
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="gbtn big" style="flex:1" data-act="autoteam">จัดทีมอัตโนมัติ (เลือกจากพลังสูงสุด)</button></div>
   <div class="panel bonus">
-    <b>ก๊กข่มกัน</b> โจมตีก๊กที่ข่ม แรงขึ้น 25% โดนก๊กที่ข่มเรา แรงลดลง 15%
+    <b>โบนัสทัพ</b>
+    <div style="margin-top:4px;font-size:13px;line-height:1.6">• ก๊กเดียวกัน 3 / 4 / 5 / 6 คน: HP และ ATK +6% / +10% / +14% / +18%<br>• มิตรภาพ: ส่งคู่ที่รู้จักกันลงพร้อมกัน เช่น เล่าปี่ กวนอู เตียวหุย<br>• ก๊กข่มกัน: ตีก๊กที่ข่ม แรงขึ้น 25% โดนก๊กที่ข่มเรา ลดลง 15%</div>
     <div class="cycle"><span class="f" style="background:var(--wei)">วุย</span>ข่ม<span class="f" style="background:var(--shu)">จ๊ก</span>ข่ม<span class="f" style="background:var(--wu)">ง่อ</span>ข่ม<span class="f" style="background:var(--wei)">วุย</span></div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">ฝ่ายอิสระไม่ข่มและไม่ถูกข่ม · ทัพตอนนี้: ${Object.entries(facs).map(([f,n])=>`${FAC[f].th} ${n}`).join(' · ')||'—'}</div>
-  </div>
-  <div class="panel teambonds"><b>มิตรภาพในทัพ</b>
-    ${(()=>{const on=activeBonds(S.team.filter(Boolean)); return on.length ? on.map(b=>`<div class="bond on"><span>${b.name}</span><em>${bondText(b)}</em></div>`).join('') : '<div style="font-size:12px;color:var(--muted)">ยังไม่มี ลองส่งขุนพลที่มีมิตรภาพกันลงทัพพร้อมกัน เช่น เล่าปี่ กวนอู เตียวหุย</div>'})()}
   </div>`;
 }
 function viewTeam(){
@@ -1966,7 +2010,7 @@ function eventLeft(){
 }
 
 const CITY_HS=[['summon','แท่นอัญเชิญ'],['tower','หอท้าขุนพล'],['arena','สนามประลอง'],['shop','ร้านค้า'],['beasts','บ้านสัตว์เทพ'],['shrine','ศาลตื่นจิต'],['guild','กิลด์'],['story','หอพงศาวดาร']];
-const UI={more:false, stab:'hi', shtab:'gen'};
+const UI={fsel:null, more:false, stab:'hi', shtab:'gen'};
 function viewCity(){
   const goal=Math.ceil(S.tower/10)*10, ev=curEvent();
   const dot=c=>c?'<span class="dot"></span>':'';
@@ -2093,7 +2137,7 @@ function viewTower(){
   </div>
   <div class="note">หอแยกจากด่านหลักและยากขึ้นเร็วกว่า ตั้งแต่ชั้น 60 ศัตรูจะตื่นจิตแล้ว ชั้นที่ลงท้ายด้วย 0 ได้หีบเลือกขุนพล S+</div>
   <div class="panel apbox"><div class="aphead"><b>เล่นอัตโนมัติ</b><small>สู้ต่อเนื่อง ระหว่างด่านจะพัฒนาทัพให้เอง หยุดเมื่อแพ้ 3 ครั้งติด</small></div>
-    <div class="apopts">${[['lv','อัปเลเวล'],['gear','ใส่ของ'],['team','เลือกตัวละคร']].map(([k,t])=>`<button class="chip" data-act="apcfg" data-k="${k}" aria-pressed="${apCfg()[k]!==false}">${t}</button>`).join('')}</div>
+    <div class="apopts">${[['lv','อัปเลเวล'],['gear','ใส่ของ'],['team','เติมช่องว่างในทัพ']].map(([k,t])=>`<button class="chip" data-act="apcfg" data-k="${k}" aria-pressed="${apCfg()[k]!==false}">${t}</button>`).join('')}</div>
     <button class="gbtn big" style="width:100%" data-act="apstart" data-m="tower">▶ เริ่มเล่นอัตโนมัติ</button></div>`;
 }
 
@@ -2832,6 +2876,9 @@ function openHero(id){
         <div class="stat"><span>ป้องกันเวท</span><b>${fmt(s.mdef)}</b></div>
         <div class="stat"><span>ความเร็ว</span><b>${s.spd}</b></div>
       </div>
+      ${own?`<div class="gear"><h4>อุปกรณ์</h4><div class="gslots">${SLOTS.map(sl=>{const g=own.eq[sl.k]?gearById(own.eq[sl.k]):null;
+          return `<button class="gslot" data-act="gearslot" data-id="${id}" data-slot="${sl.k}" style="--q:${g?QUAL[g.q].c:'#b9a57a'}"><i class="${g?'':'e'}">${g?gearIcon(g):`<img src="ui/${GEAR_ART[sl.k][0]}.webp" alt="">`}</i><small>${g?`+${g.enh} iLv.${g.il}`:'ว่าง'}</small><span>${sl.th}</span></button>`}).join('')}</div>
+        <div class="actions" style="margin-top:8px"><button class="btn small" data-act="autogear" data-id="${id}">สวมอัตโนมัติ</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="ungear" data-id="${id}">ถอดทั้งหมด</button></div></div>`:''}
       <div class="skill"><h4>สกิลและความสามารถ</h4><div class="sk5">${[
         ['โจมตีทั่วไป', `โจมตีศัตรู${h.role==='arch'?'คนใดก็ได้':'แถวหน้า'} 100% แบบ${r.mag?'เวท (ศัตรูใช้ป้องกันเวท)':'กายภาพ (ศัตรูใช้ป้องกันกาย)'} และสะสมโทสะ`],
         ['พรสวรรค์', TALENT[h.role]],
@@ -2841,9 +2888,6 @@ function openHero(id){
       ].map(([t,d],i)=>`<div class="sk ${i===4&&!aw?'lock':''}"><span><i>${['攻','天','技','连','神'][i]}</i>${t}</span><p>${d}</p></div>`).join('')}</div></div>
       ${myBonds.length?`<div class="bonds"><h4>มิตรภาพ</h4>${myBonds.map(b=>{const on=b.ids.every(i=>teamIds.includes(i));
         return `<div class="bond ${on?'on':''}"><span>${b.name}: ${b.ids.map(i=>HERO[i].th).join(' ')}</span><em>${on?'✓ ':''}${bondText(b)}</em></div>`}).join('')}</div>`:''}
-      ${own?`<div class="gear"><h4>อุปกรณ์</h4><div class="gslots">${SLOTS.map(sl=>{const g=own.eq[sl.k]?gearById(own.eq[sl.k]):null;
-          return `<button class="gslot" data-act="gearslot" data-id="${id}" data-slot="${sl.k}" style="--q:${g?QUAL[g.q].c:'#b9a57a'}"><i class="${g?'':'e'}">${g?gearIcon(g):`<img src="ui/${GEAR_ART[sl.k][0]}.webp" alt="">`}</i><small>${g?`+${g.enh} iLv.${g.il}`:'ว่าง'}</small><span>${sl.th}</span></button>`}).join('')}</div>
-        <div class="actions" style="margin-top:8px"><button class="btn small" data-act="autogear" data-id="${id}">สวมอัตโนมัติ</button><button class="btn ghost small" style="color:var(--on-parch)" data-act="ungear" data-id="${id}">ถอดทั้งหมด</button></div></div>`:''}
       ${own?`<div class="awk mechbox"><h4>ร่างจักรกล</h4>
         <p>${aw>=3?'สวมเกราะจักรกลแห่งสามก๊ก ค่า HP และ ATK +12% เปลี่ยนรูปลักษณ์ทั้งในการ์ดและสนามรบ':'ปลดล็อกเมื่อตื่นจิตขั้น 3 แปลงร่างเป็นขุนพลจักรกล HP และ ATK +12%'}</p>
         <div class="mechprev"><span class="tok ${h.fac}">${portrait(id,false)}</span><span>→</span><span class="tok ${h.fac}">${portrait(id,true)}</span></div>
@@ -2853,13 +2897,13 @@ function openHero(id){
         ${aw<5?`<button class="btn red" style="width:100%" data-act="awaken" data-id="${id}" ${canAw?'':'disabled'}>ตื่นจิตขั้น ${aw+1}</button>
         <div class="cost"><span class="${soul<ac.soul?'no':''}">ผลึกจิต ${soul}/${ac.soul}</span><span class="${S.gold<ac.gold?'no':''}">เงิน ${fmt(ac.gold)}</span></div>`:'<b>ตื่นจิตครบ 5 ขั้นแล้ว</b>'}
       </div>`:''}
-      ${own?`<div class="actions">
-        <div><div class="lvbtns"><button class="btn" data-act="lvup" data-id="${id}" ${canLv?'':'disabled'}>${lv>=cap?'เต็ม':'+1 เลเวล'}</button><button class="btn" data-act="lvup10" data-id="${id}" ${canLv?'':'disabled'}>+10</button></div>
-          ${lv<cap?`<div class="cost"><span class="${S.gold<lc.gold?'no':''}">เงิน ${fmt(lc.gold)}</span><span class="${S.exp<lc.exp?'no':''}">EXP ${fmt(lc.exp)}</span></div>`:''}</div>
-        <div><button class="btn" style="width:100%" data-act="starup" data-id="${id}" ${canSt?'':'disabled'}>${st>=5?'ดาวเต็มแล้ว':'เลื่อนดาว'}</button>
-          ${st<5?`<div class="cost"><span class="${own.copies<sc.copies?'no':''}">สำเนา ${own.copies}/${sc.copies}</span><span class="${S.gold<sc.gold?'no':''}">เงิน ${fmt(sc.gold)}</span></div>`:''}</div>
-        <button class="btn ghost wide" style="color:var(--on-parch)" data-act="trial" data-id="${id}">ทดลองใช้ในสนามรบ</button>
-        <button class="btn ${inTeam?'ghost':'red'} wide" data-act="toggleteam" data-id="${id}">${inTeam?'ถอนออกจากทัพ':'ส่งเข้าทัพ'}</button>
+      ${own?`<button class="btn ghost" style="width:100%;margin-top:10px;color:var(--on-parch)" data-act="trial" data-id="${id}">ทดลองใช้ในสนามรบ</button>
+      <div class="hbar">
+        <div class="hb1"><button class="btn" data-act="lvup" data-id="${id}" ${canLv?'':'disabled'}>${lv>=cap?'เลเวลเต็ม':'+1 เลเวล'}</button><button class="btn" data-act="lvup10" data-id="${id}" ${canLv?'':'disabled'}>+10</button>
+          <small>${lv<cap?`<span class="${S.gold<lc.gold?'no':''}">เงิน ${fmt(lc.gold)}</span> <span class="${S.exp<lc.exp?'no':''}">EXP ${fmt(lc.exp)}</span>`:`Lv.${lv}/${cap}`}</small></div>
+        <div class="hb2"><button class="btn" data-act="starup" data-id="${id}" ${canSt?'':'disabled'}>${st>=5?'ดาวเต็ม':'เลื่อนดาว'}</button>
+          <small>${st<5?`<span class="${own.copies<sc.copies?'no':''}">สำเนา ${own.copies}/${sc.copies}</span>`:'★★★★★'}</small></div>
+        <div class="hb3"><button class="btn ${inTeam?'ghost':'red'}" ${inTeam?'style="color:var(--on-parch)"':''} data-act="toggleteam" data-id="${id}">${inTeam?'ถอนออก':'ส่งเข้าทัพ'}</button><small>${inTeam?'อยู่ในทัพ':'สำรอง'}</small></div>
       </div>`:''}
       ${own?'':`<button class="btn red" style="width:100%;margin-top:10px" data-act="trial" data-id="${id}">ทดลองใช้ในสนามรบ</button>`}
       <button class="btn ghost" style="width:100%;margin-top:10px;color:var(--on-parch)" data-act="close">ปิด</button>
@@ -3124,7 +3168,10 @@ const AP_MODES=['stage','tower'];
 const apCfg = () => S.autoCfg||(S.autoCfg={lv:true, gear:true, team:true, speed:4});
 function autoPrep(){
   const c=apCfg(), log=[];
-  if(c.team){ const before=S.team.join(); autoTeam(true); if(S.team.join()!==before) log.push('จัดทัพใหม่') }
+  if(c.team){ // fill empty slots only; never pull out heroes the player placed
+    const bench=Object.keys(S.heroes).filter(id=>!S.team.includes(id)).sort((a,b)=>heroPower(b)-heroPower(a));
+    let n=0; for(const id of bench){ const pref=['war','cav'].includes(HERO[id].role)?[0,1,2,3,4,5]:[3,4,5,0,1,2], j=pref.find(k=>!S.team[k]); if(j===undefined) break; S.team[j]=id; n++ }
+    if(n) log.push(`เติมทัพ ${n} คน`) }
   if(c.lv){ let n=0, moved=true; const ids=S.team.filter(Boolean);
     while(moved && n<500){ moved=false; for(const id of ids){ if(levelUp(id,1)){ n++; moved=true } } }
     if(S.potions>0 && n===0){ S.exp+=S.potions*POTION_EXP; S.potions=0; moved=true; while(moved && n<500){ moved=false; for(const id of ids){ if(levelUp(id,1)){ n++; moved=true } } } }
@@ -3191,6 +3238,15 @@ document.addEventListener('click',e=>{
       case 'sendfb': { const t=$('#fbtext').value.trim(); if(!t) return toast('พิมพ์ความเห็นก่อน'); act.disabled=true;
         SB.from('feedback').insert({message:(t+`\n\n[${innerWidth}x${innerHeight} @${devicePixelRatio} · ${navigator.userAgent.slice(0,140)} · หน้า ${UI.lastTab||tab}]`).slice(0,1000), name:(S.pname||'').slice(0,24), stage:S.stage}).then(({error})=>{ if(error){ act.disabled=false; toast('ส่งไม่สำเร็จ ลองใหม่') } else { $('#fbtext').value=''; toast('ขอบคุณสำหรับความเห็น!') } }); return }
       case 'cpfill': { const i=$('#cpin'); if(i){ i.value=act.dataset.k; i.focus() } return }
+      case 'fslot': { const i = act.dataset.slot!==undefined ? +act.dataset.slot : S.team.indexOf(id); if(i<0) return;
+        if(UI.fsel==null){ UI.fsel=i; render(); return }
+        if(UI.fsel===i){ UI.fsel=null; render(); return }
+        const a=UI.fsel; [S.team[a],S.team[i]]=[S.team[i],S.team[a]]; UI.fsel=null; save(); render(); toast('สลับตำแหน่งแล้ว'); return }
+      case 'fbench': { let i=UI.fsel;
+        if(i==null){ const pref=['war','cav'].includes(HERO[id].role)?[0,1,2,3,4,5]:[3,4,5,0,1,2]; i=pref.find(j=>!S.team[j]); if(i===undefined) return toast('ทัพเต็มแล้ว แตะช่องที่จะเปลี่ยนก่อน') }
+        const out=S.team[i]; S.team[i]=id; UI.fsel=null; save(); render(); toast(out?`${HERO[id].th} เข้าแทน ${HERO[out].th}`:`${HERO[id].th} เข้าทัพแล้ว`); return }
+      case 'fremove': { const i=UI.fsel; if(i==null||!S.team[i]) return; if(S.team.filter(Boolean).length<=1) return toast('ทัพต้องมีขุนพลอย่างน้อย 1 คน'); S.team[i]=null; UI.fsel=null; save(); render(); return }
+      case 'fcancel': UI.fsel=null; render(); return;
       case 'svtab': if(tab!=='savegame') UI.lastTab=tab; UI.svtab=act.dataset.k; UI.ask=null; render(); return;
       case 'tierrole': UI.tierRole=act.dataset.k; render(); return;
       case 'apstart': startAuto(act.dataset.m); return;

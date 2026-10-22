@@ -223,7 +223,12 @@ const BONDS = [
   {name:'ม้าศึกเสเหลียง',      ids:['machao','mayunlu'], hp:.10, atk:.15}
 ];
 const activeBonds = ids => BONDS.filter(b=>b.ids.every(i=>ids.includes(i)));
-function bondBonus(ids, id){let hp=0,atk=0; for(const b of activeBonds(ids)) if(b.ids.includes(id)){hp+=b.hp;atk+=b.atk} return {hp,atk}}
+// Same-faction synergy: 3+ generals of one kingdom in the team lift that kingdom's HP and ATK.
+const FAC_SYN = {3:.06, 4:.10, 5:.14, 6:.18};
+const facCount = (ids, fac) => ids.filter(i=>HERO[i]&&HERO[i].fac===fac).length;
+const facSyn = (ids, fac) => FAC_SYN[Math.min(6,facCount(ids,fac))]||0;
+function bondBonus(ids, id){let hp=0,atk=0; for(const b of activeBonds(ids)) if(b.ids.includes(id)){hp+=b.hp;atk+=b.atk}
+  const f=HERO[id]?facSyn(ids,HERO[id].fac):0; return {hp:hp+f, atk:atk+f}}
 
 function pickTeam(rnd, pool){
   const ids=[];
@@ -535,7 +540,7 @@ function portrait(id, mech=false){
 
 
 export {
-  HERO_MOD, HMOD,
+  HERO_MOD, HMOD, FAC_SYN, facCount, facSyn,
   FAC, BEATS, ROLE, RAR, HEROES, HERO, LOOK, TALENT, BONDS, SLOTS, QUAL, BEASTS, BOTS, LOGIN7, FISH, STORY, EVENTS, OPENING, FIRST_HERO, REGIONS, ROLE_COST,
   mulberry32, levelCap, stats, skillMult, power, lvCost, starCost, awCost, stageLabel, comboChance, regionOf,
   activeBonds, bondBonus, pickTeam, enemyTeam, towerTeam, stageReward, towerReward,

@@ -3,7 +3,7 @@
 const fs=require('fs'); const code=fs.readFileSync(process.argv[2],'utf8');
 const DAYS=+(process.argv[3]||30);
 const el=()=>({innerHTML:'',textContent:'',value:'',style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains:()=>false},dataset:{},hidden:false,disabled:false,
-  querySelector:()=>el(),querySelectorAll:()=>[],appendChild(){},insertAdjacentHTML(){},setAttribute(){},remove(){},focus(){},select(){},scrollTop:0,getBoundingClientRect:()=>({left:0,top:0,width:1,height:1})});
+  querySelector:()=>el(),querySelectorAll:()=>[],appendChild(){},insertAdjacentHTML(){},setAttribute(){},remove(){},focus(){},select(){},addEventListener(){},isConnected:false,scrollTop:0,getBoundingClientRect:()=>({left:0,top:0,width:1,height:1})});
 const handlers={};
 global.document={querySelector:()=>el(),querySelectorAll:()=>[],createElement:()=>el(),body:el(),addEventListener:(t,f)=>handlers[t]=f,hidden:false};
 const store={}; global.localStorage={getItem:k=>store[k]??null,setItem:(k,v)=>store[k]=v};
