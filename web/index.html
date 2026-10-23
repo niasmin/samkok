@@ -17,12 +17,12 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=f1bbc88471').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=2c035df405').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Chonburi&family=Ma+Shan+Zheng&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Taviraj:wght@800&family=Trirong:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap">
 <style>
 /* Layout: one phone-shaped lacquer cabinet. Parchment panels sit in a red-lacquer frame; every general is a brush-ink seal, not a stock portrait. */
 :root{
@@ -41,8 +41,8 @@
   --qun:#684a8e;
   --good:#5aa957;
   --bad:#d4523d;
-  --f-display:'Chonburi','Bai Jamjuree',Georgia,serif;
-  --f-body:'Bai Jamjuree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-display:'Taviraj','Trirong',Georgia,serif;
+  --f-body:'Trirong',system-ui,-apple-system,'Segoe UI',sans-serif;
   --f-seal:'Ma Shan Zheng','Noto Serif SC','Songti SC','SimSun',serif;
   color-scheme:dark;
 }
@@ -1064,6 +1064,35 @@ div.fslot{display:block;width:100%;max-width:96px;min-width:0}div.fslot>.card{wi
 @keyframes knock{0%{transform:none}25%{transform:translateX(var(--kb,-14px)) rotate(-4deg)}100%{transform:none}}
 .fxi{position:absolute;left:50%;top:40%;width:150px;height:150px;margin:-75px 0 0 -75px;pointer-events:none;z-index:4;transform:rotate(var(--r,0deg)) scale(calc(var(--s,1)*.6));opacity:0;animation:fxi .62s ease-out forwards}
 @keyframes fxi{15%{opacity:1;transform:rotate(var(--r,0deg)) scale(var(--s,1))}100%{opacity:0;transform:rotate(var(--r,0deg)) scale(calc(var(--s,1)*1.25))}}
+
+/* ---- theme: lacquer-and-gold plaques ----
+   Buttons read as carved lacquer plaques: a hard gold frame, a thin light inner line,
+   brass studs at each end and an engraved label in the display face. */
+:root{--stud:radial-gradient(circle at 8px 50%,#fff3c4 0 1.4px,#8a5a14 1.9px 2.8px,transparent 3.2px),radial-gradient(circle at calc(100% - 8px) 50%,#fff3c4 0 1.4px,#8a5a14 1.9px 2.8px,transparent 3.2px)}
+.btn,.gbtn{font-family:var(--f-display);letter-spacing:.2px;border-radius:6px;padding-left:20px;padding-right:20px;
+  background:var(--stud),linear-gradient(180deg,#fff0bd 0%,#f1c766 38%,#d29a32 62%,#b07a1e 100%);
+  color:#4a1206;text-shadow:0 1px 0 rgba(255,240,200,.65);border:2px solid #5e3509;
+  box-shadow:inset 0 0 0 1px rgba(255,246,214,.85),inset 0 -3px 0 rgba(90,40,0,.25),0 3px 0 #4a2606,0 5px 8px rgba(0,0,0,.35)}
+.btn:active,.gbtn:active{transform:translateY(2px);box-shadow:inset 0 0 0 1px rgba(255,246,214,.85),inset 0 2px 3px rgba(90,40,0,.35),0 1px 0 #4a2606}
+.btn.red{background:var(--stud),linear-gradient(180deg,#e2624a 0%,#c23a26 45%,#97200f 75%,#7a160a 100%);color:#fff3d6;text-shadow:0 1px 0 #3a0702,0 0 6px rgba(0,0,0,.35);
+  border-color:#e0b048;box-shadow:inset 0 0 0 1px rgba(255,214,140,.55),inset 0 0 0 3px rgba(90,10,4,.55),0 3px 0 #3a0c06,0 5px 10px rgba(0,0,0,.4)}
+.btn.red:active{box-shadow:inset 0 0 0 1px rgba(255,214,140,.55),inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 #3a0c06}
+.btn.ghost{background:var(--stud),linear-gradient(180deg,rgba(74,26,14,.55),rgba(26,10,6,.65));color:#f6dc96;text-shadow:0 1px 0 #000;border:1.5px solid #c99a3e;
+  box-shadow:inset 0 0 0 1px rgba(255,230,160,.18),0 2px 0 rgba(0,0,0,.35)}
+.btn.small,.task .btn,.day .btn,.hbar .btn,.lvbtns .btn,.bhead .btn,.aprow2 .btn.red{padding-left:10px;padding-right:10px;background-size:0 0,0 0,100% 100%;background-repeat:no-repeat}
+.btn.ghost.small,.bhead .btn.ghost{background:linear-gradient(180deg,rgba(74,26,14,.55),rgba(26,10,6,.65))}
+.btn[disabled],.gbtn:disabled{filter:grayscale(.85) brightness(.85);opacity:.65;box-shadow:inset 0 0 0 1px rgba(255,246,214,.4)}
+.gbtn.big{border-radius:8px}
+/* segmented tabs and chips: dark wood with a gold tablet for the active one */
+.subtabs{border-radius:8px;background:linear-gradient(180deg,rgba(20,6,3,.55),rgba(50,16,8,.55));border:1.5px solid #9b6a1c;box-shadow:inset 0 0 0 1px rgba(255,220,150,.12)}
+.subtabs button{font-family:var(--f-display);border-radius:5px;letter-spacing:.2px}
+.subtabs button[aria-pressed="true"]{background:linear-gradient(180deg,#fff0bd,#f1c766 40%,#c48c28);color:#4a1206;text-shadow:0 1px 0 rgba(255,240,200,.6);box-shadow:inset 0 0 0 1px rgba(255,246,214,.85),0 2px 0 #4a2606}
+.chip{border-radius:6px;border-color:rgba(212,164,70,.75);background:linear-gradient(180deg,rgba(74,26,14,.5),rgba(26,10,6,.6))}
+.chip[aria-pressed="true"]{background:linear-gradient(180deg,#fff0bd,#e9b850);color:#4a1206;border-color:#5e3509;box-shadow:inset 0 0 0 1px rgba(255,246,214,.8)}
+button.back{font-family:var(--f-display);border-radius:6px;border-color:#c99a3e;background:linear-gradient(180deg,rgba(74,26,14,.6),rgba(26,10,6,.7));color:#f6dc96}
+/* headings and labels in the display face */
+.h,.power,.stage-tag{letter-spacing:.3px}
+nav button{font-family:var(--f-display);font-size:11.5px;letter-spacing:.2px}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>

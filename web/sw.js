@@ -1,5 +1,5 @@
 // Offline cache for the web build. BUILD is stamped by tools/build_web.py so each release gets a fresh cache.
-const BUILD='f1bbc88471';
+const BUILD='2c035df405';
 const CACHE='kunphon-'+BUILD;
 const CORE=['./','index.html','manifest.webmanifest','icon-192.png','ui/city2.webp','ui/avatar.webp','ui/bf-village.webp','ui/bf-gate.webp','ui/bf-harbor.webp',
   'ui/n-city.webp','ui/n-heroes.webp','ui/n-team.webp','ui/n-train.webp','ui/n-camp.webp'];
