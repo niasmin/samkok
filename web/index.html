@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=173e635a56').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=0580a77805').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1833,7 +1833,7 @@ function poseAttack(el, dt){
   clearTimeout(img._pt); at.forEach(([t,k],i)=>{ const f=()=>{ setPF(img,k) }; if(!t) f(); else img._pt=setTimeout(f,t) });
 }
 // Reaction frames (hit, kneel, fallen, rise) for generals that have them.
-const HURT=new Set(["caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guanyu_y", "guojia", "huanggai", "huatuo", "jiangwei", "lingtong", "liubei", "liubei_y", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei_y", "zhangjiao", "zhangliao", "zhaoyun", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhuge", "zhurong", "zuoci"]);
+const HURT=new Set(["huangzhong", "zhangfei", "huaxiong", "caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guanyu_y", "guojia", "huanggai", "huatuo", "jiangwei", "lingtong", "liubei", "liubei_y", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei_y", "zhangjiao", "zhangliao", "zhaoyun", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhuge", "zhurong", "zuoci"]);
 function poseHurt(el, kind){
   const img=el?.querySelector?.('.pf'), id=el?.dataset?.pid; if(!img||!img.style||!HURT.has(id)) return false;
   clearTimeout(img._pt); clearTimeout(img._ht);
