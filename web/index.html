@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=9f7c8d57eb').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=8e67490cae').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1904,7 +1904,7 @@ const EVO_ROLE={
 for(const [id,m] of Object.entries(EVO_MOTIF)) if(!EVO[id]) EVO[id]=EVO_ROLE[HERO[id].role](m);
 const EVO_AW=[1,3,5];
 // 3D models of the evolved forms (one node per form: e1, e2, e3), viewed from the hero sheet.
-const MODEL3D={gongsunzan:'art/3d/gongsunzan.glb'};
+const MODEL3D={gongsunzan:'art/3d/gongsunzan.json'};
 const THREE_URL='https://cdn.jsdelivr.net/npm/three@0.160.0';
 let threeLib=null;
 const loadThree=()=>threeLib||(threeLib=Promise.all([import(THREE_URL+'/+esm'), import(THREE_URL+'/examples/jsm/loaders/GLTFLoader.js/+esm')])
