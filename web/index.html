@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=581c8fe50f').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=173e635a56').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1031,17 +1031,22 @@ div.fslot{display:block;width:100%;max-width:96px;min-width:0}div.fslot>.card{wi
 .u.dead.fallen{animation:none;opacity:.9;filter:grayscale(.35) brightness(.85)}
 .u.dead.fallen .hp,.u.dead.fallen .rg{opacity:.4}
 
-/* battle: left vs right lanes (player left, enemy right; front lines meet in the middle) */
-.field{--uw:min(76px,18vw)}
-.lanes{flex:1;display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:0}
-.lanes .side{flex:0 0 auto;flex-direction:row;align-items:center;gap:clamp(2px,1.2vw,8px)}
-.lanes .line{flex-direction:column;align-items:center;gap:clamp(10px,3.2vh,30px)}
-.lanes .line .u:nth-child(1){transform:scale(.9)}
-.lanes .line .u:nth-child(3){transform:scale(1.06)}
-.lanes .ps .line.front .u:nth-child(2){margin-left:10px}
-.lanes .es .line.front .u:nth-child(2){margin-right:10px}
-.lanes .line.back{margin-top:-26px}
-.lanes{padding-top:12px}
+/* battle: left vs right lanes (player left, enemy right; front lines meet in the middle).
+   Units stand on the courtyard floor: the block sits at the bottom of the field and rows
+   further back are smaller and drawn toward the centre for perspective. */
+.field{--uw:min(76px,18vw,9vh)}
+.lanes{flex:1;display:flex;align-items:flex-end;justify-content:space-between;gap:4px;min-height:0;padding-bottom:clamp(4px,7vh - 26px,48px)}
+.lanes .side{flex:0 0 auto;flex-direction:row;align-items:flex-end;gap:clamp(2px,1.2vw,8px)}
+.lanes .line{flex-direction:column;align-items:center;gap:0}
+.lanes .line .u{margin-top:calc(var(--uw)*-.12)}
+.lanes .line .u:first-child{margin-top:0}
+.lanes .ps .line .u:nth-child(1){transform:translateX(calc(var(--uw)*.16)) scale(.84)}
+.lanes .ps .line .u:nth-child(2){transform:translateX(calc(var(--uw)*.07)) scale(.93)}
+.lanes .es .line .u:nth-child(1){transform:translateX(calc(var(--uw)*-.16)) scale(.84)}
+.lanes .es .line .u:nth-child(2){transform:translateX(calc(var(--uw)*-.07)) scale(.93)}
+.lanes .line .u:nth-child(3){transform:scale(1.03)}
+.lanes .u{transform-origin:50% 100%}
+.lanes .line .u:nth-child(1){z-index:1}.lanes .line .u:nth-child(2){z-index:2}.lanes .line .u:nth-child(3){z-index:3}
 .lanes .u{width:var(--uw)}
 .lanes .u .tok{width:var(--uw);height:var(--uw)}
 .lanes .u::after{top:calc(var(--uw)*.84)}
