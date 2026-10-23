@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=638b6c455b').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=751a137429').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1022,7 +1022,7 @@ div.fslot{display:block;width:100%;max-width:96px;min-width:0}div.fslot>.card{wi
 
 /* key-pose sprites */
 .u .tok.pose{background:none;border:0;box-shadow:none;overflow:visible;position:relative}
-.u .tok.pose .pf{position:absolute;left:50%;bottom:-4px;width:132%;max-width:none;height:auto;transform:translateX(-50%);transform-origin:50% 100%;animation:lbreathe 3.2s ease-in-out infinite;filter:drop-shadow(0 0 1px rgba(0,0,0,.6));pointer-events:none}
+.u .tok.pose .pf{position:absolute;left:50%;bottom:-4px;width:132%;max-width:none;aspect-ratio:1;background-size:800% 100%;background-repeat:no-repeat;background-position:0 0;transform:translateX(-50%);transform-origin:50% 100%;animation:lbreathe 3.2s ease-in-out infinite;filter:drop-shadow(0 0 1px rgba(0,0,0,.6));pointer-events:none}
 .u.foe .tok.pose .pf{transform:translateX(-50%) scaleX(-1);animation:none}
 .u.hit .tok.pose{animation:none}
 .u.hit .tok.pose .pf{filter:brightness(2.2) sepia(1) hue-rotate(-30deg) saturate(4)}
@@ -1795,22 +1795,25 @@ const liveArt = (id, mech) => (!mech && ART.has(id))
 const POSES={liubei_y:4, guanyu_y:4, zhangfei_y:4, zhaoyun:4, zhuge:4, huatuo:4, huaxiong:2};
 // The rest bend their single portrait into the same four beats until hand-drawn poses arrive (tools/procpose.py).
 for(const id of ["caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guojia", "huanggai", "huangzhong", "jiangwei", "lingtong", "liubei", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei", "zhangjiao", "zhangliao", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhurong", "zuoci"]) POSES[id]=POSES[id]||4;
-const poseSrc = (id,k) => `ui/pose/${id}_${k}.webp`;
-const poseTok = id => `<span class="tok pose ${HERO[id].fac}"><img class="pf" src="${poseSrc(id,0)}" alt="" draggable="false"></span>`;
+// One sprite strip per general: frames 0-3 ready/wind-up/strike/recover, 4-7 hit/kneel/fallen/rise.
+const spriteSrc = id => `ui/sprite/${id}.webp`;
+const frameIx = k => typeof k==='string' ? 4 + +k.slice(1) : k;
+const setPF = (img,k) => { img.style.backgroundPosition = `${frameIx(k)*100/7}% 0` };
+const poseTok = id => `<span class="tok pose ${HERO[id].fac}"><span class="pf" style="background-image:url(${spriteSrc(id)})"></span></span>`;
 function poseAttack(el, dt){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||!id||POSES[id]<4) return;
   const at=[[0,1],[dt*0.28,2],[dt*0.62,3],[dt*0.92,0]];
-  clearTimeout(img._pt); at.forEach(([t,k],i)=>{ const f=()=>{ img.src=poseSrc(id,k) }; if(!t) f(); else img._pt=setTimeout(f,t) });
+  clearTimeout(img._pt); at.forEach(([t,k],i)=>{ const f=()=>{ setPF(img,k) }; if(!t) f(); else img._pt=setTimeout(f,t) });
 }
 // Reaction frames (hit, kneel, fallen, rise) for generals that have them.
 const HURT=new Set(["caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guanyu_y", "guojia", "huanggai", "huatuo", "jiangwei", "lingtong", "liubei", "liubei_y", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei_y", "zhangjiao", "zhangliao", "zhaoyun", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhuge", "zhurong", "zuoci"]);
 function poseHurt(el, kind){
   const img=el?.querySelector?.('.pf'), id=el?.dataset?.pid; if(!img||!img.style||!HURT.has(id)) return false;
   clearTimeout(img._pt); clearTimeout(img._ht);
-  if(kind==='hit'){ if(el.classList.contains('dead')) return true; img.src=poseSrc(id,'h0'); img._ht=setTimeout(()=>{ if(!el.classList.contains('dead')) img.src=poseSrc(id,0) },330) }
-  else if(kind==='die'){ el.classList.add('fallen'); img.src=poseSrc(id,'h1'); img._ht=setTimeout(()=>{ img.src=poseSrc(id,'h2') },260) }
-  else if(kind==='down'){ el.classList.add('fallen'); img.src=poseSrc(id,'h2') }
-  else if(kind==='rise'){ el.classList.remove('fallen','dead'); img.src=poseSrc(id,'h3'); img._ht=setTimeout(()=>{ img.src=poseSrc(id,0) },450) }
+  if(kind==='hit'){ if(el.classList.contains('dead')) return true; setPF(img,'h0'); img._ht=setTimeout(()=>{ if(!el.classList.contains('dead')) setPF(img,0) },330) }
+  else if(kind==='die'){ el.classList.add('fallen'); setPF(img,'h1'); img._ht=setTimeout(()=>{ setPF(img,'h2') },260) }
+  else if(kind==='down'){ el.classList.add('fallen'); setPF(img,'h2') }
+  else if(kind==='rise'){ el.classList.remove('fallen','dead'); setPF(img,'h3'); img._ht=setTimeout(()=>{ setPF(img,0) },450) }
   return true;
 }
 // Painted effects, drawn with screen blending so their black backgrounds vanish.
@@ -1821,7 +1824,7 @@ function fxImg(el, name, rot=0, big=1){
 const SKILL_FX = (id) => id==='guanyu'||id==='guanyu_y' ? 'crescent' : ({war:'slash',cav:'thrust_red',arch:'thrust_ice',strat:'whirl',heal:'lotus'})[HERO[id]?.role]||'slash';
 function poseBlock(el){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||POSES[id]!==2) return;
-  img.src=poseSrc(id,1); clearTimeout(img._bt); img._bt=setTimeout(()=>{ img.src=poseSrc(id,0) },380);
+  setPF(img,1); clearTimeout(img._bt); img._bt=setTimeout(()=>{ setPF(img,0) },380);
 }
 const liveTok = (id, mech) => `<span class="tok ${HERO[id].fac}">${liveArt(id, mech===undefined?isMech(id):mech)}</span>`;
 const tok = (id, extra='', mech) => `<span class="tok ${HERO[id].fac}" ${extra}>${portrait(id, mech===undefined?isMech(id):mech)}</span>`;
@@ -3082,7 +3085,7 @@ function fight(mode='stage', bot=null){
   const max=Object.fromEntries(res.start.map(u=>[u.uid,u.max]));
   setMusic('battle');
   try{ const pre=src=>{ const im=new Image(); im.src=src };
-    for(const u of res.start){ if(POSES[u.id]) for(let k=0;k<POSES[u.id];k++) pre(poseSrc(u.id,k)); if(HURT.has(u.id)) for(const k of ['h0','h1','h2','h3']) pre(poseSrc(u.id,k)) }
+    for(const u of res.start) if(POSES[u.id]) pre(spriteSrc(u.id));
     ['slash','crescent','thrust_red','thrust_ice','whirl','lotus','dome','burst'].forEach(n=>pre(`ui/fx/${n}.webp`)) }catch(e){}
   B={wait:null,armed:-1,res,max,mode,bot,units:Object.fromEntries(res.start.map(u=>[u.uid,u])),i:0,speed:B?.speed||1,timer:null,done:false};
   $('#spd').textContent='x'+B.speed;
