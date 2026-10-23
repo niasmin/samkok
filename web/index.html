@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=6b12fdae9f').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=f1f3f6c5a4').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -861,7 +861,7 @@ button.back{display:inline-flex;align-items:center;gap:4px;font-size:14px;paddin
 /* ---- living characters ---- */
 .liveart{position:relative;display:block;width:100%;height:100%;transform-origin:50% 100%;animation:lbreathe 3.2s ease-in-out infinite;animation-delay:calc(var(--ph)*-3.2s)}
 .liveart i{position:absolute;left:0;right:0;top:calc(var(--k)*100%/12);height:calc(100%/12 + 1px);
-  background:var(--img) 50% calc(var(--k)*100%/11)/100% 1200% no-repeat;
+  background:var(--img) var(--bx,50%) calc(var(--k)*100%/11)/var(--bw,100%) 1200% no-repeat;
   --a:calc((11 - var(--k))*0.28px);
   animation:lsway 2.6s ease-in-out infinite;animation-delay:calc(var(--k)*-0.11s + var(--ph)*-2.6s)}
 @keyframes lsway{0%,100%{transform:translateX(calc(var(--a)*-1))}50%{transform:translateX(var(--a))}}
@@ -1192,6 +1192,12 @@ details.bonus summary{cursor:pointer;list-style:revert}
 .bpanel #useSk{padding:6px 18px;font-size:15px}
 .bpanel .tgl{padding:2px 4px 2px 10px;font-size:13px}
 .bpanel .autohint{flex:1 1 0;min-width:0;text-align:left;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.evoa{display:block;width:100%;height:100%;background-repeat:no-repeat;pointer-events:none}
+.card .seal .evoa{position:absolute;inset:0;transform:scale(1.15);transform-origin:50% 30%}
+.pcard .evoa{position:absolute;inset:0}
+.skb .evoa,.fig .evoa{border-radius:50%}
+.fxi.evof{display:block;background-repeat:no-repeat}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1864,15 +1870,33 @@ const EVO={
   sunce:[['พยัคฆ์ตื่นศึก','ทวนพยัคฆ์ทะลวง'],['จุติราชันพยัคฆ์','พยัคฆ์เพลิงคำราม'],['เทพพยัคฆ์อัคคี','พยัคฆ์สุริยันถล่มศึก']],
   lubu:[['ขุนศึกไร้พ่าย','ง้าวสะเทือนสมรภูมิ'],['อสูรสนามรบ','อัสนีทลายทัพ'],['เทพสงครามทลายฟ้า','ง้าวเทวะผ่าสวรรค์']]
 };
+// The other generals take their form and skill names from a motif and their role.
+const EVO_MOTIF={gongsunzan:'หงส์เงิน',zhurong:'เพลิงใต้',yuanshu:'หยกราชันย์',huatuo:'โอสถเทวะ',yuanshao:'อินทรีม่วง',dongzhuo:'อสูรโลหิต',lingtong:'ลมพายุ',dingfeng:'หิมะทอง',
+  lusu:'ตะวันทอง',huanggai:'เพลิงพลีชีพ',taishici:'อัคคีคู่',daqiao:'บุปผาแดง',ganning:'กระแสเพลิง',yuejin:'สายฟ้าคราม',lumeng:'เพลิงกลศึก',caozhi:'คลื่นกวี',zhonghui:'น้ำแข็งคราม',
+  caoren:'โล่เหล็ก',xiahoudun:'มังกรคราม',xunyu:'วายุคราม',luxun:'เพลิงพันลี้',dianwei:'ง้าวคู่คราม',sunshangxiang:'หงส์เพลิง',xuhuang:'ขวานฟ้า',sunquan:'หงส์ราชา',mayunlu:'มรกตพลิ้ว',
+  xiahouyuan:'ลมกรด',zhangbao:'งูมรกต',guanxing:'มังกรเขียว',zhangliao:'อินทรีคราม',weiyan:'อสูรมรกต',zhenji:'ธาราคราม',caopi:'ราชันคราม',zhoutai:'โลหิตพิทักษ์',yueying:'กลไกหยก',
+  xuchu:'พยัคฆ์คราม',huangzhong:'ตะวันทอง',caiwenji:'พิณม่วง',dengai:'หงส์คราม',zhangfei:'อสรพิษ',fazheng:'หยกพยากรณ์',menghuo:'คชสารเพลิง',liubei_y:'ท้อมรกต',jiangwei:'มังกรหยก',
+  zhaoyun:'มังกรมรกต',machao:'สิงห์เงิน',liubei:'คุณธรรมหยก',zuoci:'เซียนม่วง',zhangjiao:'อัสนีเหลือง',sunjian:'พยัคฆ์ทอง',zhouyu:'หงส์อัคคี',guojia:'ดาราคราม',pangtong:'หงส์ดรุณ',
+  zhuge:'มังกรหลับ',huaxiong:'โล่ทมิฬ',diaochan:'จันทร์ม่วง',guanyinping:'ดาบมรกต',zhangfei_y:'อสรพิษเพลิง',guanyu_y:'จันทร์มรกต'};
+const EVO_ROLE={
+  war:  m=>[[`ขุนศึก${m}ตื่นพลัง`,`${m}สะบั้นศึก`],[`จุติ${m}`,`${m}ทลายทัพ`],[`เทพ${m}สงคราม`,`${m}สวรรค์พิฆาต`]],
+  cav:  m=>[[`อัศวิน${m}ตื่นพลัง`,`ทวน${m}ทะลวง`],[`จุติ${m}ทะยาน`,`${m}ตะลุยทัพ`],[`เทพ${m}ไร้เทียมทาน`,`${m}เหินฟ้าผ่าสมรภูมิ`]],
+  arch: m=>[[`นักธนู${m}ตื่นพลัง`,`ศร${m}เจาะเกราะ`],[`จุติ${m}พันศร`,`ห่าศร${m}`],[`เทพศร${m}`,`ศรเทวะ${m}ถล่มฟ้า`]],
+  strat:m=>[[`กุนซือ${m}ตื่นปัญญา`,`กล${m}`],[`จุติ${m}`,`${m}พันกลยุทธ์`],[`เทพ${m}ล่วงรู้ฟ้า`,`${m}พลิกฟ้าคว่ำพิภพ`]],
+  heal: m=>[[`ผู้พิทักษ์${m}ตื่นพลัง`,`${m}ฟื้นทัพ`],[`จุติ${m}`,`${m}คุ้มภัย`],[`เทพ${m}การุณย์`,`${m}ชุบชีวิตทั่วทัพ`]]};
+for(const [id,m] of Object.entries(EVO_MOTIF)) if(!EVO[id]) EVO[id]=EVO_ROLE[HERO[id].role](m);
 const EVO_AW=[1,3,5];
 const evoTier = (id, aw) => EVO[id] ? EVO_AW.filter(a=>(aw||0)>=a).length : 0;
 const myEvo = id => evoTier(id, (typeof S!=='undefined' && S && S.heroes[id]?.aw) || 0);
 const evoSkill = (id, aw) => { const t=evoTier(id,aw); return t ? EVO[id][t-1][1] : HERO[id].sk };
-const artSrc = (id, t) => t ? `art/evo/${id}_e${t}.webp` : `art/${id}.webp`;
+const artSrc = (id, t) => `art/${id}.webp`;
+const evoStrip = id => `art/evo2/${id}.webp`;
+const evoCell = (id, k) => `background-image:url(${evoStrip(id)});background-size:600% auto;background-position:${k*20}% 0`;
 function portrait(id, mech=false, tier=myEvo(id)){
   const key=id+(mech?'#m':'')+(tier?'#e'+tier:'');
   if(PCACHE[key]) return PCACHE[key];
   const h=HERO[id];
+  if(!mech && ART.has(id) && tier) return PCACHE[key]=`<span class="art evoa" style="${evoCell(id,tier-1)}"></span>`;
   if(!mech && ART.has(id)) return PCACHE[key]=`<img class="art" src="${artSrc(id,tier)}" alt="" draggable="false" decoding="async" loading="lazy">`;
   if(h.boss) return PCACHE[key]=`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="56" r="40" fill="#ff6a2a" opacity=".25"/><path d="M14 40 L26 6 L38 34Z M86 40 L74 6 L62 34Z" fill="#e8c45a" stroke="#6b4a10"/><circle cx="50" cy="54" r="34" fill="#4a0e08"/><path d="M20 50 Q50 30 80 50 Q66 42 50 44 Q34 42 20 50Z" fill="#2a0604"/><ellipse cx="37" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="63" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="37" cy="52" rx="2" ry="5" fill="#2a0604"/><ellipse cx="63" cy="52" rx="2" ry="5" fill="#2a0604"/><path d="M30 70 L38 64 L44 72 L50 64 L56 72 L62 64 L70 70 L62 80 L38 80Z" fill="#fff4dc"/></svg>`;
   const L=LOOK[id]||{}, f=!!L.f, hv=hashN(id);
@@ -1962,17 +1986,19 @@ function cardHTML(id, opts={}){
 }
 const LIVE_STRIPS=12;
 const liveArt = (id, mech, tier=myEvo(id)) => (!mech && ART.has(id))
-  ? `<span class="liveart" style="--img:url(${artSrc(id,tier)});--ph:${(hashStr(id)%100)/100}">${Array.from({length:LIVE_STRIPS},(_,k)=>`<i style="--k:${k}"></i>`).join('')}</span>`
+  ? `<span class="liveart" style="--img:url(${tier?evoStrip(id):artSrc(id,0)});${tier?`--bw:600%;--bx:${(tier-1)*20}%;`:''}--ph:${(hashStr(id)%100)/100}">${Array.from({length:LIVE_STRIPS},(_,k)=>`<i style="--k:${k}"></i>`).join('')}</span>`
   : portrait(id, mech);
 // Key-pose sprites (ready, windup, action, recover) for generals that have them; Hua Xiong has ready + shield block.
 const POSES={liubei_y:4, guanyu_y:4, zhangfei_y:4, zhaoyun:4, zhuge:4, huatuo:4, huaxiong:2};
 // The rest bend their single portrait into the same four beats until hand-drawn poses arrive (tools/procpose.py).
 for(const id of ["caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guojia", "huanggai", "huangzhong", "jiangwei", "lingtong", "liubei", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei", "zhangjiao", "zhangliao", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhurong", "zuoci"]) POSES[id]=POSES[id]||4;
 // One sprite strip per general: frames 0-3 ready/wind-up/strike/recover, 4-7 hit/kneel/fallen/rise.
-const spriteSrc = (id, t=0) => t ? `ui/sprite/${id}_e${t}.webp` : `ui/sprite/${id}.webp`;
+const spriteSrc = (id, t=0) => t ? `ui/evo/${id}.webp` : `ui/sprite/${id}.webp`;
+// Inline style for a sprite holder: evolved forms sit in rows of one atlas.
+const sprStyle = (id, t=0) => `background-image:url(${spriteSrc(id,t)})${t?`;background-size:800% 300%;background-position:0 ${(t-1)*50}%`:''}`;
 const frameIx = k => typeof k==='string' ? 4 + +k.slice(1) : k;
-const setPF = (img,k) => { img.style.backgroundPosition = `${frameIx(k)*100/7}% 0` };
-const poseTok = (id, t=0) => `<span class="tok pose ${HERO[id].fac}"><span class="pf" style="background-image:url(${spriteSrc(id,t)})"></span></span>`;
+const setPF = (img,k) => { img.style.backgroundPosition = `${frameIx(k)*100/7}% ${img.dataset?.y||0}%` };
+const poseTok = (id, t=0) => `<span class="tok pose ${HERO[id].fac}"><span class="pf" data-y="${t?(t-1)*50:0}" style="${sprStyle(id,t)}"></span></span>`;
 function poseAttack(el, dt){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||!id||POSES[id]<4) return;
   const at=[[0,1],[dt*0.28,2],[dt*0.62,3],[dt*0.92,0]];
@@ -1991,10 +2017,12 @@ function poseHurt(el, kind){
 }
 // Painted effects, drawn with screen blending so their black backgrounds vanish.
 function fxImg(el, name, rot=0, big=1){
-  if(!el?.appendChild) return; const f=document.createElement('img'); f.className='fxi'; f.src=`ui/fx/${name}.webp`; f.alt='';
+  if(!el?.appendChild) return; const ev=name.startsWith('evo:')&&name.split(':');
+  const f=document.createElement(ev?'span':'img'); f.className='fxi'+(ev?' evof':'');
+  if(ev) f.style.cssText=evoCell(ev[1], +ev[2]+2); else { f.src=`ui/fx/${name}.webp`; f.alt='' }
   f.style.setProperty?.('--r',rot+'deg'); f.style.setProperty?.('--s',big); el.appendChild(f); setTimeout(()=>f.remove(),650);
 }
-const SKILL_FX = (id, aw) => evoTier(id,aw) ? `evo/${id}_e${evoTier(id,aw)}` : id==='guanyu'||id==='guanyu_y' ? 'crescent' : ({war:'slash',cav:'thrust_red',arch:'thrust_ice',strat:'whirl',heal:'lotus'})[HERO[id]?.role]||'slash';
+const SKILL_FX = (id, aw) => evoTier(id,aw) ? `evo:${id}:${evoTier(id,aw)}` : id==='guanyu'||id==='guanyu_y' ? 'crescent' : ({war:'slash',cav:'thrust_red',arch:'thrust_ice',strat:'whirl',heal:'lotus'})[HERO[id]?.role]||'slash';
 function poseBlock(el){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||POSES[id]!==2) return;
   setPF(img,1); clearTimeout(img._bt); img._bt=setTimeout(()=>{ setPF(img,0) },380);
@@ -2210,7 +2238,7 @@ function synergyHTML(){
 const LINK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 function viewFormation(){
   const sel=UI.fsel, teamIds=S.team.filter(Boolean), fac=UI.ffac||'all';
-  const spr=(id,t)=>POSES[id]&&!isMech(id)?`<span class="fspr" style="background-image:url(${spriteSrc(id,t)})"></span>`:`<span class="fspr art">${portrait(id,isMech(id))}</span>`;
+  const spr=(id,t)=>POSES[id]&&!isMech(id)?`<span class="fspr" style="${sprStyle(id,t)}"></span>`:`<span class="fspr art">${portrait(id,isMech(id))}</span>`;
   const mine=i=>{const id=S.team[i];
     return id?`<button class="fu p${i} ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}" aria-label="${esc(HERO[id].th)}">${spr(id,myEvo(id))}<span class="fpl"><i class="fd ${HERO[id].fac}">${FAC[HERO[id].fac].ch}</i>Lv.${H(id).lv}</span></button>`
              :`<button class="fu p${i} empty ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}" aria-label="ช่องว่าง"><span class="fring">＋</span></button>`};
@@ -3276,7 +3304,7 @@ function fight(mode='stage', bot=null){
   const max=Object.fromEntries(res.start.map(u=>[u.uid,u.max]));
   setMusic('battle');
   try{ const pre=src=>{ const im=new Image(); im.src=src };
-    for(const u of res.start) if(POSES[u.id]){ pre(spriteSrc(u.id,evoTier(u.id,u.aw))); if(evoTier(u.id,u.aw)) pre(`ui/fx/${SKILL_FX(u.id,u.aw)}.webp`) }
+    for(const u of res.start) if(POSES[u.id]){ pre(spriteSrc(u.id,evoTier(u.id,u.aw))); if(evoTier(u.id,u.aw)) pre(evoStrip(u.id)) }
     ['slash','crescent','thrust_red','thrust_ice','whirl','lotus','dome','burst'].forEach(n=>pre(`ui/fx/${n}.webp`)) }catch(e){}
   B={wait:null,armed:-1,res,max,mode,bot,units:Object.fromEntries(res.start.map(u=>[u.uid,u])),i:0,speed:B?.speed||1,timer:null,done:false};
   $('#spd').textContent='x'+B.speed;
