@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=c451f255f1').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=dc55f2ab78').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1218,6 +1218,43 @@ details.bonus summary{cursor:pointer;list-style:revert}
 
 #boot .blogo{width:min(340px,82vw);height:auto;object-fit:contain;animation:blogo 2.8s ease-in-out infinite;filter:drop-shadow(0 10px 14px rgba(0,0,0,.55))}
 @keyframes blogo{50%{transform:translateY(-4px) scale(1.015);filter:drop-shadow(0 14px 18px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(255,200,90,.35))}}
+
+/* ---- scene cohesion: one light for map and generals ---- */
+.sc-village{--rim:rgba(255,232,160,.85);--rimx:2px;--tone:saturate(.92) contrast(1.03) sepia(.05);--g1:rgba(255,214,120,.38);--g2:rgba(30,50,10,.4);--gx:85%;--gy:5%;--shx:22%;--shk:-28deg;--haze:rgba(235,240,220,.18)}
+.sc-gate{--rim:rgba(255,180,100,.9);--rimx:-2px;--tone:brightness(.94) saturate(.9) contrast(1.04) sepia(.1);--g1:rgba(255,170,90,.35);--g2:rgba(30,8,20,.5);--gx:62%;--gy:0%;--shx:-6%;--shk:8deg;--haze:rgba(255,200,150,.16)}
+.sc-harbor{--rim:rgba(255,170,80,.95);--rimx:2px;--tone:brightness(.95) saturate(.92) contrast(1.04) sepia(.12);--g1:rgba(255,150,60,.38);--g2:rgba(40,10,24,.45);--gx:78%;--gy:8%;--shx:-22%;--shk:26deg;--haze:rgba(255,190,130,.18)}
+/* background recedes: softer focus and a haze toward the horizon */
+.field .bfbg{filter:blur(1.1px) saturate(.95)}
+.field .bfbg.bpic.bf-tower{filter:blur(1.1px) saturate(.75) brightness(.8) hue-rotate(-10deg)}
+.field .bfbg.bpic.bf-raid{filter:blur(1.1px) hue-rotate(-15deg) saturate(1.3) brightness(.62)}
+.field .bfbg::after,.fbf::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--haze,transparent) 0%,transparent 48%);pointer-events:none}
+/* the grade sits over map and generals alike */
+.sgrade,.svig{position:absolute;inset:0;pointer-events:none;z-index:2}
+.sgrade{mix-blend-mode:soft-light;background:radial-gradient(ellipse 90% 70% at var(--gx,70%) var(--gy,0%),var(--g1,transparent),transparent 70%),linear-gradient(180deg,transparent 40%,var(--g2,transparent))}
+.svig{background:radial-gradient(ellipse 85% 75% at 50% 52%,transparent 55%,rgba(10,4,2,.55))}
+.field>.sgrade,.field>.svig,.field>.amb{position:absolute}
+.field>.bhead2,.field>.bpanel{z-index:4}
+/* generals take the scene's tone and a rim of its light */
+.field .u .tok,.fbf .fspr{filter:var(--tone) drop-shadow(var(--rimx) -1px 0 var(--rim)) drop-shadow(0 0 1px rgba(0,0,0,.55))}
+.fbf .fu.ghost .fspr{filter:brightness(0)}
+/* grounding: contact shadow plus a cast shadow away from the light */
+.lanes .u::before,.fbf .fu::before{content:"";position:absolute;left:18%;right:18%;bottom:-3px;height:12px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.7),rgba(0,0,0,.25) 55%,transparent 72%);z-index:-1;top:auto}
+.lanes .u::after{content:"";position:absolute;left:12%;right:12%;bottom:-6px;top:auto;height:24px;border-radius:50%;z-index:-2;
+  background:radial-gradient(ellipse at 50% 50%,rgba(20,8,4,.45),transparent 70%);transform:translateX(var(--shx,0)) skewX(var(--shk,0deg)) scaleX(1.35)}
+/* depth: the far row sits a little in the haze */
+.lanes .line .u:nth-child(1) .tok{filter:var(--tone) brightness(.94) saturate(.9) drop-shadow(var(--rimx) -1px 0 var(--rim)) drop-shadow(0 0 1px rgba(0,0,0,.5)) }
+/* drifting particles in the scene's light */
+.amb{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.amb i{position:absolute;left:var(--x);bottom:-10px;width:5px;height:5px;border-radius:50%;opacity:0;animation:amb calc(7s + var(--d)*6s) linear infinite;animation-delay:calc(var(--i)*-.9s)}
+.amb.ember i{background:radial-gradient(#fff4c0,#ffae3a 45%,rgba(255,120,30,0) 70%);box-shadow:0 0 6px rgba(255,170,60,.8)}
+.amb.leaf i{width:8px;height:5px;border-radius:70% 0 70% 0;background:linear-gradient(135deg,#f6e08a,#9cc34a);bottom:auto;top:-10px;animation-name:leaf}
+.amb.dust i{background:rgba(255,240,210,.6)}
+@keyframes amb{0%{transform:translate(0,0);opacity:0}10%{opacity:.9}100%{transform:translate(calc((var(--d) - .5)*120px),-110vh);opacity:0}}
+@keyframes leaf{0%{transform:translate(0,0) rotate(0);opacity:0}10%{opacity:.85}100%{transform:translate(calc(-60px - var(--d)*80px),110vh) rotate(540deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.amb{display:none}}
+/* the skill bar melts into the scene instead of sitting on it */
+.bpanel{background:linear-gradient(180deg,rgba(40,12,6,.55),rgba(20,6,3,.88));border-color:rgba(201,154,62,.7);box-shadow:0 -10px 24px rgba(0,0,0,.35);backdrop-filter:blur(3px)}
+.fbf .amb,.fbf .sgrade,.fbf .svig{z-index:4}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><img class="blogo" src="ui/logo.webp" alt="ขุนพลสามก๊ก" width="800" height="452"><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -2319,7 +2356,7 @@ function viewFormation(){
       ${on?'<span class="rck" aria-hidden="true">✓</span>':ln?`<span class="rlk" title="มิตรภาพกับคนในทัพ">${LINK_SVG}</span>`:''}<span class="rn">${esc(h.th)}</span></button>`};
   const hint=sel==null?'':`เลือก${sel<3?'แถวหน้า':'แถวหลัง'} ช่อง ${sel%3+1}${selId?` (${esc(HERO[selId].th)})`:''} · แตะอีกตำแหน่งเพื่อสลับ หรือแตะขุนพลด้านล่างเพื่อใส่`;
   return `${heroTabs()}
-  <div class="fbf bg-${stageBg(S.stage)}">
+  <div class="fbf bg-${stageBg(S.stage)} sc-${stageBg(S.stage)}">${sceneFX(stageBg(S.stage))}
     <div class="fpow">⚔ ${fmt(teamPower())}</div><div class="ffoe">ด่าน ${stageLabel(S.stage)} · ศัตรู ${fmt(foes.reduce((x,f)=>x+(f?power(f.id,f.lv,f.star):0),0))}</div>
     ${[3,4,5,0,1,2].map(mine).join('')}${foes.map(foe).join('')}
   </div>
@@ -3357,7 +3394,7 @@ function fight(mode='stage', bot=null){
   const plaque=(side,name)=>{const f=mainFac(side); return `<div class="tpl ${side==='p'?'me':'foe'}"><i class="tem ${f}">${FAC[f].ch}</i><span class="tnm"><b>${name}</b><small>⚔ ${fmt(sidePow(side))}</small></span></div>`};
   const by=(side,slots)=>res.start.filter(u=>u.side===side&&slots.includes(u.slot)).map(unitHTML).join('');
   $('#layer').innerHTML=`<div class="battle" role="dialog" aria-label="การต่อสู้">
-    <div class="field">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}
+    <div class="field sc-${bfOf(raid?'raid':tower?'tower':arena?'arena':'stage')}">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}${sceneFX(bfOf(raid?'raid':tower?'tower':arena?'arena':'stage'))}
       <div class="bhead2">${plaque('p',esc(S.pname||'ท่านเจ้าเมือง'))}<span class="rnd" id="rnd">รอบ 1/20</span>${plaque('e',foeName)}</div>
       <div class="bctl">${UI.autoplay?`<button class="btn ghost aptag" data-act="apstop">■ ออโต้</button>`:''}<button class="bc" data-act="speed" id="spd">x1</button><button class="bc" data-act="skip">ข้าม</button></div>
       <div class="lanes"><div class="side ps"><div class="line back">${by('p',[3,4,5])}</div><div class="line front">${by('p',[0,1,2])}</div></div>
@@ -3379,6 +3416,10 @@ function fight(mode='stage', bot=null){
 const BF_CYCLE=['village','gate','harbor'];
 const stageBg = stage => BF_CYCLE[regionOf(stage)%BF_CYCLE.length];
 const bfOf = kind => kind==='arena'?'harbor' : kind==='tower'||kind==='raid'?'gate' : stageBg(S.stage);
+// Scene light shared by the background and everyone standing in it: a colour grade and vignette laid over
+// both, drifting particles, and per-scene rim light / shadow direction set through CSS variables (.sc-*).
+const SCENE_PART={village:'leaf', gate:'ember', harbor:'ember'};
+const sceneFX = sc => `<div class="sgrade" aria-hidden="true"></div><div class="svig" aria-hidden="true"></div><div class="amb ${SCENE_PART[sc]||'dust'}" aria-hidden="true">${Array.from({length:14},(_,i)=>`<i style="--i:${i};--x:${(i*53)%100}%;--d:${(i*37)%10/10}"></i>`).join('')}</div>`;
 function battleBg(kind){
   return `<div class="bfbg bpic bf-${kind} bg-${bfOf(kind)}" aria-hidden="true"></div>`;
 }
