@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=dc55f2ab78').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=ceebf4e0ce').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1255,6 +1255,56 @@ details.bonus summary{cursor:pointer;list-style:revert}
 /* the skill bar melts into the scene instead of sitting on it */
 .bpanel{background:linear-gradient(180deg,rgba(40,12,6,.55),rgba(20,6,3,.88));border-color:rgba(201,154,62,.7);box-shadow:0 -10px 24px rgba(0,0,0,.35);backdrop-filter:blur(3px)}
 .fbf .amb,.fbf .sgrade,.fbf .svig{z-index:4}
+
+/* ---- polish: transitions, hit feel, intro and outro ---- */
+#view.vt-in{animation:viewIn .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(12px);filter:blur(2px)}to{opacity:1;transform:none;filter:none}}
+.battle{animation:battleIn .5s ease-out}
+@keyframes battleIn{from{clip-path:circle(0% at 50% 55%)}to{clip-path:circle(150% at 50% 55%)}}
+.sheet,.veil>.panel{animation:sheetIn .28s cubic-bezier(.2,.9,.25,1.1)}
+@keyframes sheetIn{from{transform:translateY(24px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+/* hit-stop and graded shakes */
+.field.hstop .u,.field.hstop .u *,.field.hstop .fxi,.field.hstop .proj{animation-play-state:paused!important;transition:none!important}
+.field.shake-s{animation:fshakeS .3s}
+@keyframes fshakeS{25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,1px)}}
+/* damage numbers spring up with a little arc */
+.num{animation:numPop .95s cubic-bezier(.2,.9,.3,1) forwards;left:calc(50% + var(--jx,0px))}
+.num.crit{color:#ffd24a;font-size:30px;text-shadow:0 2px 0 #6a1206,0 0 10px rgba(255,140,40,.9),0 0 2px #000}
+.num.heal{color:#8af07a}
+@keyframes numPop{0%{opacity:0;transform:translate(-50%,8px) scale(.4)}14%{opacity:1;transform:translate(-50%,-14px) scale(1.4)}28%{transform:translate(-50%,-10px) scale(1)}100%{opacity:0;transform:translate(-50%,-52px) scale(.95)}}
+.num.crit{animation-name:numCrit}
+@keyframes numCrit{0%{opacity:0;transform:translate(-50%,8px) scale(.3) rotate(-8deg)}14%{opacity:1;transform:translate(-50%,-18px) scale(1.7) rotate(4deg)}30%{transform:translate(-50%,-12px) scale(1.15) rotate(0)}100%{opacity:0;transform:translate(-50%,-58px) scale(1)}}
+/* intro: both armies march in from their edges, a battle cry stamps the field */
+.battle.intro .ps .u{animation:marchL .7s cubic-bezier(.2,.8,.3,1) backwards}
+.battle.intro .es .u{animation:marchR .7s cubic-bezier(.2,.8,.3,1) backwards}
+.battle.intro .lanes .u:nth-child(2){animation-delay:.08s}.battle.intro .lanes .u:nth-child(3){animation-delay:.16s}
+.battle.intro .lanes .line.back .u{animation-duration:.85s}
+@keyframes marchL{from{transform:translateX(-70vw);opacity:0}60%{opacity:1}}
+@keyframes marchR{from{transform:translateX(70vw);opacity:0}60%{opacity:1}}
+.field>.bcry{position:absolute;inset:0;z-index:6;display:none;place-items:center;pointer-events:none}
+.battle.intro .field>.bcry{display:grid}
+.bcry b{font:clamp(40px,13vw,64px) var(--f-display);color:#ffe9a8;text-shadow:0 4px 0 #5a0c06,0 0 24px rgba(255,170,60,.9);padding:6px 26px;border-radius:10px;
+  background:linear-gradient(90deg,transparent,rgba(120,14,6,.85) 18%,rgba(120,14,6,.85) 82%,transparent);animation:cry 1.1s ease-out .35s backwards}
+@keyframes cry{0%{transform:scale(2.4);opacity:0}25%{transform:scale(.95);opacity:1}35%{transform:scale(1.05)}80%{transform:none;opacity:1}100%{opacity:0;transform:scale(1.05)}}
+/* outro */
+.u.cheer{animation:cheer .55s ease-in-out 3}
+@keyframes cheer{40%{transform:translateY(-16px) scale(1.04)}}
+.u.beaten{filter:grayscale(.5) brightness(.75);transition:filter .5s}
+.result{animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}}
+.result .panel{animation:sheetIn .35s cubic-bezier(.2,.9,.25,1.2);position:relative;overflow:visible}
+.result.rwin .panel::before{content:"";position:absolute;left:50%;top:-10px;width:420px;height:420px;margin-left:-210px;margin-top:-170px;z-index:-1;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg,rgba(255,215,110,.38) 0 9deg,transparent 9deg 22deg);border-radius:50%;
+  -webkit-mask:radial-gradient(circle,#000 25%,transparent 68%);mask:radial-gradient(circle,#000 25%,transparent 68%);animation:spin 12s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result.rwin h2{font-size:42px;background:linear-gradient(180deg,#fff6c8,#f2c240 55%,#b8741a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #5a0c06)}
+.result.rlose{background:rgba(10,8,8,.78);backdrop-filter:grayscale(.8)}
+.result.rlose h2{color:#b9b0a6;text-shadow:0 2px 0 #000}
+/* city: the same light and drifting leaves */
+.city.c2>.sgrade,.city.c2>.svig,.city.c2>.amb{position:absolute;z-index:1}
+.city.c2>.hs{z-index:2}
+.city.c2>.svig{background:radial-gradient(ellipse 90% 80% at 50% 50%,transparent 60%,rgba(10,4,2,.35))}
+@media (prefers-reduced-motion:reduce){#view.vt-in,.battle,.battle.intro .u,.bcry b,.u.cheer,.result.rwin .panel::before{animation:none!important}}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><img class="blogo" src="ui/logo.webp" alt="ขุนพลสามก๊ก" width="800" height="452"><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -2417,7 +2467,7 @@ function viewCity(){
     <button class="evt" data-go="savegame"><img class="evi" src="ui/chest.webp" alt="">บันทึก<small>อัตโนมัติ</small></button>
     <button class="evt" data-go="guild"><img class="evi" src="ui/flag.webp" alt="">กิลด์<small>${S.guild.id===null?'ยังไม่เข้า':`บอส ${S.guild.raid}/3`}</small>${S.guild.id!==null&&!S.guild.checked?'<span class="dot"></span>':''}</button>
   </div>
-  <div class="city pic c2">
+  <div class="city pic c2 sc-village">${sceneFX('village')}
     ${CITY_HS.map(([k,l])=>`<button class="hs h2-${k}" data-go="${k}"><span class="lbl">${l}${k==='shrine'?`<small>${eventLeft()}</small>`:''}</span>${dot(k==='summon'?S.freeDate!==today():k==='guild'?S.guild.id!==null&&!S.guild.checked:false)}</button>`).join('')}
   </div>
   <div class="evbanner2">
@@ -2921,6 +2971,14 @@ function sfx(name){
     case 'sp': [587,659,740,880,988,1175].forEach((f,i)=>tone(f,t+i*.08,.5,{vol:.13})); tone(98,t+.5,1.8,{type:'sine',vol:.4}); break;
     case 'win': [587,659,880,988,1175].forEach((f,i)=>tone(f,t+i*.12,.45,{vol:.16})); break;
     case 'lose': [440,392,330,294].forEach((f,i)=>tone(f,t+i*.18,.55,{type:'sine',vol:.14})); break;
+    // weapon voices: blades ring, spears punch, arrows whistle then thunk, strategists chime
+    case 'slash': noise(t,.09,.4,3400); noise(t+.02,.14,.25,1600); tone(1250,t+.01,.18,{type:'triangle',vol:.05,bend:.92}); break;
+    case 'thrust': noise(t,.06,.45,2600); tone(120,t,.14,{type:'sine',vol:.32,bend:.55}); break;
+    case 'arrow': noise(t,.22,.12,5200); tone(1900,t,.2,{type:'sine',vol:.025,bend:.6}); break;
+    case 'arrowhit': noise(t,.05,.35,1200); tone(220,t,.08,{type:'square',vol:.06,bend:.5}); break;
+    case 'magic': [1046,1318,1568].forEach((f,i)=>tone(f,t+i*.035,.35,{type:'sine',vol:.06})); noise(t,.3,.08,800); break;
+    case 'ko': tone(90,t,.45,{type:'sine',vol:.4,bend:.5}); noise(t+.05,.35,.2,500); break;
+    case 'taiko': [0,.22,.44].forEach((d,i)=>{ tone(i<2?70:55,t+d,.4,{type:'sine',vol:.5,bend:.6}); noise(t+d,.06,.25,700) }); break;
   }
 }
 // D pentatonic, the classic sound of Chinese folk melodies
@@ -3188,7 +3246,9 @@ function render(){
   const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, tier:viewTier, savegame:viewSave, coupon:viewCoupon, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
     arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap, train:viewTrain, evrank:viewEvRank}[tab]();
   sendTab();
-  $('#view').innerHTML=v; renderTop(); tutorial();
+  const vw=$('#view'); vw.innerHTML=v; renderTop(); tutorial();
+  // a soft rise-in whenever the player moves to a different screen
+  if(UI.lastShown!==tab){ UI.lastShown=tab; vw.classList?.remove('vt-in'); void vw.offsetWidth; vw.classList?.add('vt-in') }
 }
 
 // ---------- tutorial (first session) ----------
@@ -3395,6 +3455,7 @@ function fight(mode='stage', bot=null){
   const by=(side,slots)=>res.start.filter(u=>u.side===side&&slots.includes(u.slot)).map(unitHTML).join('');
   $('#layer').innerHTML=`<div class="battle" role="dialog" aria-label="การต่อสู้">
     <div class="field sc-${bfOf(raid?'raid':tower?'tower':arena?'arena':'stage')}">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}${sceneFX(bfOf(raid?'raid':tower?'tower':arena?'arena':'stage'))}
+      <div class="bcry" aria-hidden="true"><b>ประจัญบาน!</b></div>
       <div class="bhead2">${plaque('p',esc(S.pname||'ท่านเจ้าเมือง'))}<span class="rnd" id="rnd">รอบ 1/20</span>${plaque('e',foeName)}</div>
       <div class="bctl">${UI.autoplay?`<button class="btn ghost aptag" data-act="apstop">■ ออโต้</button>`:''}<button class="bc" data-act="speed" id="spd">x1</button><button class="bc" data-act="skip">ข้าม</button></div>
       <div class="lanes"><div class="side ps"><div class="line back">${by('p',[3,4,5])}</div><div class="line front">${by('p',[0,1,2])}</div></div>
@@ -3410,7 +3471,8 @@ function fight(mode='stage', bot=null){
     ['slash','crescent','thrust_red','thrust_ice','whirl','lotus','dome','burst'].forEach(n=>pre(`ui/fx/${n}.webp`)) }catch(e){}
   B={wait:null,armed:-1,res,max,mode,bot,units:Object.fromEntries(res.start.map(u=>[u.uid,u])),i:0,speed:B?.speed||1,timer:null,done:false};
   $('#spd').textContent='x'+B.speed;
-  step();
+  const bt=$('.battle'); bt?.classList.add('intro'); sfx('taiko');
+  B.timer=setTimeout(()=>{ bt?.classList.remove('intro'); step() }, UI.autoplay?450:1150/Math.max(1,B.speed));
 }
 // Battlefield art: stages cycle village -> fortress gate -> harbour by region; arena is the harbour, tower and guild boss the gate.
 const BF_CYCLE=['village','gate','harbor'];
@@ -3440,12 +3502,12 @@ function applyHits(a, animate){
     const el=$('#u-'+h.tgt); if(!el) continue;
     el.querySelector('.hp i').style.width=(h.hp/B.max[h.tgt]*100)+'%';
     if(animate){
-      const n=document.createElement('span'); n.className='num'+(h.heal?' heal':h.crit?' crit':'');
+      const n=document.createElement('span'); n.className='num'+(h.heal?' heal':h.crit?' crit':''); n.style.setProperty?.('--jx',((hashStr(h.tgt+B.i)%40)-20)+'px');
       n.textContent=h.heal?(h.divine?'จิตเทวะ +':'+')+fmt(h.heal):(h.combo?'คอมโบ ':h.crit?'คริ ':'')+fmt(h.dmg)+(h.adv>1?' ▲':''); el.appendChild(n); setTimeout(()=>n.remove(),900);
       if(!h.heal){el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'),360); if(!h.dead && !poseHurt(el,'hit')) poseBlock(el); if(h.crit) fxImg(el,'burst',0,.8)}
       if(h.divine){ poseHurt(el,'rise'); fxImg(el,'dome',0,1.2) }
     }
-    if(h.dead){ el.classList.add('dead'); poseHurt(el, animate?'die':'down') }
+    if(h.dead){ el.classList.add('dead'); poseHurt(el, animate?'die':'down'); if(animate){ sfx('ko'); fieldShake('s') } }
   }
   for(const [uid,r] of Object.entries(a.rage)){ const el=$('#u-'+uid); if(el) el.querySelector('.rg i').style.width=r+'%'; const sk=$('#sk-'+uid); if(sk){ sk.style.setProperty?.('--r',r); sk.classList.toggle('full',r>=100) } }
   for(const h of a.hits) if(h.dead) $('#sk-'+h.tgt)?.classList.add('dead');
@@ -3479,11 +3541,16 @@ function step(){
     else if(role==='strat'){ fly(src,t,a.skill?'fireball':'orb',dt*0.3); setTimeout(()=>fx(t,a.skill?'burst':'spark'),dt*0.3) }
     else setTimeout(()=>fx(t, a.skill?'slash big':'slash'), dt*0.25);
   }
-  setTimeout(()=>B&&!B.done&&applyHits(a,true), dt*0.3);
+  const crit=a.hits.some(h=>h.crit), heal=a.hits.some(h=>h.heal!==undefined);
+  setTimeout(()=>{ if(!B||B.done) return; applyHits(a,true); if(crit||a.skill) hitStop(a.skill?130:80); if(crit&&!a.skill) fieldShake('s') }, dt*0.3);
   if(a.skill) sfx('skill');
-  setTimeout(()=>sfx(a.hits.some(h=>h.heal!==undefined)?'heal':a.hits.some(h=>h.crit)?'crit':'hit'), dt*0.3);
-  B.timer=setTimeout(step, a.skill?dt*1.6:dt);
+  if(!heal&&role==='arch') sfx('arrow'); else if(!heal&&role==='strat') sfx('magic');
+  setTimeout(()=>{ sfx(heal?'heal':role==='arch'?'arrowhit':role==='cav'?'thrust':role==='strat'?'hit':'slash'); if(crit) sfx('crit') }, dt*0.3);
+  B.timer=setTimeout(step, (a.skill?dt*1.6:dt)+(crit||a.skill?110:0));
 }
+// Hit-stop: freeze the fighters for a beat on heavy blows so they land.
+function hitStop(ms){ const f=$('.field'); if(!f?.classList) return; f.classList.add('hstop'); setTimeout(()=>f.classList.remove('hstop'),ms) }
+function fieldShake(k){ const f=$('.field'); if(!f?.classList) return; f.classList.remove('shake-'+k); void f.offsetWidth; f.classList.add('shake-'+k); setTimeout(()=>f.classList.remove('shake-'+k),320) }
 function fireSkill(){
   $('#sk-'+B.wait)?.classList.remove('ready'); B.wait=null; B.armed=B.i;
   const u=$('#useSk'); if(u) u.disabled=true; const h=$('#skHint'); if(h&&S.autoSkill===false) h.textContent='พลังโกรธเต็มแล้วแตะ "ใช้สกิล" หรือแตะรูปขุนพลที่เรืองแสง';
@@ -3491,7 +3558,7 @@ function fireSkill(){
 }
 function skip(){ if(!B||B.done) return; clearTimeout(B.timer); while(B.i<B.res.actions.length) applyHits(B.res.actions[B.i++],false); finish() }
 function finish(){
-  if(B.done) return; B.done=true;
+  if(B.done) return; B.done=true; $('.battle')?.classList?.remove('intro');
   const win=B.res.winner==='p', tower=B.mode==='tower', arena=B.mode==='arena', raid=B.mode==='raid', story=B.mode==='story', train=B.mode==='train', trial=B.mode==='trial';
   let rwHTML='';
   const drop = g => g?`<span style="color:${QUAL[g.q].c}">${esc(gearName(g))}</span>`:'';
@@ -3545,8 +3612,11 @@ function finish(){
     rwHTML=`<div class="rw"><span><i class="coin g"></i>+${fmt(rw.gold)}</span><span><i class="coin x"></i>+${fmt(rw.exp)}</span><span><i class="coin j"></i>+${rw.gems}</span>${drop(g)}${shardTxt}<span>ยา EXP ×${pot}</span>${chapterDone?`<span>พิชิตแคว้น${esc(REGIONS[(Math.floor((S.stage-2)/10))%REGIONS.length].n)}: หยก +200 · ยา EXP ×5</span>`:''}</div>
       ${joined}<p>เปิดด่าน ${stageLabel(S.stage)} แล้ว รางวัลออฟไลน์เพิ่มขึ้น</p>`;
   }
+  // outro: the winning side celebrates, the survivors of the losing side drop to a knee
+  try{ for(const u of B.res.start){ const el=$('#u-'+u.uid); if(!el||el.classList.contains('dead')) continue;
+      if((u.side==='p')===win) el.classList.add('cheer'); else { el.classList.add('beaten'); const img=el.querySelector('.pf'); if(img&&HURT.has(u.id)) setPF(img,'h1') } } }catch(e){}
   setTimeout(()=>{
-    const box=document.createElement('div'); box.className='result';
+    const box=document.createElement('div'); box.className='result '+(win||raid||trial||train?'rwin':'rlose');
     box.innerHTML=`<div class="panel" role="alertdialog" aria-label="${win?'ชนะ':'แพ้'}">
       <h2 class="${win||raid||trial||train?'win':'lose'}">${raid?'จบการโจมตีบอส':trial?'จบการทดลอง':train?'จบการฝึก':win?'ชนะ!':'พ่ายแพ้'}</h2>
       ${win||raid||arena||trial||train?rwHTML
@@ -3559,7 +3629,7 @@ function finish(){
     sfx(win||raid?'win':'lose');
     if(B.mode==='stage' && !win && typeof track==='function') track('stage_loss');
     if(UI.autoplay) autoContinue(win);
-  }, 500/B.speed);
+  }, 900/B.speed);
 }
 // ---------- auto play: keep fighting, upgrading between battles, until stuck or a goal is met ----------
 const AP_MODES=['stage','tower'];
