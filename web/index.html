@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=2c035df405').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=2d02481916').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1093,6 +1093,17 @@ button.back{font-family:var(--f-display);border-radius:6px;border-color:#c99a3e;
 /* headings and labels in the display face */
 .h,.power,.stage-tag{letter-spacing:.3px}
 nav button{font-family:var(--f-display);font-size:11.5px;letter-spacing:.2px}
+
+/* evolution forms */
+.evoname{display:inline-block;margin-top:4px;padding:2px 10px;border-radius:6px;font:13px var(--f-display);color:#4a1206;background:linear-gradient(180deg,#fff0bd,#e9b850);border:1px solid #8a5a14}
+.evorow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.evo{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:6px 2px;border-radius:8px;background:rgba(58,36,22,.08);border:1.5px solid rgba(138,90,20,.35)}
+.evo .tok{width:100%;height:auto;aspect-ratio:1;background:none!important;border:0;box-shadow:none}
+.evo .tok img.art{width:100%;height:100%;object-fit:contain}
+.evo b{font:11.5px/1.25 var(--f-display);color:var(--on-parch)}
+.evo small{font-size:10.5px;line-height:1.25;color:var(--muted)}
+.evo.lock .tok{filter:grayscale(1) brightness(.45) contrast(1.1)}
+.evo.cur{border-color:#d4a446;background:radial-gradient(circle at 50% 35%,rgba(255,220,120,.45),rgba(255,220,120,.05) 70%);box-shadow:0 0 0 1px #fff2c4 inset}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1757,11 +1768,24 @@ const PDEFS = `<defs><radialGradient id="pg-aura"><stop offset="0" stop-color="#
   <linearGradient id="pg-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="1" stop-color="#b8862a"/></linearGradient></defs>`;
 // Painted art supplied by the owner (art/<id>.webp). Generals without it, and every mecha form, use the drawn SVG.
 const ART = new Set(['caiwenji', 'caocao', 'caopi', 'caoren', 'caozhi', 'daqiao', 'dengai', 'dianwei', 'diaochan', 'dingfeng', 'dongzhuo', 'fazheng', 'ganning', 'gongsunzan', 'guanxing', 'guanyinping', 'guanyu', 'guojia', 'huanggai', 'huangzhong', 'huatuo', 'jiangwei', 'lingtong', 'liubei', 'lubu', 'lumeng', 'lusu', 'luxun', 'machao', 'mayunlu', 'menghuo', 'pangtong', 'simayi', 'sunce', 'sunjian', 'sunquan', 'sunshangxiang', 'taishici', 'weiyan', 'xiahoudun', 'xiahouyuan', 'xuchu', 'xuhuang', 'xunyu', 'yuanshao', 'yuanshu', 'yuejin', 'yueying', 'zhangbao', 'zhangfei', 'zhangjiao', 'zhangliao', 'zhaoyun', 'zhenji', 'zhonghui', 'zhoutai', 'zhouyu', 'zhuge', 'zhurong', 'zuoci','liubei_y','guanyu_y','zhangfei_y','huaxiong']);
-function portrait(id, mech=false){
-  const key=id+(mech?'#m':'');
+// Evolution forms (ร่างวิวัฒน์): awakening 1, 3 and 5 unlock forms E1-E3 for generals with painted forms.
+// Looks, skill name and skill effect change; stats come from awakening as before.
+const EVO={
+  guanyu:[['ขุนพลมังกรตื่นพลัง','ง้าวมังกรสะบั้น'],['จุติมังกรหยก','มังกรหยกกวาดทัพ'],['เทพมังกรสงคราม','พิพากษามังกรสวรรค์']],
+  caocao:[['ราชันบัญชาศึก','ราชโองการสยบทัพ'],['จักรพรรดิมังกรคราม','มังกรครามบัญชาทัพ'],['ราชันครองใต้หล้า','บัญชาสวรรค์ครองพิภพ']],
+  sunce:[['พยัคฆ์ตื่นศึก','ทวนพยัคฆ์ทะลวง'],['จุติราชันพยัคฆ์','พยัคฆ์เพลิงคำราม'],['เทพพยัคฆ์อัคคี','พยัคฆ์สุริยันถล่มศึก']],
+  lubu:[['ขุนศึกไร้พ่าย','ง้าวสะเทือนสมรภูมิ'],['อสูรสนามรบ','อัสนีทลายทัพ'],['เทพสงครามทลายฟ้า','ง้าวเทวะผ่าสวรรค์']]
+};
+const EVO_AW=[1,3,5];
+const evoTier = (id, aw) => EVO[id] ? EVO_AW.filter(a=>(aw||0)>=a).length : 0;
+const myEvo = id => evoTier(id, (typeof S!=='undefined' && S && S.heroes[id]?.aw) || 0);
+const evoSkill = (id, aw) => { const t=evoTier(id,aw); return t ? EVO[id][t-1][1] : HERO[id].sk };
+const artSrc = (id, t) => t ? `art/evo/${id}_e${t}.webp` : `art/${id}.webp`;
+function portrait(id, mech=false, tier=myEvo(id)){
+  const key=id+(mech?'#m':'')+(tier?'#e'+tier:'');
   if(PCACHE[key]) return PCACHE[key];
   const h=HERO[id];
-  if(!mech && ART.has(id)) return PCACHE[key]=`<img class="art" src="art/${id}.webp" alt="" draggable="false" decoding="async" loading="lazy">`;
+  if(!mech && ART.has(id)) return PCACHE[key]=`<img class="art" src="${artSrc(id,tier)}" alt="" draggable="false" decoding="async" loading="lazy">`;
   if(h.boss) return PCACHE[key]=`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="56" r="40" fill="#ff6a2a" opacity=".25"/><path d="M14 40 L26 6 L38 34Z M86 40 L74 6 L62 34Z" fill="#e8c45a" stroke="#6b4a10"/><circle cx="50" cy="54" r="34" fill="#4a0e08"/><path d="M20 50 Q50 30 80 50 Q66 42 50 44 Q34 42 20 50Z" fill="#2a0604"/><ellipse cx="37" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="63" cy="52" rx="8" ry="5.5" fill="#ffcf5a"/><ellipse cx="37" cy="52" rx="2" ry="5" fill="#2a0604"/><ellipse cx="63" cy="52" rx="2" ry="5" fill="#2a0604"/><path d="M30 70 L38 64 L44 72 L50 64 L56 72 L62 64 L70 70 L62 80 L38 80Z" fill="#fff4dc"/></svg>`;
   const L=LOOK[id]||{}, f=!!L.f, hv=hashN(id);
   const skin=L.skin||'#f9d8b9', skinS=L.skin?'#b07a52':'#eab894', hair=L.old?'#dcd6cc':(L.hair||'#22170f'), bc=L.old?'#efebe3':(L.beardColor||hair);
@@ -1849,18 +1873,18 @@ function cardHTML(id, opts={}){
     <span class="nm">${esc(h.th)}</span>${opts.extra||''}</button>`;
 }
 const LIVE_STRIPS=12;
-const liveArt = (id, mech) => (!mech && ART.has(id))
-  ? `<span class="liveart" style="--img:url(art/${id}.webp);--ph:${(hashStr(id)%100)/100}">${Array.from({length:LIVE_STRIPS},(_,k)=>`<i style="--k:${k}"></i>`).join('')}</span>`
+const liveArt = (id, mech, tier=myEvo(id)) => (!mech && ART.has(id))
+  ? `<span class="liveart" style="--img:url(${artSrc(id,tier)});--ph:${(hashStr(id)%100)/100}">${Array.from({length:LIVE_STRIPS},(_,k)=>`<i style="--k:${k}"></i>`).join('')}</span>`
   : portrait(id, mech);
 // Key-pose sprites (ready, windup, action, recover) for generals that have them; Hua Xiong has ready + shield block.
 const POSES={liubei_y:4, guanyu_y:4, zhangfei_y:4, zhaoyun:4, zhuge:4, huatuo:4, huaxiong:2};
 // The rest bend their single portrait into the same four beats until hand-drawn poses arrive (tools/procpose.py).
 for(const id of ["caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guojia", "huanggai", "huangzhong", "jiangwei", "lingtong", "liubei", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei", "zhangjiao", "zhangliao", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhurong", "zuoci"]) POSES[id]=POSES[id]||4;
 // One sprite strip per general: frames 0-3 ready/wind-up/strike/recover, 4-7 hit/kneel/fallen/rise.
-const spriteSrc = id => `ui/sprite/${id}.webp`;
+const spriteSrc = (id, t=0) => t ? `ui/sprite/${id}_e${t}.webp` : `ui/sprite/${id}.webp`;
 const frameIx = k => typeof k==='string' ? 4 + +k.slice(1) : k;
 const setPF = (img,k) => { img.style.backgroundPosition = `${frameIx(k)*100/7}% 0` };
-const poseTok = id => `<span class="tok pose ${HERO[id].fac}"><span class="pf" style="background-image:url(${spriteSrc(id)})"></span></span>`;
+const poseTok = (id, t=0) => `<span class="tok pose ${HERO[id].fac}"><span class="pf" style="background-image:url(${spriteSrc(id,t)})"></span></span>`;
 function poseAttack(el, dt){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||!id||POSES[id]<4) return;
   const at=[[0,1],[dt*0.28,2],[dt*0.62,3],[dt*0.92,0]];
@@ -1882,7 +1906,7 @@ function fxImg(el, name, rot=0, big=1){
   if(!el?.appendChild) return; const f=document.createElement('img'); f.className='fxi'; f.src=`ui/fx/${name}.webp`; f.alt='';
   f.style.setProperty?.('--r',rot+'deg'); f.style.setProperty?.('--s',big); el.appendChild(f); setTimeout(()=>f.remove(),650);
 }
-const SKILL_FX = (id) => id==='guanyu'||id==='guanyu_y' ? 'crescent' : ({war:'slash',cav:'thrust_red',arch:'thrust_ice',strat:'whirl',heal:'lotus'})[HERO[id]?.role]||'slash';
+const SKILL_FX = (id, aw) => evoTier(id,aw) ? `evo/${id}_e${evoTier(id,aw)}` : id==='guanyu'||id==='guanyu_y' ? 'crescent' : ({war:'slash',cav:'thrust_red',arch:'thrust_ice',strat:'whirl',heal:'lotus'})[HERO[id]?.role]||'slash';
 function poseBlock(el){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||POSES[id]!==2) return;
   setPF(img,1); clearTimeout(img._bt); img._bt=setTimeout(()=>{ setPF(img,0) },380);
@@ -2987,7 +3011,7 @@ function openHero(id){
         <div class="hbart ${h.rar}" data-tilt><span class="gloss"></span>${liveArt(id,own?isMech(id):false)}<em class="r ${h.rar}">${RAR[h.rar].label}</em><span class="hst">${aw?'☾'.repeat(aw):stars(st)}</span></div>
         <div>
           <h2>${esc(h.th)}</h2>
-          <div class="en">${esc(h.en)} · ${own?`Lv.${lv}/${cap} · สำเนา ${own.copies}`:'ยังไม่มีในทัพ อัญเชิญเพื่อรับ'}</div>
+          <div class="en">${esc(h.en)} · ${own?`Lv.${lv}/${cap} · สำเนา ${own.copies}`:'ยังไม่มีในทัพ อัญเชิญเพื่อรับ'}</div>${EVO[id]&&evoTier(id,aw)?`<div class="evoname">ร่าง${esc(EVO[id][evoTier(id,aw)-1][0])}</div>`:''}
           <div class="tags"><span class="tag" style="background:var(--${h.fac})">${FAC[h.fac].ch} ${FAC[h.fac].th}</span><span class="tag role">${roleIcon(h.role,'ri sm')}${r.th}</span>${tierTable()[id]?`<span class="tag tier ${tierTable()[id].t}">${tierTable()[id].t} · อันดับ ${tierTable()[id].rank}</span>`:''}<span class="tag" style="background:#8a5a12">${RAR[h.rar].label}</span></div>
           <div class="power" style="color:var(--wu);margin-top:8px"><small style="color:var(--muted)">พลัง</small>${fmt(own?heroPower(id):power(id,lv,st,aw))}</div>
         </div>
@@ -3006,12 +3030,16 @@ function openHero(id){
       <div class="skill"><h4>สกิลและความสามารถ</h4><div class="sk5">${[
         ['โจมตีทั่วไป', `โจมตีศัตรู${h.role==='arch'?'คนใดก็ได้':'แถวหน้า'} 100% แบบ${r.mag?'เวท (ศัตรูใช้ป้องกันเวท)':'กายภาพ (ศัตรูใช้ป้องกันกาย)'} และสะสมโทสะ`],
         ['พรสวรรค์', TALENT[h.role]],
-        ['สกิล', `<b>${esc(h.sk)}</b> ${r.desc(Math.round(skillMult(id,aw)*(h.role==='strat'?1.2:1)*100))} ใช้เมื่อโทสะเต็ม`],
+        ['สกิล', `<b>${esc(evoSkill(id,aw))}</b> ${r.desc(Math.round(skillMult(id,aw)*(h.role==='strat'?1.2:1)*100))} ใช้เมื่อโทสะเต็ม`],
         ['คอมโบ', `หลังโจมตีทั่วไป มีโอกาส ${comboChance(h.role)*100}% ตีซ้ำอีก 60%`],
         ['ฐานเทวะ', aw?`ครั้งแรกที่เลือดต่ำกว่า 30% ฟื้นทันที ${20+aw*4}% ของ HP และพลังโจมตี +${aw*5}%`:'ปลดล็อกเมื่อตื่นจิตขั้น 1']
       ].map(([t,d],i)=>`<div class="sk ${i===4&&!aw?'lock':''}"><span><i>${['攻','天','技','连','神'][i]}</i>${t}</span><p>${d}</p></div>`).join('')}</div></div>
       ${myBonds.length?`<div class="bonds"><h4>มิตรภาพ</h4>${myBonds.map(b=>{const on=b.ids.every(i=>teamIds.includes(i));
         return `<div class="bond ${on?'on':''}"><span>${b.name}: ${b.ids.map(i=>HERO[i].th).join(' ')}</span><em>${on?'✓ ':''}${bondText(b)}</em></div>`}).join('')}</div>`:''}
+      ${EVO[id]?`<div class="awk evobox"><h4>ร่างวิวัฒน์</h4>
+        <p>ตื่นจิตขั้น 1, 3 และ 5 เปลี่ยนเป็นร่างใหม่ พร้อมชื่อสกิลและเอฟเฟกต์สกิลใหม่ทั้งในการ์ดและสนามรบ</p>
+        <div class="evorow">${[0,1,2,3].map(t=>{const cur=evoTier(id,aw), got=own&&t<=cur;
+          return `<div class="evo ${got?'got':'lock'} ${own&&t===cur?'cur':''}"><span class="tok ${h.fac}">${portrait(id,false,t)}</span><b>${t?esc(EVO[id][t-1][0]):'ร่างเริ่มต้น'}</b><small>${t?(got?esc(EVO[id][t-1][1]):`ตื่นจิต ${EVO_AW[t-1]}`):esc(h.sk)}</small></div>`}).join('')}</div></div>`:''}
       ${own?`<div class="awk mechbox"><h4>ร่างจักรกล</h4>
         <p>${aw>=3?'สวมเกราะจักรกลแห่งสามก๊ก ค่า HP และ ATK +12% เปลี่ยนรูปลักษณ์ทั้งในการ์ดและสนามรบ':'ปลดล็อกเมื่อตื่นจิตขั้น 3 แปลงร่างเป็นขุนพลจักรกล HP และ ATK +12%'}</p>
         <div class="mechprev"><span class="tok ${h.fac}">${portrait(id,false)}</span><span>→</span><span class="tok ${h.fac}">${portrait(id,true)}</span></div>
@@ -3038,7 +3066,7 @@ function openHero(id){
 const closeLayer=()=>{$('#layer').innerHTML=''};
 // ---------- celebrations: short full-screen moments for big wins ----------
 const CELEB_Q=[]; let celebOn=false;
-const CELEB_KIND={hero:{t:'ได้รับขุนพลใหม่!', c:'#ffd36a'}, star:{t:'เลื่อนดาวสำเร็จ!', c:'#ffe066'}, awaken:{t:'ตื่นจิตสำเร็จ!', c:'#ff8af0'},
+const CELEB_KIND={hero:{t:'ได้รับขุนพลใหม่!', c:'#ffd36a'}, star:{t:'เลื่อนดาวสำเร็จ!', c:'#ffe066'}, awaken:{t:'ตื่นจิตสำเร็จ!', c:'#ff8af0'}, evolve:{t:'วิวัฒน์ร่างใหม่!', c:'#9affd6'},
   rank:{t:'อันดับประลองขึ้น!', c:'#7ad8ff'}, region:{t:'พิชิตแคว้นสำเร็จ!', c:'#ff9a5a'}};
 function celebrate(kind, id, sub){ CELEB_Q.push({kind,id,sub}); if(!celebOn) nextCeleb() }
 function nextCeleb(){
@@ -3130,7 +3158,7 @@ function fight(mode='stage', bot=null){
   const res=simulate(A,E,(train?800000+S.train.left:trial?850000:story?300000+bot.c*100+bot.s*10:raid?700000+hashStr(today())%1000:tower?500000+S.tower*1000:arena?900000+S.arena.ref*100:S.stage*1000)+S.battleSeed++);
   save();
   const unitHTML=u=>`<div class="u ${u.side==='e'?'foe':''}" id="u-${u.uid}" data-pid="${u.id}">
-     ${POSES[u.id]&&!(u.side==='p'&&isMech(u.id))?poseTok(u.id):liveTok(u.id,u.side==='p'&&isMech(u.id))}<div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}${esc(HERO[u.id].th)} ${u.lv}</div></div>`;
+     ${POSES[u.id]&&!(u.side==='p'&&isMech(u.id))?poseTok(u.id,evoTier(u.id,u.aw)):liveTok(u.id,u.side==='p'&&isMech(u.id))}<div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}${esc(HERO[u.id].th)} ${u.lv}</div></div>`;
   const by=(side,slots)=>res.start.filter(u=>u.side===side&&slots.includes(u.slot)).map(unitHTML).join('');
   $('#layer').innerHTML=`<div class="battle" role="dialog" aria-label="การต่อสู้">
     <div class="field">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}
@@ -3145,7 +3173,7 @@ function fight(mode='stage', bot=null){
   const max=Object.fromEntries(res.start.map(u=>[u.uid,u.max]));
   setMusic('battle');
   try{ const pre=src=>{ const im=new Image(); im.src=src };
-    for(const u of res.start) if(POSES[u.id]) pre(spriteSrc(u.id));
+    for(const u of res.start) if(POSES[u.id]){ pre(spriteSrc(u.id,evoTier(u.id,u.aw))); if(evoTier(u.id,u.aw)) pre(`ui/fx/${SKILL_FX(u.id,u.aw)}.webp`) }
     ['slash','crescent','thrust_red','thrust_ice','whirl','lotus','dome','burst'].forEach(n=>pre(`ui/fx/${n}.webp`)) }catch(e){}
   B={wait:null,armed:-1,res,max,mode,bot,units:Object.fromEntries(res.start.map(u=>[u.uid,u])),i:0,speed:B?.speed||1,timer:null,done:false};
   $('#spd').textContent='x'+B.speed;
@@ -3201,7 +3229,7 @@ function step(){
   const su=B.units[a.src], role=su?ROLE&&HERO[su.id].role:'war';
   if(a.skill){
     const c=document.createElement('div'); c.className='skillcall '+(a.src[0]==='p'?'mine':'theirs');
-    c.innerHTML=`<span class="cut tok ${HERO[su.id].fac}">${portrait(su.id, a.src[0]==='p'&&isMech(su.id))}</span><b></b>`; c.querySelector('b').textContent=a.skill;
+    c.innerHTML=`<span class="cut tok ${HERO[su.id].fac}">${portrait(su.id, a.src[0]==='p'&&isMech(su.id), evoTier(su.id,su.aw))}</span><b></b>`; c.querySelector('b').textContent=EVO[su.id]?evoSkill(su.id,su.aw):a.skill;
     document.body.appendChild(c); setTimeout(()=>c.remove(),1000/B.speed+200);
     const fld=$('.field'); if(fld){ fld.classList.add('shake','flash'); setTimeout(()=>fld.classList.remove('shake','flash'),420) }
   }
@@ -3209,7 +3237,7 @@ function step(){
   for(const h of a.hits){
     const t=$('#u-'+h.tgt); if(!t) continue;
     if(h.heal!==undefined){ setTimeout(()=>{ fx(t, h.divine?'divine':'healfx'); if(a.skill&&!h.divine) fxImg(t,'lotus',0,.9) }, dt*0.25); continue }
-    if(a.skill){ const up=a.src[0]==='p', nm=SKILL_FX(su.id); setTimeout(()=>fxImg(t, nm, nm.startsWith('thrust')?(up?0:180):(up?0:180), 1.1), dt*0.28) }
+    if(a.skill){ const up=a.src[0]==='p', nm=SKILL_FX(su.id, su.aw); setTimeout(()=>fxImg(t, nm, nm.startsWith('thrust')?(up?0:180):(up?0:180), 1.1), dt*0.28) }
     if(role==='arch'){ fly(src,t,'arrow',dt*0.3); setTimeout(()=>fx(t,'pierce'),dt*0.3) }
     else if(role==='strat'){ fly(src,t,a.skill?'fireball':'orb',dt*0.3); setTimeout(()=>fx(t,a.skill?'burst':'spark'),dt*0.3) }
     else setTimeout(()=>fx(t, a.skill?'slash big':'slash'), dt*0.25);
@@ -3602,7 +3630,8 @@ document.addEventListener('click',e=>{
         const had=!!H(selPick); if(had) H(selPick).copies++; else S.heroes[selPick]={lv:1,star:1,copies:0,aw:0,eq:{}};
         save(); closeLayer(); render(); if(had) toast(`ได้สำเนา ${HERO[selPick].th} +1`); else celebrate('hero', selPick, 'จากหีบเลือกขุนพล S+'); return }
       case 'awaken': { const h=H(id), c=awCost(h.aw); if(h.star<5||h.aw>=5||(S.souls[id]||0)<c.soul||S.gold<c.gold) return;
-        S.souls[id]-=c.soul; S.gold-=c.gold; h.aw++; save(); render(); openHero(id); celebrate('awaken', id, `ตื่นจิตขั้น ${h.aw} · เลเวลสูงสุด ${levelCap(h.star,h.aw)}`); return }
+        const t0=evoTier(id,h.aw); S.souls[id]-=c.soul; S.gold-=c.gold; h.aw++; save(); render(); openHero(id); celebrate('awaken', id, `ตื่นจิตขั้น ${h.aw} · เลเวลสูงสุด ${levelCap(h.star,h.aw)}`);
+        if(evoTier(id,h.aw)>t0){ const e=EVO[id][evoTier(id,h.aw)-1]; celebrate('evolve', id, `ร่าง${e[0]} · สกิล ${e[1]}`) } return }
       case 'pull1': closeLayer(); doPull(1); return;
       case 'pull10': closeLayer(); doPull(10); return;
       case 'showall': roster.showAll=!roster.showAll; render(); return;
