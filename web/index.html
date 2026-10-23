@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=751a137429').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=581c8fe50f').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1030,6 +1030,28 @@ div.fslot{display:block;width:100%;max-width:96px;min-width:0}div.fslot>.card{wi
 /* reaction frames & painted fx */
 .u.dead.fallen{animation:none;opacity:.9;filter:grayscale(.35) brightness(.85)}
 .u.dead.fallen .hp,.u.dead.fallen .rg{opacity:.4}
+
+/* battle: left vs right lanes (player left, enemy right; front lines meet in the middle) */
+.field{--uw:min(76px,18vw)}
+.lanes{flex:1;display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:0}
+.lanes .side{flex:0 0 auto;flex-direction:row;align-items:center;gap:clamp(2px,1.2vw,8px)}
+.lanes .line{flex-direction:column;align-items:center;gap:clamp(10px,3.2vh,30px)}
+.lanes .line .u:nth-child(1){transform:scale(.9)}
+.lanes .line .u:nth-child(3){transform:scale(1.06)}
+.lanes .ps .line.front .u:nth-child(2){margin-left:10px}
+.lanes .es .line.front .u:nth-child(2){margin-right:10px}
+.lanes .line.back{margin-top:-26px}
+.lanes{padding-top:12px}
+.lanes .u{width:var(--uw)}
+.lanes .u .tok{width:var(--uw);height:var(--uw)}
+.lanes .u::after{top:calc(var(--uw)*.84)}
+.lanes .u::before{top:calc(var(--uw)*.76)}
+.lanes .u .n{font-size:11px}
+.lanes .u.lunge-up,.lanes .u.lunge-down{transform:none}
+@keyframes atkUp{0%{transform:none}28%{transform:translateX(-10px) scale(.94,1.04) rotate(-5deg)}55%{transform:translateX(56px) scale(1.16) rotate(4deg);filter:brightness(1.15)}100%{transform:none}}
+@keyframes atkDown{0%{transform:none}28%{transform:translateX(10px) scale(.94,1.04) rotate(5deg)}55%{transform:translateX(-56px) scale(1.16) rotate(-4deg);filter:brightness(1.15)}100%{transform:none}}
+.u.hit{--kb:-14px}.u.foe.hit{--kb:14px}
+@keyframes knock{0%{transform:none}25%{transform:translateX(var(--kb,-14px)) rotate(-4deg)}100%{transform:none}}
 .fxi{position:absolute;left:50%;top:40%;width:150px;height:150px;margin:-75px 0 0 -75px;pointer-events:none;z-index:4;transform:rotate(var(--r,0deg)) scale(calc(var(--s,1)*.6));opacity:0;animation:fxi .62s ease-out forwards}
 @keyframes fxi{15%{opacity:1;transform:rotate(var(--r,0deg)) scale(var(--s,1))}100%{opacity:0;transform:rotate(var(--r,0deg)) scale(calc(var(--s,1)*1.25))}}
 </style>
@@ -3075,9 +3097,8 @@ function fight(mode='stage', bot=null){
     <div class="field">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}
       <div class="bhead"><span class="rnd" id="rnd">รอบ 1</span><span class="sub">${train?'ลานฝึก':trial?`ทดลองใช้ ${esc(HERO[bot.id].th)}`:story?`เนื้อเรื่อง ${bot.c+1}-${bot.s+1}`:raid?'บอสกิลด์':tower?`หอท้าขุนพล ชั้น ${S.tower}`:arena?`ประลองกับ ${esc(bot.name)}`:`ด่าน ${stageLabel(S.stage)}`}</span>
         <span style="display:flex;gap:6px">${UI.autoplay?`<button class="btn ghost aptag" data-act="apstop">■ ออโต้</button>`:''}<button class="btn ghost" data-act="speed" id="spd">x1</button><button class="btn ghost" data-act="skip">ข้าม</button></span></div>
-      <div class="side"><div class="line">${by('e',[3,4,5])}</div><div class="line">${by('e',[0,1,2])}</div></div>
-      <div class="vs" aria-hidden="true">战</div>
-      <div class="side"><div class="line">${by('p',[0,1,2])}</div><div class="line">${by('p',[3,4,5])}</div></div>
+      <div class="lanes"><div class="side ps"><div class="line back">${by('p',[3,4,5])}</div><div class="line front">${by('p',[0,1,2])}</div></div>
+      <div class="side es"><div class="line front">${by('e',[0,1,2])}</div><div class="line back">${by('e',[3,4,5])}</div></div></div>
       <div class="bpanel"><div class="skr">${res.start.filter(u=>u.side==='p').sort((x,y)=>x.slot-y.slot).map(u=>`<span class="skb r-${HERO[u.id].role}" id="sk-${u.uid}" data-act="useskill" style="--r:0">${portrait(u.id,isMech(u.id))}</span>`).join('')}</div>
         <div class="auto"><button class="tgl" data-act="autosk" aria-pressed="${S.autoSkill!==false}">อัตโนมัติ <b>${S.autoSkill!==false?'ON':'OFF'}</b></button><button class="gbtn" id="useSk" data-act="useskill" disabled>ใช้สกิล</button></div>
         <small class="autohint" id="skHint">${S.autoSkill!==false?'ขุนพลใช้สกิลเองเมื่อพลังโกรธเต็ม':'พลังโกรธเต็มแล้วแตะ "ใช้สกิล" หรือแตะรูปขุนพลที่เรืองแสง'}</small></div>
@@ -3145,7 +3166,7 @@ function step(){
   for(const h of a.hits){
     const t=$('#u-'+h.tgt); if(!t) continue;
     if(h.heal!==undefined){ setTimeout(()=>{ fx(t, h.divine?'divine':'healfx'); if(a.skill&&!h.divine) fxImg(t,'lotus',0,.9) }, dt*0.25); continue }
-    if(a.skill){ const up=a.src[0]==='p', nm=SKILL_FX(su.id); setTimeout(()=>fxImg(t, nm, nm.startsWith('thrust')?(up?-90:90):(up?0:180), 1.1), dt*0.28) }
+    if(a.skill){ const up=a.src[0]==='p', nm=SKILL_FX(su.id); setTimeout(()=>fxImg(t, nm, nm.startsWith('thrust')?(up?0:180):(up?0:180), 1.1), dt*0.28) }
     if(role==='arch'){ fly(src,t,'arrow',dt*0.3); setTimeout(()=>fx(t,'pierce'),dt*0.3) }
     else if(role==='strat'){ fly(src,t,a.skill?'fireball':'orb',dt*0.3); setTimeout(()=>fx(t,a.skill?'burst':'spark'),dt*0.3) }
     else setTimeout(()=>fx(t, a.skill?'slash big':'slash'), dt*0.25);
