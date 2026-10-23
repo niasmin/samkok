@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=2d02481916').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=5043749bf8').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1104,6 +1104,58 @@ nav button{font-family:var(--f-display);font-size:11.5px;letter-spacing:.2px}
 .evo small{font-size:10.5px;line-height:1.25;color:var(--muted)}
 .evo.lock .tok{filter:grayscale(1) brightness(.45) contrast(1.1)}
 .evo.cur{border-color:#d4a446;background:radial-gradient(circle at 50% 35%,rgba(255,220,120,.45),rgba(255,220,120,.05) 70%);box-shadow:0 0 0 1px #fff2c4 inset}
+
+/* team setup: battlefield preview + roster grid */
+.fbf{position:relative;aspect-ratio:10/9;border-radius:12px;overflow:hidden;border:2px solid #c99a3e;box-shadow:inset 0 0 0 1px rgba(255,230,160,.35),0 4px 12px rgba(0,0,0,.4);
+  background:url(ui/bf-village.webp) center 62%/cover no-repeat;margin-bottom:10px}
+.fbf.bg-gate{background-image:url(ui/bf-gate.webp)}.fbf.bg-harbor{background-image:url(ui/bf-harbor.webp)}
+.fbf::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 30%,transparent 80%,rgba(0,0,0,.25));pointer-events:none}
+.fpow,.ffoe{position:absolute;top:8px;z-index:3;font:14px var(--f-display);padding:3px 10px;border-radius:6px;background:rgba(26,10,6,.72);border:1px solid #c99a3e;color:#ffe9a8}
+.fpow{left:8px}.ffoe{right:8px;font-size:12px;color:#f3c9b8;border-color:rgba(201,154,62,.5)}
+.fu{position:absolute;width:21%;aspect-ratio:1;transform:translate(-50%,-100%);display:block;padding:0;z-index:2}
+.fu.p3,.fu.e3{top:42%}.fu.p4,.fu.e4{top:67%}.fu.p5,.fu.e5{top:93%}
+.fu.p0,.fu.e0{top:42%}.fu.p1,.fu.e1{top:67%}.fu.p2,.fu.e2{top:93%}
+.fu.p3{left:13%}.fu.p4{left:11%}.fu.p5{left:9%}.fu.p0{left:33%}.fu.p1{left:31%}.fu.p2{left:29%}
+.fu.e0{left:65%}.fu.e1{left:67%}.fu.e2{left:69%}.fu.e3{left:85%}.fu.e4{left:87%}.fu.e5{left:89%}
+.fu.p3,.fu.p0,.fu.e0,.fu.e3{z-index:1;width:19%}.fu.p5,.fu.p2,.fu.e2,.fu.e5{z-index:3;width:22.5%}
+.fu::before{content:"";position:absolute;left:14%;right:14%;bottom:-2%;height:16%;border-radius:50%;background:radial-gradient(rgba(0,0,0,.5),transparent 70%)}
+.fspr{position:absolute;inset:0;background-size:800% 100%;background-repeat:no-repeat;background-position:0 0;filter:drop-shadow(0 0 1px rgba(0,0,0,.7))}
+.fspr.art img{width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+.fu.ghost .fspr{filter:brightness(0);opacity:.42;transform:scaleX(-1)}
+.fu.sel::before{background:radial-gradient(rgba(255,230,120,.95),rgba(255,200,80,.35) 55%,transparent 72%);height:22%;bottom:-6%;animation:selp 1s ease-in-out infinite}
+.fu.sel .fspr{animation:lbreathe .9s ease-in-out infinite;filter:drop-shadow(0 0 2px #fff6c0) drop-shadow(0 0 6px #ffd84a) drop-shadow(0 0 10px #ffb020)}
+@keyframes selp{50%{opacity:.55}}
+.fring{position:absolute;left:12%;right:12%;bottom:0;height:30%;border-radius:50%;border:2px dashed rgba(255,232,160,.85);background:rgba(255,230,160,.12);display:grid;place-items:center;color:#fff3c4;font-size:18px;text-shadow:0 1px 2px #000}
+.fu.empty.sel .fring{border-style:solid;background:rgba(255,224,102,.35)}
+.fpl{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);display:flex;align-items:center;gap:3px;white-space:nowrap;font:600 11px var(--f-body);color:#fff;padding:1px 6px 1px 1px;border-radius:999px;background:rgba(20,8,4,.78);border:1px solid rgba(255,220,150,.55)}
+.fd{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;font:normal 11px/1 var(--f-seal);color:#fff;border:1px solid rgba(255,240,200,.8);font-style:normal}
+.fd.wei{background:var(--wei)}.fd.shu{background:var(--shu)}.fd.wu{background:var(--wu)}.fd.qun{background:var(--qun)}
+.rost{padding:10px 8px 12px;border-radius:12px;background:linear-gradient(180deg,#f8ecd0,#ecd9b0);border:2px solid #c99a3e;box-shadow:inset 0 0 0 1px #fff7e0;margin-bottom:10px}
+.rfil{display:flex;align-items:center;gap:6px;margin:0 2px 8px;flex-wrap:wrap}
+.rf{min-width:38px;height:34px;padding:0 10px;border-radius:999px;font:15px/1 var(--f-seal);color:#fff;background:#7a6a58;border:2px solid #fff3d6;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.rf.all{font:13px var(--f-display)}.rf.wei{background:var(--wei)}.rf.shu{background:var(--shu)}.rf.wu{background:var(--wu)}.rf.qun{background:var(--qun)}
+.rf[aria-pressed="true"]{outline:2.5px solid #e0a83a;outline-offset:1px;filter:brightness(1.12)}
+.rf.all[aria-pressed="true"]{background:linear-gradient(180deg,#fff0bd,#e9b850);color:#4a1206}
+.rcount{margin-left:auto;font:14px var(--f-display);color:#7a3a10}
+.rgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.rc{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;padding:0;border:2.5px solid #8a8a8a;background:linear-gradient(180deg,#5a4a3a,#2a1a12);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.rc.A{border-color:#6a9be0}.rc.S{border-color:#e0a83a}.rc.SP{border-color:#e05a3a;background:linear-gradient(180deg,#7a2a1a,#2a0e08)}
+.rart{position:absolute;inset:0}.rart img.art,.rart svg{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.rr{position:absolute;left:2px;top:2px;font:10px/1 var(--f-display);font-style:normal;padding:2px 3px;border-radius:3px;color:#fff;background:#5a5470}
+.rr.S{background:#c4861a}.rr.SP{background:#c4321f}
+.rl{position:absolute;right:3px;top:1px;font:12px var(--f-display);color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+.rc .fd{position:absolute;left:2px;top:42%;width:15px;height:15px;font-size:9.5px}
+.raw{position:absolute;right:2px;top:17px;font-size:8px;color:#ffb0e8;text-shadow:0 0 2px #000}
+.rlock{position:absolute;right:1px;bottom:15px;font-size:10px}
+.rn{position:absolute;left:0;right:0;bottom:0;font:600 10px/1.5 var(--f-body);color:#fff;text-align:center;background:linear-gradient(transparent,rgba(0,0,0,.8));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.rc.on::after{content:"";position:absolute;inset:0;background:rgba(10,40,20,.35)}
+.rck{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:2;font:900 34px/1 system-ui;color:#5ee06a;-webkit-text-stroke:2px #1d6a2a;text-shadow:0 2px 0 #0d3a16,0 0 8px rgba(0,0,0,.5)}
+.rlk{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:2;width:30px;height:30px;color:#ffd75a;filter:drop-shadow(0 1px 0 #6a3a08) drop-shadow(0 0 3px rgba(0,0,0,.6))}
+.rlk svg{width:100%;height:100%}
+.rbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.rbtns .btn{font-size:17px;padding:10px}
+details.bonus summary{cursor:pointer;list-style:revert}
+.rtip{display:block;margin-top:8px;font-size:11.5px;line-height:1.5;color:#7a5a3a;text-align:center}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><div class="bt">ขุนพลสามก๊ก</div><img src="art/liubei_y.webp" alt=""><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -2117,34 +2169,44 @@ function synergyHTML(){
   for(const bd of activeBonds(ids)) out.push(`<span class="syn on bond"><b>友</b>${bd.name} <em>${bondText(bd)}</em></span>`);
   return `<div class="synbar">${out.join('')||'<span class="syn">ยังไม่มีโบนัส</span>'}</div>`;
 }
+// Team setup: a battlefield preview (our lanes left, the next stage's enemy as silhouettes right)
+// above a five-column roster. Tap two field slots to swap; tap a roster card to deploy or recall it.
+const LINK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 function viewFormation(){
-  const sel=UI.fsel, T=tierTable();
-  const slot=i=>{const id=S.team[i];
-    return id?`<div class="fslot ${sel===i?'sel':''}">${cardHTML(id,{team:false,act:'fslot'})}</div>`
-             :`<button class="slot-empty fslot ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}">＋<br>ว่าง</button>`};
-  const fig=i=>{const id=S.team[i]; return id?`<button class="fig f${i} ${sel===i?'sel':''}" data-act="fslot" data-id="${id}"><span class="lvb">Lv.${S.heroes[id].lv}</span>${liveArt(id,isMech(id))}</button>`:''};
-  const bench=Object.keys(S.heroes).filter(id=>!S.team.includes(id)).sort((a,b)=>heroPower(b)-heroPower(a));
+  const sel=UI.fsel, teamIds=S.team.filter(Boolean), fac=UI.ffac||'all';
+  const spr=(id,t)=>POSES[id]&&!isMech(id)?`<span class="fspr" style="background-image:url(${spriteSrc(id,t)})"></span>`:`<span class="fspr art">${portrait(id,isMech(id))}</span>`;
+  const mine=i=>{const id=S.team[i];
+    return id?`<button class="fu p${i} ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}" aria-label="${esc(HERO[id].th)}">${spr(id,myEvo(id))}<span class="fpl"><i class="fd ${HERO[id].fac}">${FAC[HERO[id].fac].ch}</i>Lv.${H(id).lv}</span></button>`
+             :`<button class="fu p${i} empty ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}" aria-label="ช่องว่าง"><span class="fring">＋</span></button>`};
+  const foes=enemyTeam(S.stage);
+  const foe=(x,i)=>x?`<span class="fu e${i} ghost">${POSES[x.id]?`<span class="fspr" style="background-image:url(${spriteSrc(x.id)})"></span>`:''}</span>`:'';
   const selId=sel!=null?S.team[sel]:null;
-  const hint=sel==null?'แตะช่องในทัพเพื่อเลือก แล้วแตะขุนพลสำรองด้านล่างเพื่อสลับเข้า · แตะ 2 ช่องในทัพเพื่อสลับตำแหน่ง'
-    :`เลือก${sel<3?'แถวหน้า':'แถวหลัง'} ช่อง ${sel%3+1}${selId?` (${esc(HERO[selId].th)})`:''} · แตะขุนพลสำรองเพื่อใส่ หรือแตะอีกช่องเพื่อสลับ`;
+  const bonded=id=>BONDS.some(b=>b.ids.includes(id)&&b.ids.some(x=>x!==id&&teamIds.includes(x)));
+  const all=Object.keys(S.heroes).filter(id=>fac==='all'||HERO[id].fac===fac)
+    .sort((a,b)=>{const ia=S.team.indexOf(a), ib=S.team.indexOf(b); return (ib>=0)-(ia>=0) || (ia>=0&&ib>=0?ia-ib:heroPower(b)-heroPower(a))});
+  const card=id=>{const h=HERO[id], on=S.team.includes(id), ln=!on&&bonded(id), aw=H(id).aw;
+    return `<button class="rc ${h.rar} ${on?'on':''}" data-act="froster" data-id="${id}" aria-pressed="${on}" aria-label="${esc(h.th)}${on?' (อยู่ในทัพ)':''}">
+      <span class="rart">${portrait(id,isMech(id))}</span><em class="rr ${h.rar}">${RAR[h.rar].label}</em><b class="rl">${H(id).lv}</b>
+      <i class="fd ${h.fac}">${FAC[h.fac].ch}</i>${aw?`<span class="raw">${'☾'.repeat(aw)}</span>`:''}${isLocked(id)?'<span class="rlock">🔒</span>':''}
+      ${on?'<span class="rck" aria-hidden="true">✓</span>':ln?`<span class="rlk" title="มิตรภาพกับคนในทัพ">${LINK_SVG}</span>`:''}<span class="rn">${esc(h.th)}</span></button>`};
+  const hint=sel==null?'':`เลือก${sel<3?'แถวหน้า':'แถวหลัง'} ช่อง ${sel%3+1}${selId?` (${esc(HERO[selId].th)})`:''} · แตะอีกตำแหน่งเพื่อสลับ หรือแตะขุนพลด้านล่างเพื่อใส่`;
   return `${heroTabs()}
-  <div class="tstage">${[3,4,5,0,1,2].map(fig).join('')}<div class="tpow">⚔ พลังทัพ ${fmt(teamPower())}</div></div>
+  <div class="fbf bg-${stageBg(S.stage)}">
+    <div class="fpow">⚔ ${fmt(teamPower())}</div><div class="ffoe">ด่าน ${stageLabel(S.stage)} · ศัตรู ${fmt(foes.reduce((x,f)=>x+(f?power(f.id,f.lv,f.star):0),0))}</div>
+    ${[3,4,5,0,1,2].map(mine).join('')}${foes.map(foe).join('')}
+  </div>
+  ${sel!=null?`<div class="fhint on">${hint}</div><div class="factions">${selId?`<button class="btn small" data-hero="${selId}">ดูขุนพล</button><button class="btn ghost small" data-act="fremove">เรียกกลับ</button>`:''}<button class="btn ghost small" data-act="fcancel">ยกเลิก</button></div>`:''}
+  <div class="rost">
+    <div class="rfil">${[['all','ทั้งหมด'],['wei','魏'],['shu','蜀'],['wu','吴'],['qun','群']].map(([k,t])=>`<button class="rf ${k}" data-act="ffac" data-k="${k}" aria-pressed="${fac===k}" aria-label="${k==='all'?'ทั้งหมด':FAC[k].th}">${t}</button>`).join('')}<span class="rcount">${teamIds.length}/6</span></div>
+    ${all.length?`<div class="rgrid">${all.map(card).join('')}</div>`:'<div class="note">ยังไม่มีขุนพลก๊กนี้</div>'}
+    <div class="rbtns"><button class="btn" data-act="autoteam">จัดอัตโนมัติ</button><button class="btn red" data-go="camp">ออกรบ</button></div>
+    <small class="rtip">แตะการ์ดเพื่อส่งลงสนามหรือเรียกกลับ · แตะ 2 ตำแหน่งบนสนามเพื่อสลับ · โซ่ทอง = มีมิตรภาพกับคนในทัพ</small>
+  </div>
   ${synergyHTML()}
-  <h1 class="vh">จัดทีมขุนพล</h1>
-  <div class="fhint ${sel!=null?'on':''}">${hint}</div>
-  ${sel!=null?`<div class="factions">${selId?`<button class="btn small" data-hero="${selId}">ดูขุนพล</button><button class="btn ghost small" data-act="fremove">ถอดออกจากทัพ</button>`:''}<button class="btn ghost small" data-act="fcancel">ยกเลิก</button></div>`:''}
-  <div class="rowlabel">แถวหน้า · รับดาบก่อน เหมาะกับนักรบ ทหารม้า</div>
-  <div class="slots front">${slot(0)}${slot(1)}${slot(2)}</div>
-  <div class="rowlabel">แถวหลัง · ปลอดภัยกว่า เหมาะกับนักธนู กุนซือ หมอ</div>
-  <div class="slots back">${slot(3)}${slot(4)}${slot(5)}</div>
-  <h2 class="h" style="font-size:17px;margin-top:14px">ขุนพลสำรอง <span class="sub">${bench.length} คน · ${sel!=null?'แตะเพื่อใส่ช่องที่เลือก':'แตะเพื่อใส่ช่องว่าง'}</span></h2>
-  ${bench.length?`<div class="bench">${bench.map(id=>`<button class="bh" data-act="fbench" data-id="${id}">${tok(id)}${roleIcon(HERO[id].role)}<em class="${T[id]?.t||''}">${T[id]?.t||''}</em><span>${esc(HERO[id].th)}</span><small>Lv.${H(id).lv} · ${fmt(heroPower(id))}</small></button>`).join('')}</div>`:'<div class="note">ขุนพลทุกคนอยู่ในทัพแล้ว</div>'}
-  <div style="display:flex;gap:8px;margin-top:12px"><button class="gbtn big" style="flex:1" data-act="autoteam">จัดทีมอัตโนมัติ (เลือกจากพลังสูงสุด)</button></div>
-  <div class="panel bonus">
-    <b>โบนัสทัพ</b>
-    <div style="margin-top:4px;font-size:13px;line-height:1.6">• ก๊กเดียวกัน 3 / 4 / 5 / 6 คน: HP และ ATK +6% / +10% / +14% / +18%<br>• มิตรภาพ: ส่งคู่ที่รู้จักกันลงพร้อมกัน เช่น เล่าปี่ กวนอู เตียวหุย<br>• ก๊กข่มกัน: ตีก๊กที่ข่ม แรงขึ้น 25% โดนก๊กที่ข่มเรา ลดลง 15%</div>
+  <details class="panel bonus"><summary><b>โบนัสทัพ</b></summary>
+    <div style="margin-top:4px;font-size:13px;line-height:1.6">• ก๊กเดียวกัน 3 / 4 / 5 / 6 คน: HP และ ATK +6% / +10% / +14% / +18%<br>• มิตรภาพ (ไอคอนโซ่): ส่งคู่ที่รู้จักกันลงพร้อมกัน เช่น เล่าปี่ กวนอู เตียวหุย<br>• ก๊กข่มกัน: ตีก๊กที่ข่ม แรงขึ้น 25% โดนก๊กที่ข่มเรา ลดลง 15%</div>
     <div class="cycle"><span class="f" style="background:var(--wei)">วุย</span>ข่ม<span class="f" style="background:var(--shu)">จ๊ก</span>ข่ม<span class="f" style="background:var(--wu)">ง่อ</span>ข่ม<span class="f" style="background:var(--wei)">วุย</span></div>
-  </div>`;
+  </details>`;
 }
 function viewTeam(){
   const tm=S.team.filter(Boolean);
@@ -3530,6 +3592,14 @@ document.addEventListener('click',e=>{
         const out=S.team[i]; S.team[i]=id; UI.fsel=null; save(); render(); toast(out?`${HERO[id].th} เข้าแทน ${HERO[out].th}`:`${HERO[id].th} เข้าทัพแล้ว`); return }
       case 'fremove': { const i=UI.fsel; if(i==null||!S.team[i]) return; if(isLocked(S.team[i])) return toast('ขุนพลตัวนี้ล็อกอยู่ ปลดล็อกก่อน'); if(S.team.filter(Boolean).length<=1) return toast('ทัพต้องมีขุนพลอย่างน้อย 1 คน'); S.team[i]=null; UI.fsel=null; save(); render(); return }
       case 'fcancel': UI.fsel=null; render(); return;
+      case 'ffac': UI.ffac=act.dataset.k; render(); return;
+      case 'froster': { const i=S.team.indexOf(id);
+        if(i>=0){ if(isLocked(id)) return toast('ขุนพลตัวนี้ล็อกอยู่ ปลดล็อกก่อน'); if(S.team.filter(Boolean).length<=1) return toast('ทัพต้องมีขุนพลอย่างน้อย 1 คน');
+          S.team[i]=null; UI.fsel=null; save(); render(); toast(`${HERO[id].th} กลับค่าย`); return }
+        let j=UI.fsel;
+        if(j==null){ const pref=['war','cav'].includes(HERO[id].role)?[0,1,2,3,4,5]:[3,4,5,0,1,2]; j=pref.find(k=>!S.team[k]); if(j===undefined) return toast('ทัพเต็มแล้ว แตะตำแหน่งบนสนามที่จะเปลี่ยนก่อน') }
+        if(S.team[j]&&isLocked(S.team[j])) return toast('ขุนพลในช่องนี้ล็อกอยู่');
+        const out=S.team[j]; S.team[j]=id; UI.fsel=null; save(); render(); toast(out?`${HERO[id].th} เข้าแทน ${HERO[out].th}`:`${HERO[id].th} ลงสนามแล้ว`); return }
       case 'svtab': if(tab!=='savegame') UI.lastTab=tab; UI.svtab=act.dataset.k; UI.ask=null; render(); return;
       case 'tierrole': UI.tierRole=act.dataset.k; render(); return;
       case 'daily': doDaily(); return;
