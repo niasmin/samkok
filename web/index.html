@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=f4f8a1ca94').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=1abded8735').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1327,6 +1327,29 @@ details.bonus summary{cursor:pointer;list-style:revert}
 .avatar[data-fr="2"]{box-shadow:0 0 0 2px #e6e9f0,0 0 10px rgba(220,230,255,.8)}
 .avatar[data-fr="3"]{box-shadow:0 0 0 2px #ffd75a,0 0 14px rgba(255,200,60,.95);animation:frglow 2s ease-in-out infinite}
 @keyframes frglow{50%{box-shadow:0 0 0 2px #fff0b0,0 0 20px rgba(255,210,80,1)}}
+
+/* ---- living sprites ---- */
+.lsp{display:block}
+.lsp>i{position:absolute;left:0;right:0;top:calc(var(--k)*10%);height:calc(10% + 1px);background-image:var(--img);background-repeat:no-repeat;
+  background-size:800% calc(var(--rows)*1000%);
+  background-position:calc(var(--fx)*100%/7) calc((var(--row)*10 + var(--k))/(var(--rows)*10 - 1)*100%);
+  --a:calc((9 - var(--k))*0.42px);animation:lspsway 2.8s ease-in-out infinite;animation-delay:calc(var(--k)*-.13s + var(--ph)*-2.8s)}
+@keyframes lspsway{0%,100%{transform:translateX(calc(var(--a)*-1))}50%{transform:translateX(var(--a))}}
+.u .tok.pose .pf{background:none!important;transform:none;translate:-50% 0;animation:lbreathe2 3.1s ease-in-out infinite;animation-delay:calc(var(--ph)*-3.1s)}
+.u.foe .tok.pose .pf{transform:none;scale:-1 1;animation:lbreathe2 3.1s ease-in-out infinite;animation-delay:calc(var(--ph)*-3.1s)}
+@keyframes lbreathe2{0%,100%{transform:scale(1,1)}50%{transform:scale(1.014,1.03) translateY(-1px)}}
+.u.dead .pf>i,.u.beaten .pf>i{animation:none}
+.u.dead .tok.pose .pf,.u.fallen .tok.pose .pf{animation:none}
+.lsp.fg-shift{animation:fgShift .9s ease-in-out!important}
+.lsp.fg-lean{animation:fgLean .9s ease-in-out!important}
+.lsp.fg-bob{animation:fgBob .9s ease-in-out!important}
+@keyframes fgShift{30%{transform:translateX(3px) rotate(1.5deg)}70%{transform:translateX(-2px) rotate(-1deg)}}
+@keyframes fgLean{40%{transform:rotate(3.5deg) scale(1.02)}}
+@keyframes fgBob{25%{transform:translateY(-5px) scale(.98,1.04)}50%{transform:translateY(0) scale(1.03,.96)}75%{transform:translateY(-2px)}}
+/* team-setup preview */
+.fbf .fspr.lsp{background:none;animation:lbreathe2 3.1s ease-in-out infinite;animation-delay:calc(var(--ph)*-3.1s)}
+.fbf .fu.ghost .fspr.lsp{scale:-1 1;transform:none}
+@media (prefers-reduced-motion:reduce){.lsp>i,.u .tok.pose .pf,.fbf .fspr.lsp{animation:none!important}}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><img class="blogo" src="ui/logo.webp" alt="ขุนพลสามก๊ก" width="800" height="452"><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -2209,18 +2232,22 @@ const spriteSrc = (id, t=0) => t ? `ui/evo/${id}.webp` : `ui/sprite/${id}.webp`;
 // Inline style for a sprite holder: evolved forms sit in rows of one atlas.
 const sprStyle = (id, t=0) => `background-image:url(${spriteSrc(id,t)})${t?`;background-size:800% 300%;background-position:0 ${(t-1)*50}%`:''}`;
 const frameIx = k => typeof k==='string' ? 4 + +k.slice(1) : k;
-const setPF = (img,k) => { img.style.backgroundPosition = `${frameIx(k)*100/7}% ${img.dataset?.y||0}%` };
-const poseTok = (id, t=0) => `<span class="tok pose ${HERO[id].fac}"><span class="pf" data-y="${t?(t-1)*50:0}" style="${sprStyle(id,t)}"></span></span>`;
+const setPF = (img,k) => { img.style.setProperty?.('--fx', frameIx(k)) };
+// Living sprite: the frame is drawn as stacked horizontal strips that sway a little more toward the head,
+// so capes, hair and weapons move while the feet stay planted. --fx picks the frame, --row the evolved form.
+const LSP_N=10;
+const livePF = (id, t=0, cls='pf', seed=id) => `<span class="${cls} lsp" style="--img:url(${spriteSrc(id,t)});--rows:${t?3:1};--row:${t?t-1:0};--fx:0;--ph:${(hashStr(seed)%100)/100}">${Array.from({length:LSP_N},(_,k)=>`<i style="--k:${k}"></i>`).join('')}</span>`;
+const poseTok = (id, t=0, seed) => `<span class="tok pose ${HERO[id].fac}">${livePF(id,t,'pf',seed||id)}</span>`;
 function poseAttack(el, dt){
   const img=el?.querySelector?.('.pf'); const id=el?.dataset?.pid; if(!img||!img.style||!id||POSES[id]<4) return;
-  const at=[[0,1],[dt*0.28,2],[dt*0.62,3],[dt*0.92,0]];
+  img._busy=Date.now()+dt; const at=[[0,1],[dt*0.28,2],[dt*0.62,3],[dt*0.92,0]];
   clearTimeout(img._pt); at.forEach(([t,k],i)=>{ const f=()=>{ setPF(img,k) }; if(!t) f(); else img._pt=setTimeout(f,t) });
 }
 // Reaction frames (hit, kneel, fallen, rise) for generals that have them.
 const HURT=new Set(["huangzhong", "zhangfei", "huaxiong", "caiwenji", "caocao", "caopi", "caoren", "caozhi", "daqiao", "dengai", "dianwei", "diaochan", "dingfeng", "dongzhuo", "fazheng", "ganning", "gongsunzan", "guanxing", "guanyinping", "guanyu", "guanyu_y", "guojia", "huanggai", "huatuo", "jiangwei", "lingtong", "liubei", "liubei_y", "lubu", "lumeng", "lusu", "luxun", "machao", "mayunlu", "menghuo", "pangtong", "simayi", "sunce", "sunjian", "sunquan", "sunshangxiang", "taishici", "weiyan", "xiahoudun", "xiahouyuan", "xuchu", "xuhuang", "xunyu", "yuanshao", "yuanshu", "yuejin", "yueying", "zhangbao", "zhangfei_y", "zhangjiao", "zhangliao", "zhaoyun", "zhenji", "zhonghui", "zhoutai", "zhouyu", "zhuge", "zhurong", "zuoci"]);
 function poseHurt(el, kind){
   const img=el?.querySelector?.('.pf'), id=el?.dataset?.pid; if(!img||!img.style||!HURT.has(id)) return false;
-  clearTimeout(img._pt); clearTimeout(img._ht);
+  clearTimeout(img._pt); clearTimeout(img._ht); img._busy=Date.now()+500;
   if(kind==='hit'){ if(el.classList.contains('dead')) return true; setPF(img,'h0'); img._ht=setTimeout(()=>{ if(!el.classList.contains('dead')) setPF(img,0) },330) }
   else if(kind==='die'){ el.classList.add('fallen'); setPF(img,'h1'); img._ht=setTimeout(()=>{ setPF(img,'h2') },260) }
   else if(kind==='down'){ el.classList.add('fallen'); setPF(img,'h2') }
@@ -2467,12 +2494,12 @@ function synergyHTML(){
 const LINK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 function viewFormation(){
   const sel=UI.fsel, teamIds=S.team.filter(Boolean), fac=UI.ffac||'all';
-  const spr=(id,t)=>POSES[id]&&!isMech(id)?`<span class="fspr" style="${sprStyle(id,t)}"></span>`:`<span class="fspr art">${portrait(id,isMech(id))}</span>`;
+  const spr=(id,t)=>POSES[id]&&!isMech(id)?livePF(id,t,'fspr','f'+id):`<span class="fspr art">${portrait(id,isMech(id))}</span>`;
   const mine=i=>{const id=S.team[i];
     return id?`<button class="fu p${i} ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}" aria-label="${esc(HERO[id].th)}">${spr(id,myEvo(id))}<span class="fpl"><i class="fd ${HERO[id].fac}">${FAC[HERO[id].fac].ch}</i>Lv.${H(id).lv}</span></button>`
              :`<button class="fu p${i} empty ${sel===i?'sel':''}" data-act="fslot" data-slot="${i}" aria-label="ช่องว่าง"><span class="fring">＋</span></button>`};
   const foes=enemyTeam(S.stage);
-  const foe=(x,i)=>x?`<span class="fu e${i} ghost">${POSES[x.id]?`<span class="fspr" style="background-image:url(${spriteSrc(x.id)})"></span>`:''}</span>`:'';
+  const foe=(x,i)=>x?`<span class="fu e${i} ghost">${POSES[x.id]?livePF(x.id,0,'fspr','e'+i+x.id):''}</span>`:'';
   const selId=sel!=null?S.team[sel]:null;
   const bonded=id=>BONDS.some(b=>b.ids.includes(id)&&b.ids.some(x=>x!==id&&teamIds.includes(x)));
   const all=Object.keys(S.heroes).filter(id=>fac==='all'||HERO[id].fac===fac)
@@ -3570,7 +3597,7 @@ function fight(mode='stage', bot=null){
   const res=simulate(A,E,(train?800000+S.train.left:trial?850000:story?300000+bot.c*100+bot.s*10:raid?700000+hashStr(today())%1000:tower?500000+S.tower*1000:arena?900000+S.arena.ref*100:S.stage*1000)+S.battleSeed++);
   save();
   const unitHTML=u=>`<div class="u ${u.side==='e'?'foe':''}" id="u-${u.uid}" data-pid="${u.id}">
-     ${POSES[u.id]&&!(u.side==='p'&&isMech(u.id))?poseTok(u.id,evoTier(u.id,u.aw)):liveTok(u.id,u.side==='p'&&isMech(u.id))}<div class="sts"></div><div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${FAC[HERO[u.id].fac]?`<i class="fd ${HERO[u.id].fac}">${FAC[HERO[u.id].fac].ch}</i>`:''}${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}<span>${esc(HERO[u.id].th)}</span><em>${u.lv}</em></div></div>`;
+     ${POSES[u.id]&&!(u.side==='p'&&isMech(u.id))?poseTok(u.id,evoTier(u.id,u.aw),u.uid+u.id):liveTok(u.id,u.side==='p'&&isMech(u.id))}<div class="sts"></div><div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${FAC[HERO[u.id].fac]?`<i class="fd ${HERO[u.id].fac}">${FAC[HERO[u.id].fac].ch}</i>`:''}${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}<span>${esc(HERO[u.id].th)}</span><em>${u.lv}</em></div></div>`;
   // Team plaques: name, power and the faction most of the side belongs to.
   const sidePow=side=>res.start.filter(u=>u.side===side).reduce((x,u)=>x+power(u.id,u.lv,u.star,u.aw),0);
   const mainFac=side=>{const c={}; res.start.filter(u=>u.side===side).forEach(u=>{const f=HERO[u.id].fac; if(FAC[f]) c[f]=(c[f]||0)+1}); return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||'qun'};
@@ -3596,6 +3623,7 @@ function fight(mode='stage', bot=null){
   B={wait:null,armed:-1,res,max,mode,bot,units:Object.fromEntries(res.start.map(u=>[u.uid,u])),i:0,speed:B?.speed||1,timer:null,done:false};
   $('#spd').textContent='x'+B.speed;
   const bt=$('.battle'); bt?.classList.add('intro'); sfx('taiko');
+  clearInterval(UI.fidget); UI.fidget=setInterval(fidget, 1300);
   B.timer=setTimeout(()=>{ bt?.classList.remove('intro'); step() }, UI.autoplay?450:1150/Math.max(1,B.speed));
 }
 // Battlefield art: stages cycle village -> fortress gate -> harbour by region; arena is the harbour, tower and guild boss the gate.
@@ -3683,6 +3711,16 @@ function step(){
   B.timer=setTimeout(step, (a.skill?dt*1.6:dt)+(crit||a.skill?110:0));
 }
 // Hit-stop: freeze the fighters for a beat on heavy blows so they land.
+// Idle life between blows: a general shifts weight, rolls a shoulder or twirls the weapon (recover frame).
+function fidget(){
+  if(!B||B.done||!$('.battle')){ clearInterval(UI.fidget); return }
+  const all=[...document.querySelectorAll('.lanes .u:not(.dead)')]; if(!all.length) return;
+  const el=all[Math.floor(Math.random()*all.length)], img=el.querySelector('.pf');
+  if(!img||el.classList.contains('lunge-up')||el.classList.contains('lunge-down')||el.classList.contains('hit')) return;
+  const kind=['shift','lean','bob'][Math.floor(Math.random()*3)];
+  img.classList.remove('fg-shift','fg-lean','fg-bob'); void img.offsetWidth; img.classList.add('fg-'+kind); setTimeout(()=>img.classList.remove('fg-'+kind),900);
+  if(kind==='lean' && POSES[el.dataset.pid]>=4 && !(img._busy>Date.now())){ setPF(img,3); img._busy=Date.now()+420; setTimeout(()=>{ if(!(img._busy>Date.now())) setPF(img,0) },440) }
+}
 function hitStop(ms){ const f=$('.field'); if(!f?.classList) return; f.classList.add('hstop'); setTimeout(()=>f.classList.remove('hstop'),ms) }
 function fieldShake(k){ const f=$('.field'); if(!f?.classList) return; f.classList.remove('shake-'+k); void f.offsetWidth; f.classList.add('shake-'+k); setTimeout(()=>f.classList.remove('shake-'+k),320) }
 function fireSkill(){
@@ -3927,7 +3965,7 @@ function apBoxHTML(m){
     <div class="aprow2"><button class="gbtn big" data-act="apstart" data-m="${m}">▶ เริ่มเล่นอัตโนมัติ</button><button class="btn red" data-act="daily">⚡ งานประจำวัน</button></div>
     <small class="aplock">🔒 ล็อกขุนพลได้ที่หน้ารายละเอียดขุนพล ตัวที่ล็อกจะไม่ถูกย้ายออกจากทัพ</small></div>`;
 }
-function endBattle(){ if(UI.autoplay) stopAuto(); if(B){clearTimeout(B.timer);B.done=true} closeLayer(); render(); setMusic('city') }
+function endBattle(){ clearInterval(UI.fidget); if(UI.autoplay) stopAuto(); if(B){clearTimeout(B.timer);B.done=true} closeLayer(); render(); setMusic('city') }
 
 // ---------- events ----------
 document.addEventListener('click',e=>{
