@@ -17,7 +17,7 @@
 <meta property="og:url" content="https://niasmin.github.io/samkok/web/">
 <meta name="twitter:card" content="summary_large_image">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=ceebf4e0ce').catch(()=>{}));</script>
+<script>if('serviceWorker' in navigator && location.protocol==='https:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?b=f4f8a1ca94').catch(()=>{}));</script>
 </head><body><title>ขุนพลสามก๊ก</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1305,6 +1305,28 @@ details.bonus summary{cursor:pointer;list-style:revert}
 .city.c2>.hs{z-index:2}
 .city.c2>.svig{background:radial-gradient(ellipse 90% 80% at 50% 50%,transparent 60%,rgba(10,4,2,.35))}
 @media (prefers-reduced-motion:reduce){#view.vt-in,.battle,.battle.intro .u,.bcry b,.u.cheer,.result.rwin .panel::before{animation:none!important}}
+
+/* ---- battle statuses ---- */
+.lanes .u .sts{order:-1;display:flex;gap:2px;justify-content:center;min-height:15px;margin-bottom:1px}
+.u .sts i{display:grid;place-items:center;width:15px;height:15px;border-radius:4px;font:normal 10px/1 var(--f-seal);color:#fff;border:1px solid rgba(255,255,255,.7);box-shadow:0 1px 2px rgba(0,0,0,.6)}
+.st-burn{background:linear-gradient(180deg,#ff8a3a,#c2300f)}.st-stun{background:linear-gradient(180deg,#c9a0ff,#6a3ab8)}.st-shield{background:linear-gradient(180deg,#8fd0ff,#2a6ab8)}
+.st-up{background:linear-gradient(180deg,#ffd76a,#c4861a)}.st-down{background:linear-gradient(180deg,#9a9a9a,#4a4a4a)}
+.num.stx{font:600 13px var(--f-body);top:calc(-6px + var(--sy,0px));background:none!important;border:0;text-shadow:0 1px 2px #000,0 0 4px #000;animation:numPop 1.1s ease-out forwards;white-space:nowrap}
+.num.stx.st-burn{color:#ffb070}.num.stx.st-stun{color:#e0c4ff}.num.stx.st-shield{color:#a8dcff}.num.stx.st-up{color:#ffe08a}.num.stx.st-down{color:#d0d0d0}.num.stx.st-drain{color:#ff9ad0}.num.stx.st-rage{color:#ffe066}
+.num.burnt{color:#ff9a4a}
+.u.dazed .tok{animation:dazed .5s ease-in-out}
+@keyframes dazed{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+/* ---- shared level, dismantle, new player, seasons ---- */
+.sharedlv{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;color:#1d4a7a;background:#d8ecff;border:1px solid #7aa8d8}
+.dismbox p{font-size:12.5px}
+.nbhead{display:flex;gap:10px;align-items:center;padding:10px;margin-bottom:10px;border-radius:12px;background:linear-gradient(135deg,#7a160a,#3a0a05);border:2px solid #c99a3e}
+.nbhead img{width:110px;flex:none}.nbhead p{margin:4px 0 0;font-size:13px;color:#f6dcb0;line-height:1.5}.nbhead .vh{margin:0;color:#ffe9a8}
+.season{display:flex;flex-direction:column;gap:3px;padding:10px 12px;margin-bottom:10px}
+.season>b{font:17px var(--f-display);color:#7a1e10}.season span{font-size:13px}.season small{font-size:11.5px;color:var(--muted);line-height:1.5}
+.avatar[data-fr="1"]{box-shadow:0 0 0 2px #c48a5a,0 0 8px rgba(196,138,90,.7)}
+.avatar[data-fr="2"]{box-shadow:0 0 0 2px #e6e9f0,0 0 10px rgba(220,230,255,.8)}
+.avatar[data-fr="3"]{box-shadow:0 0 0 2px #ffd75a,0 0 14px rgba(255,200,60,.95);animation:frglow 2s ease-in-out infinite}
+@keyframes frglow{50%{box-shadow:0 0 0 2px #fff0b0,0 0 20px rgba(255,210,80,1)}}
 </style>
 
 <div id="boot" role="status" aria-live="polite"><img class="blogo" src="ui/logo.webp" alt="ขุนพลสามก๊ก" width="800" height="452"><div class="bbar"><i id="bootbar"></i></div><small id="boottxt">กำลังโหลดภาพ…</small></div>
@@ -1652,13 +1674,19 @@ const FISH = [{th:'ปลาตะเพียน',pts:1},{th:'ปลาคา�
 // Long fights tip over: from round 9 hits grow harder and heals weaker, so healer stacks can't stall to the 20-round limit.
 const fatigue = r => r<=8 ? 1 : 1+0.2*(r-8);
 const healDecay = r => r<=8 ? 1 : Math.max(0.2, 1-0.12*(r-8));
+// Faction signatures on skills: Wu sets foes alight, Wei controls (drains rage, may stun), Shu guards allies
+// with shields, the Independents weaken (lower enemy attack). Healers also feed rage to the whole team, and
+// cavalry and warriors fire themselves up after a skill.
+const FAC_FX={wu:'burn', wei:'ctrl', shu:'guard', qun:'curse'};
+const MAX_ROUNDS=18;
+const stList = u => [u.burn>0&&'burn', u.stun>0&&'stun', u.shield>0&&'shield', u.up>0&&'up', u.dn>0&&'down'].filter(Boolean);
 function simulate(A, B, seed){
   const rnd = mulberry32(seed);
   const units = [];
   const mk = (side, arr) => { const ids=arr.filter(Boolean).map(x=>x.id);
     arr.forEach((x,i)=>{ if(!x) return; const aw=x.aw||0, f=finalStats(x, bondBonus(ids,x.id));
       const role=HERO[x.id].role;
-      units.push({uid:side+i, side, slot:i, id:x.id, fac:HERO[x.id].fac, role, lv:x.lv, star:x.star, aw, hp:f.hp, max:f.hp, atk:Math.round(f.atk*(role==='arch'?1.1:1)), def:f.def, mdef:f.mdef, spd:f.spd, rage:0, alive:true, div:false}); }); };
+      units.push({uid:side+i, side, slot:i, id:x.id, fac:HERO[x.id].fac, role, lv:x.lv, star:x.star, aw, hp:f.hp, max:f.hp, atk:Math.round(f.atk*(role==='arch'?1.1:1)), def:f.def, mdef:f.mdef, spd:f.spd, rage:0, alive:true, div:false, burn:0, burnDmg:0, stun:0, shield:0, up:0, upV:0, dn:0, dnV:0}); }); };
   mk('p',A); mk('e',B);
   const start = units.map(u=>({...u}));
   const actions = [];
@@ -1667,10 +1695,19 @@ function simulate(A, B, seed){
   const front = foes => { const f=foes.filter(u=>u.slot<3); return f.length?f:foes };
   const back  = foes => { const b=foes.filter(u=>u.slot>=3); return b.length?b:foes };
   let round = 0, winner = null;
-  for(round=1; round<=20 && !winner; round++){
+  const snap = () => ({rage:Object.fromEntries(units.map(x=>[x.uid,x.rage])), sts:Object.fromEntries(units.map(x=>[x.uid,stList(x)]))});
+  for(round=1; round<=MAX_ROUNDS && !winner; round++){
     const order = units.filter(u=>u.alive).sort((a,b)=>b.spd-a.spd || (a.uid<b.uid?-1:1));
     for(const u of order){
       if(!u.alive) continue;
+      // burning hurts at the start of the general's own turn
+      if(u.burn>0){
+        const d=Math.min(u.hp, u.burnDmg); u.hp-=d; u.burn--; if(u.hp<=0){ u.hp=0; u.alive=false }
+        actions.push({round, src:u.uid, tick:'burn', hits:[{tgt:u.uid, dmg:d, burn:true, hp:u.hp, dead:!u.alive}], ...snap()});
+        if(!alive('e').length){winner='p';break} if(!alive('p').length){winner='e';break}
+        if(!u.alive) continue;
+      }
+      if(u.stun>0){ u.stun--; actions.push({round, src:u.uid, stunned:true, hits:[], ...snap()}); continue }
       const foes = alive(u.side==='p'?'e':'p');
       if(!foes.length) break;
       const allies = alive(u.side);
@@ -1681,10 +1718,12 @@ function simulate(A, B, seed){
       const strike = (t, mult, combo=false) => {
         const adv = BEATS[u.fac]===t.fac ? 1.25 : BEATS[t.fac]===u.fac ? 0.85 : 1;
         const crit = rnd() < (u.role==='cav' ? 0.25 : 0.12) + (HMOD(u.id).crit||0);
-        const dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)*fatigue(round)));
+        const buff = 1 + (u.up>0?u.upV:0) - (u.dn>0?u.dnV:0);
+        let dmg = Math.max(1, Math.round(u.atk*mult*(120/(120+(ROLE[u.role].mag?t.mdef:t.def)))*adv*(crit?1.6:1)*(0.92+rnd()*0.16)*(t.role==='war'?0.85:1)*fatigue(round)*buff));
+        let sh=0; if(t.shield>0){ sh=Math.min(t.shield,dmg); t.shield-=sh; dmg-=sh }
         t.hp = Math.max(0, t.hp-dmg);
         if(t.hp===0) t.alive=false; else t.rage=Math.min(100,t.rage+10);
-        hits.push({tgt:t.uid, dmg, crit, adv, combo, hp:t.hp, dead:!t.alive});
+        hits.push({tgt:t.uid, dmg, sh, crit, adv, combo, hp:t.hp, dead:!t.alive});
         // divine base (ฐานเทวะ): an awakened general rises once when nearly fallen
         if(t.alive && t.aw>0 && !t.div && t.hp < t.max*0.3){
           t.div=true; const amt=Math.round(t.max*(0.2+t.aw*0.04));
@@ -1693,23 +1732,39 @@ function simulate(A, B, seed){
         }
       };
       const heal = (t, amt) => { amt=Math.round(amt*healDecay(round)); t.hp=Math.min(t.max,t.hp+amt); hits.push({tgt:t.uid, heal:amt, hp:t.hp}) };
+      const fxNote = (t, st, v) => hits.push({tgt:t.uid, fx:st, v, hp:t.hp});
+      const strat = u.role==='strat'?1.5:1;
       if(kind==='heal'){
         for(const t of allies) heal(t, Math.round(u.atk*m*(0.95+rnd()*0.1)));
+        // healers feed rage to the whole team; Shu healers add a shield as well
+        for(const t of allies){ if(t===u) continue; t.rage=Math.min(100,t.rage+25); fxNote(t,'rage',25) }
+        if(FAC_FX[u.fac]==='guard') for(const t of allies){ const v=Math.round(u.atk*0.35); t.shield+=v; fxNote(t,'shield',v) }
       } else {
         const targets = kind==='aoe' ? foes : kind==='back' ? [pick(back(foes))] : kind==='single' ? [pick(front(foes))] : [u.role==='arch' ? pick(foes) : pick(front(foes))];
         for(const t of targets) strike(t, m);
+        if(isSkill){
+          const fx=FAC_FX[u.fac], few=targets.length<3;
+          for(const t of targets){ if(!t.alive) continue;
+            if(fx==='burn'){ t.burn=2; t.burnDmg=Math.max(1,Math.round(u.atk*0.15*strat)); fxNote(t,'burn',t.burnDmg) }
+            else if(fx==='ctrl'){ const d=Math.round(35*strat); t.rage=Math.max(0,t.rage-d); fxNote(t,'drain',d);
+              if(rnd() < (few?0.3:0.15)*strat){ t.stun=1; fxNote(t,'stun') } }
+            else if(fx==='curse'){ t.dn=2; t.dnV=0.2*(u.role==='strat'?1.5:1); fxNote(t,'down') } }
+          if(fx==='guard'){ const ally=alive(u.side).sort((x,y)=>x.hp/x.max-y.hp/y.max)[0]; if(ally){ const v=Math.round(u.atk*0.6*strat); ally.shield+=v; fxNote(ally,'shield',v) } }
+          if(u.role==='cav'||u.role==='war'){ u.up=3; u.upV=0.15; fxNote(u,'up') }
+        }
         if(kind==='normal'){
           if(targets[0].alive && rnd() < comboChance(u.role)) strike(targets[0], 0.6, true);
           if(u.role==='heal'){ const a=alive(u.side).sort((x,y)=>x.hp/x.max-y.hp/y.max)[0]; if(a) heal(a, Math.round(u.atk*0.5)) }
         }
       }
       u.rage = isSkill ? 0 : Math.min(100, u.rage+34);
-      actions.push({round, src:u.uid, skill:isSkill?HERO[u.id].sk:null, hits, rage:Object.fromEntries(units.map(x=>[x.uid,x.rage]))});
+      if(u.up>0) u.up--; if(u.dn>0) u.dn--;
+      actions.push({round, src:u.uid, skill:isSkill?HERO[u.id].sk:null, hits, ...snap()});
       if(!alive('e').length){winner='p';break}
       if(!alive('p').length){winner='e';break}
     }
   }
-  return {start, actions, winner: winner || 'e', rounds: Math.min(round,20)};
+  return {start, actions, winner: winner || 'e', rounds: Math.min(round,MAX_ROUNDS)};
 }
 /*SIM-END*/
 
@@ -1730,14 +1785,15 @@ function freshState(){
     login:{days:0, last:'', got:[]},
     guild:{id:null, date:'', checked:false, raid:3, best:0, coins:0, lv:1, exp:0},
     story:{}, potions:3, friend:0,
-    assist:{date:'', uses:3, pick:null}, train:{date:'', left:3}, evw:{week:0, pts:0, claimed:false}
+    assist:{date:'', uses:3, pick:null}, train:{date:'', left:3}, evw:{week:0, pts:0, claimed:false},
+    newbie:{start:Date.now(), got:[]}, freePulls:0
   };
 }
 let S;
 // fills fields added after a save was made, so older saves keep working
 function migrate(d){
   const f=freshState();
-  for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story','potions','friend','assist','train','evw']) if(d[k]===undefined) d[k]=f[k];
+  for(const k of ['tickets','souls','tower','shrinePick','shrinePity','gear','gearSeq','beasts','fishPts','fishing','arena','login','guild','story','potions','friend','assist','train','evw','newbie','freePulls']) if(d[k]===undefined) d[k]=f[k];
   if(!d.bag) d.bag={selSP:1};
   if(!d.coupons) d.coupons=[];
   if(!d.autoCfg) d.autoCfg={lv:true, gear:true, team:true, speed:4};
@@ -1762,7 +1818,11 @@ function heroBonus(id){
   const p=beastPct(S.beasts), gl=S.guild.id!==null?(S.guild.lv-1)*0.01:0, mk=isMech(id)?0.12:0; b.hpPct=p.hp+gl+mk; b.atkPct=p.atk+gl+mk; b.defPct=p.def;
   return b;
 }
-const heroEntry = id => ({id, lv:H(id).lv, star:H(id).star, aw:H(id).aw, bonus:heroBonus(id)});
+// Shared level (ระดับร่วม): once six generals are owned, every general fights at least at the sixth-highest
+// level (within its own level cap), so only the core six need levelling.
+const resLv = () => { const l=Object.values(S.heroes).map(h=>h.lv).sort((a,b)=>b-a); return l.length>=6 ? l[5] : 0 };
+const effLv = id => { const h=H(id); return Math.max(h.lv, Math.min(resLv(), levelCap(h.star,h.aw))) };
+const heroEntry = id => ({id, lv:effLv(id), star:H(id).star, aw:H(id).aw, bonus:heroBonus(id)});
 const heroFinal = id => finalStats(heroEntry(id));
 const heroPower = id => H(id) ? powerOf(heroFinal(id)) : -1;
 const myTeam = () => S.team.map(id=>id?heroEntry(id):null);
@@ -1941,6 +2001,7 @@ function checkDaily(){
   if(S.assist.date!==d) S.assist={date:d, uses:3, pick:null};
   if(S.train.date!==d) S.train={date:d, left:3};
   if(S.evw.week!==weekNo()) S.evw={week:weekNo(), pts:0, claimed:false};
+  seasonCheck();
   if(S.guild.date!==d) S.guild={...S.guild, date:d, checked:false, raid:3, best:0};
 }
 const loginReady = () => LOGIN7.some((_,i)=>i<S.login.days && !S.login.got.includes(i));
@@ -2126,7 +2187,7 @@ function portrait(id, mech=false, tier=myEvo(id)){
 
 function cardHTML(id, opts={}){
   const h=HERO[id], own=S.heroes[id];
-  const lv = opts.lv ?? own?.lv, st = opts.star ?? own?.star ?? 1, aw = opts.aw ?? own?.aw ?? 0;
+  const lv = opts.lv ?? (own?effLv(id):undefined), st = opts.star ?? own?.star ?? 1, aw = opts.aw ?? own?.aw ?? 0;
   const cls = ['card',h.fac,h.rar, aw>0?'aw':'', (!own && !opts.force)?'off':'', (opts.team!==false && S.team.includes(id))?'in-team':''].join(' ');
   const hook = opts.act ? `data-act="${opts.act}" data-id="${id}"${opts.pressed!==undefined?` aria-pressed="${opts.pressed}"`:''}` : `data-hero="${id}"`;
   return `<button class="${cls}" ${hook} aria-label="${esc(h.th)} ระดับ ${RAR[h.rar].label}">
@@ -2211,10 +2272,27 @@ const taskDone = t => S.daily[t.k]>=t.goal;
 const allDone = () => TASKS.every(taskDone);
 function tasksClaimable(){ return TASKS.some(t=>taskDone(t)&&!S.daily.got[t.k]) || (allDone() && !S.daily.got.all) }
 
+// Arena seasons: 14 days each. At the turn the final rank pays jade and a title frame, and points ease halfway
+// back toward 1000 so everyone climbs again.
+const SEASON_LEN=14;
+const seasonNo = () => Math.floor((Date.now()/864e5 - 20400)/SEASON_LEN);
+const seasonLeft = () => Math.ceil((20400 + (seasonNo()+1)*SEASON_LEN) - Date.now()/864e5);
+const SEASON_TIERS=[{r:1,t:3,th:'ราชันประลอง',gems:3000},{r:10,t:2,th:'ยอดขุนพล',gems:1500},{r:30,t:1,th:'ขุนศึก',gems:800},{r:1e9,t:0,th:'นักรบ',gems:300}];
+const seasonTier = rank => SEASON_TIERS.find(x=>rank<=x.r);
+function seasonCheck(){
+  const cur=seasonNo();
+  if(S.arena.season===undefined){ S.arena.season=cur; return }
+  if(S.arena.season===cur) return;
+  const rank=arenaRank(), t=seasonTier(rank);
+  S.gems+=t.gems; S.arena.tier=Math.max(S.arena.tier||0,t.t); S.arena.last={no:S.arena.season+1, rank, gems:t.gems, th:t.th};
+  S.arena.pts=Math.round(1000+(S.arena.pts-1000)/2); S.arena.season=cur;
+  setTimeout(()=>celebrate('rank', null, `จบฤดูกาล อันดับ ${rank} · ${t.th} · หยก +${t.gems}`), 1200);
+}
 function renderTop(){
   $('#pname').textContent=S.pname||'ท่านเจ้าเมือง';
   $('#cgold').textContent=fmt(S.gold); $('#cgems').textContent=fmt(S.gems); $('#cexp').textContent=fmt(S.exp);
   $('#ppower').textContent=fmt(teamPower());
+  const av=$('.avatar'); if(av?.dataset) av.dataset.fr=S.arena.tier||0;
   document.querySelectorAll('#nav button').forEach(b=>{
     b.setAttribute('aria-current', b.dataset.go===(['formation','tier'].includes(tab)?'heroes':tab)?'page':'false');
     b.querySelector('.dot')?.remove();
@@ -2322,8 +2400,8 @@ function viewSummon(){
     ${curEvent().k==='rateup'?`<div class="rateup">เทศกาลอัญเชิญ: ${esc(HERO[featuredSP()].th)} ออกบ่อยขึ้นสัปดาห์นี้</div>`:''}
     <div class="ptitle">อัญเชิญขุนพลระดับสูง</div>
     <div class="pullrow">
-      <button class="gbtn big" data-act="pull1" ${!free&&S.gems<300?'disabled':''}>อัญเชิญ 1 ครั้ง</button>
-      <button class="gbtn big" data-act="pull10" ${S.gems<2700?'disabled':''}>อัญเชิญ 10 ครั้ง</button>
+      <button class="gbtn big" data-act="pull1" ${!free&&S.gems<300&&(S.freePulls||0)<1?'disabled':''}>อัญเชิญ 1 ครั้ง</button>
+      <button class="gbtn big" data-act="pull10" ${S.gems<2700&&(S.freePulls||0)<10?'disabled':''}>อัญเชิญ 10 ครั้ง</button>
       <span class="cost">${free?'ฟรีวันนี้':'<i class="coin j"></i> 300'}</span><span class="cost"><i class="coin j"></i> 2,700</span>
     </div>
   </div>
@@ -2401,7 +2479,7 @@ function viewFormation(){
     .sort((a,b)=>{const ia=S.team.indexOf(a), ib=S.team.indexOf(b); return (ib>=0)-(ia>=0) || (ia>=0&&ib>=0?ia-ib:heroPower(b)-heroPower(a))});
   const card=id=>{const h=HERO[id], on=S.team.includes(id), ln=!on&&bonded(id), aw=H(id).aw;
     return `<button class="rc ${h.rar} ${on?'on':''}" data-act="froster" data-id="${id}" aria-pressed="${on}" aria-label="${esc(h.th)}${on?' (อยู่ในทัพ)':''}">
-      <span class="rart">${portrait(id,isMech(id))}</span><em class="rr ${h.rar}">${RAR[h.rar].label}</em><b class="rl">${H(id).lv}</b>
+      <span class="rart">${portrait(id,isMech(id))}</span><em class="rr ${h.rar}">${RAR[h.rar].label}</em><b class="rl">${effLv(id)}</b>
       <i class="fd ${h.fac}">${FAC[h.fac].ch}</i>${aw?`<span class="raw">${'☾'.repeat(aw)}</span>`:''}${isLocked(id)?'<span class="rlock">🔒</span>':''}
       ${on?'<span class="rck" aria-hidden="true">✓</span>':ln?`<span class="rlk" title="มิตรภาพกับคนในทัพ">${LINK_SVG}</span>`:''}<span class="rn">${esc(h.th)}</span></button>`};
   const hint=sel==null?'':`เลือก${sel<3?'แถวหน้า':'แถวหลัง'} ช่อง ${sel%3+1}${selId?` (${esc(HERO[selId].th)})`:''} · แตะอีกตำแหน่งเพื่อสลับ หรือแตะขุนพลด้านล่างเพื่อใส่`;
@@ -2446,9 +2524,10 @@ function viewCity(){
     <button data-go="tasks"><img src="ui/q-tasks.webp" alt="">ภารกิจ${dot(tasksClaimable())}</button>
     <button data-go="login"><img src="ui/q-login.webp" alt="">รางวัล 7 วัน${dot(loginReady())}</button>
     <button data-go="bag"><img src="ui/q-bag.webp" alt="">กระเป๋า${dot(bagCount())}</button>
-    <button data-act="more" aria-expanded="${!!UI.more}"><img src="ui/q-more.webp" alt="">เพิ่มเติม${dot(S.guild.id!==null&&!S.guild.checked)}</button>
+    <button data-act="more" aria-expanded="${!!UI.more}"><img src="ui/q-more.webp" alt="">เพิ่มเติม${dot((S.guild.id!==null&&!S.guild.checked)||newbieReady())}</button>
   </div>
   <div class="events" id="cmore"${UI.more?'':' hidden'}>
+    ${S.newbie&&newbieDay()<14?`<button class="evt" data-go="newbie"><img class="evi" src="ui/portal.webp" alt="">ขุนพลใหม่<small>ฟรี 100 ครั้ง</small>${newbieReady()?'<span class="dot"></span>':''}</button>`:''}
     <button class="evt" data-go="shrine"><img class="evi" src="ui/sh-ticket.webp" alt="">ตื่นจิต<small>${eventLeft()}</small></button>
     <button class="evt" data-go="tower"><img class="evi" src="ui/n-city.webp" alt="">หอท้า<small>ชั้น ${S.tower}</small></button>
     <button class="evt" data-go="arena"><img class="evi" src="ui/tk-win.webp" alt="">ประลอง<small>${S.arena.left}/5</small></button>
@@ -2599,7 +2678,7 @@ function viewBag(){
 const salvageValue = g => Math.round(200*(g.q+1)*(1+g.il/20)*(1+g.enh*0.5));
 
 // ---------- arena ----------
-const avgTeamLv = () => { const t=S.team.filter(Boolean); return t.reduce((a,id)=>a+H(id).lv,0)/t.length };
+const avgTeamLv = () => { const t=S.team.filter(Boolean); return t.reduce((a,id)=>a+effLv(id),0)/t.length };
 
 // ---------- online play ----------
 // Each player owns one shared document players/<their id>: their defence team, arena points,
@@ -2608,7 +2687,7 @@ const NET = {db:null, user:null, room:null, me:null, on:false, ro:false, players
 const realPlayers = () => Object.entries(NET.players).filter(([id,d])=>id!==NET.me && Array.isArray(d.team) && d.team.some(Boolean)).map(([id,d])=>({uid:id, ...d}));
 const pname = id => (NET.names[id]?.name) || 'ขุนพลนิรนาม';
 function myDoc(){
-  return {v:1, team:S.team.map(id=>id?{id, lv:H(id).lv, star:H(id).star, aw:H(id).aw, bonus:heroBonus(id)}:null), power:teamPower(),
+  return {v:1, team:S.team.map(id=>id?{id, lv:effLv(id), star:H(id).star, aw:H(id).aw, bonus:heroBonus(id)}:null), power:teamPower(),
     pts:S.arena.pts, evw:S.evw.week, evp:S.evw.pts, guild:S.guild.id, glv:S.guild.lv, raid:S.guild.best, rdate:S.guild.date, msgs:NET.msgs.slice(-6), hits:NET.hits.slice(-8)};
 }
 function syncSoon(){
@@ -2752,6 +2831,9 @@ function viewArena(){
   const r=arenaRank(), lv=avgTeamLv();
   return `${back()}
   <div class="shead" style="background-image:url(ui/sc-arena.webp)"><h1 class="ribbon">สนามประลอง</h1></div>
+  <div class="season panel"><b>ฤดูกาลที่ ${seasonNo()+1}</b><span>เหลือ ${seasonLeft()} วัน · ถ้าจบตอนนี้ได้ <b>${seasonTier(r).th}</b> หยก ${seasonTier(r).gems}</span>
+    <small>${SEASON_TIERS.map(x=>`${x.r<1e9?`อันดับ ${x.r===1?'1':'≤'+x.r}`:'อื่นๆ'}: ${x.th} · หยก ${x.gems}`).join(' · ')}</small>
+    ${S.arena.last?`<small>ฤดูกาลก่อน: อันดับ ${S.arena.last.rank} · ${S.arena.last.th}</small>`:''}</div>
   <div class="arena-top"><div><b>${r}</b><span>อันดับ / ${BOTS.length+realPlayers().length+1}</span></div><div><b>${fmt(S.arena.pts)}</b><span>แต้มประลอง</span></div><div><b>${S.arena.left}/5</b><span>สิทธิ์วันนี้</span></div></div>
   ${arenaOpps().map(b=>{const t=botTeam(b,S.arena.pts,lv,S.arena.ref), pw=t.reduce((a,x)=>a+power(x.id,x.lv,x.star),0);
     return `<div class="panel opp"><div><b>${esc(b.name)}</b> <span style="font-size:12px;color:var(--muted)">แต้ม ${fmt(b.pts)} · พลัง ${fmt(pw)}</span>
@@ -3089,6 +3171,20 @@ function viewEvRank(){
 }
 
 // ---------- login & shop ----------
+// New-player road: a gift each day for the first seven days, 100 free summons in all and a pick-your-own S+ on day 7.
+const NEWBIE=[{p:10},{p:10},{p:10},{p:15},{p:15},{p:20},{p:20, sel:1}];
+const newbieDay = () => Math.floor((Date.now()-(S.newbie?.start||Date.now()))/864e5);
+const newbieReady = () => S.newbie && newbieDay()<14 && NEWBIE.some((r,i)=>i<=newbieDay()&&!S.newbie.got.includes(i));
+function viewNewbie(){
+  const d=newbieDay(), left=14-d;
+  return `${back()}
+  <div class="nbhead"><img src="ui/logo.webp" alt=""><div><h1 class="vh">เส้นทางขุนพลใหม่</h1><p>รับฟรีวันละครั้ง รวม <b>อัญเชิญ 100 ครั้ง</b> และ <b>หีบเลือกขุนพล S+</b> ในวันที่ 7${left>0?` · รับได้อีก ${left} วัน`:''}</p></div></div>
+  <div class="days">${NEWBIE.map((r,i)=>{const got=S.newbie.got.includes(i), ready=i<=d&&!got&&d<14;
+    return `<div class="day ${got?'got':ready?'ready':''} ${i===6?'big':''}"><b>วันที่ ${i+1}</b><img class="dimg" src="ui/${r.sel?'it-selchest':'portal'}.webp" alt=""><span>อัญเชิญฟรี ×${r.p}${r.sel?' + หีบ S+':''}</span>
+      ${got?'<span>รับแล้ว</span>':ready?`<button class="btn" data-act="newbieclaim" data-i="${i}">รับ</button>`:'<span>ยังไม่ถึง</span>'}</div>`}).join('')}</div>
+  <div class="note">สิทธิ์อัญเชิญฟรีคงเหลือ <b>${S.freePulls||0}</b> ครั้ง ใช้ที่แท่นอัญเชิญ (ใช้ก่อนหยกอัตโนมัติ)</div>
+  <button class="btn red" style="width:100%" data-go="summon">ไปแท่นอัญเชิญ</button>`;
+}
 function viewLogin(){
   const label=r=>r.gems?`หยก ${r.gems}`:r.tickets?`ตั๋วทะลวง ${r.tickets}`:r.gold?`เงิน ${fmt(r.gold)}`:r.fish?`ปลา ${r.fish} แต้ม`:r.exp?`EXP ${fmt(r.exp)}`:'หีบเลือกขุนพล S+';
   return `${back()}
@@ -3145,7 +3241,7 @@ function buy(k){
 
 // ---------- gear on heroes ----------
 function levelUp(id, n){
-  const h=H(id); let k=0;
+  const h=H(id); let k=0; h.lv=Math.max(h.lv, effLv(id)); // a shared-level general carries on from its shared level
   while(k<n){ const c=lvCost(h.lv, HERO[id].role); if(h.lv>=levelCap(h.star,h.aw)||S.gold<c.gold||S.exp<c.exp) break; S.gold-=c.gold; S.exp-=c.exp; h.lv++; S.daily.lvl++; k++ }
   return k;
 }
@@ -3243,7 +3339,7 @@ function viewTasks(){
 function render(){
   checkDaily();
   if(tab!=='fish' && fishG){ cancelAnimationFrame(fishG.raf); fishG=null; fishMsg='ปลาหลุดไปตอนออกจากบ่อ' }
-  const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, tier:viewTier, savegame:viewSave, coupon:viewCoupon, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag,
+  const v={city:viewCity, camp:viewCamp, heroes:viewHeroes, summon:viewSummon, team:viewTeam, formation:viewFormation, tier:viewTier, savegame:viewSave, coupon:viewCoupon, tasks:viewTasks, shrine:viewShrine, tower:viewTower, bag:viewBag, newbie:viewNewbie,
     arena:viewArena, beasts:viewBeasts, fish:viewFish, login:viewLogin, shop:viewShop, guild:viewGuild, chat:viewChat, story:viewStory, map:viewMap, train:viewTrain, evrank:viewEvRank}[tab]();
   sendTab();
   const vw=$('#view'); vw.innerHTML=v; renderTop(); tutorial();
@@ -3281,9 +3377,34 @@ function tutorial(){
 }
 
 // ---------- hero sheet ----------
+function fxDesc(id){
+  const h=HERO[id], f=FAC_FX[h.fac], st=h.role==='strat'?' (กุนซือแรงขึ้น 1.5 เท่า)':'';
+  const base = h.role==='heal' ? `สกิลฮีลเติมโทสะให้ทุกคน +25${f==='guard'?' และให้โล่ทั้งทัพ':''}`
+    : f==='burn' ? `สกิลติดเผาไหม้ 2 เทิร์น ไหม้ทุกต้นเทิร์นของเป้าหมาย${st}`
+    : f==='ctrl' ? `สกิลดูดโทสะศัตรู 35 และมีโอกาสทำให้มึนงงข้ามเทิร์น${st}`
+    : f==='guard' ? `สกิลให้โล่แก่เพื่อนที่เลือดน้อยที่สุด${st}`
+    : `สกิลทำให้ศัตรูอ่อนแรง พลังโจมตี -20% 2 เทิร์น${st}`;
+  return base + (h.role==='war'||h.role==='cav' ? ' · ใช้สกิลแล้วพลังโจมตีตัวเอง +15% 2 เทิร์น' : '');
+}
+// Breaking down a general you no longer use: most of the gold and EXP spent on levels comes back, plus jade
+// and EXP potions by rarity, more for stars and awakenings.
+function dismantleGain(id){
+  const h=H(id), r=HERO[id].rar; let g=0, x=0;
+  for(let l=1;l<h.lv;l++){ const c=lvCost(l,HERO[id].role); g+=c.gold; x+=c.exp }
+  const k=(h.star-1)+h.aw*2;
+  return {gold:Math.round(g*0.7)+500, exp:Math.round(x*0.7), gems:({A:20,S:60,SP:200})[r]*(1+k), potions:({A:1,S:3,SP:8})[r]+k};
+}
+const dismantleText = id => { const d=dismantleGain(id); return `ได้คืน เงิน ${fmt(d.gold)} · EXP ${fmt(d.exp)} · หยก ${d.gems} · ยา EXP ×${d.potions} อุปกรณ์ที่สวมกลับเข้ากระเป๋า ผลึกจิตยังอยู่` };
+function dismantle(id){
+  if(!H(id)||S.team.includes(id)||isLocked(id)||Object.keys(S.heroes).length<=1) return;
+  if(UI.disArm!==id){ UI.disArm=id; openHero(id); return }
+  const d=dismantleGain(id); UI.disArm=null;
+  S.gold+=d.gold; S.exp+=d.exp; S.gems+=d.gems; S.potions+=d.potions; delete S.heroes[id]; if(S.locked) delete S.locked[id];
+  save(); closeLayer(); render(); toast(`ย่อย ${HERO[id].th} แล้ว · หยก +${d.gems} · ยา EXP ×${d.potions}`);
+}
 function openHero(id){
   const h=HERO[id], own=S.heroes[id];
-  const lv=own?.lv||1, st=own?.star||1, aw=own?.aw||0, s=own?heroFinal(id):stats(id,lv,st,aw), r=ROLE[h.role];
+  const lv=own?effLv(id):1, st=own?.star||1, aw=own?.aw||0, s=own?heroFinal(id):stats(id,lv,st,aw), r=ROLE[h.role], shared=own&&lv>own.lv;
   const cap=levelCap(st,aw), lc=lvCost(lv, h.role), sc=starCost(st), ac=awCost(aw), soul=S.souls[id]||0;
   const inTeam=S.team.includes(id);
   const canLv = own && lv<cap && S.gold>=lc.gold && S.exp>=lc.exp;
@@ -3298,7 +3419,7 @@ function openHero(id){
         <div class="hbart ${h.rar}" data-tilt><span class="gloss"></span>${liveArt(id,own?isMech(id):false)}<em class="r ${h.rar}">${RAR[h.rar].label}</em><span class="hst">${aw?'☾'.repeat(aw):stars(st)}</span></div>
         <div>
           <h2>${esc(h.th)}</h2>
-          <div class="en">${esc(h.en)} · ${own?`Lv.${lv}/${cap} · สำเนา ${own.copies}`:'ยังไม่มีในทัพ อัญเชิญเพื่อรับ'}</div>${EVO[id]&&evoTier(id,aw)?`<div class="evoname">ร่าง${esc(EVO[id][evoTier(id,aw)-1][0])}</div>`:''}
+          <div class="en">${esc(h.en)} · ${own?`Lv.${lv}/${cap} · สำเนา ${own.copies}`:'ยังไม่มีในทัพ อัญเชิญเพื่อรับ'}</div>${shared?`<div class="sharedlv">⇄ ระดับร่วม Lv.${lv} (เลเวลตามขุนพลอันดับ 6)</div>`:''}${EVO[id]&&evoTier(id,aw)?`<div class="evoname">ร่าง${esc(EVO[id][evoTier(id,aw)-1][0])}</div>`:''}
           <div class="tags"><span class="tag" style="background:var(--${h.fac})">${FAC[h.fac].ch} ${FAC[h.fac].th}</span><span class="tag role">${roleIcon(h.role,'ri sm')}${r.th}</span>${tierTable()[id]?`<span class="tag tier ${tierTable()[id].t}">${tierTable()[id].t} · อันดับ ${tierTable()[id].rank}</span>`:''}<span class="tag" style="background:#8a5a12">${RAR[h.rar].label}</span></div>
           <div class="power" style="color:var(--wu);margin-top:8px"><small style="color:var(--muted)">พลัง</small>${fmt(own?heroPower(id):power(id,lv,st,aw))}</div>
         </div>
@@ -3319,8 +3440,9 @@ function openHero(id){
         ['พรสวรรค์', TALENT[h.role]],
         ['สกิล', `<b>${esc(evoSkill(id,aw))}</b> ${r.desc(Math.round(skillMult(id,aw)*(h.role==='strat'?1.2:1)*100))} ใช้เมื่อโทสะเต็ม`],
         ['คอมโบ', `หลังโจมตีทั่วไป มีโอกาส ${comboChance(h.role)*100}% ตีซ้ำอีก 60%`],
+        ['ผลสถานะ', fxDesc(id)],
         ['ฐานเทวะ', aw?`ครั้งแรกที่เลือดต่ำกว่า 30% ฟื้นทันที ${20+aw*4}% ของ HP และพลังโจมตี +${aw*5}%`:'ปลดล็อกเมื่อตื่นจิตขั้น 1']
-      ].map(([t,d],i)=>`<div class="sk ${i===4&&!aw?'lock':''}"><span><i>${['攻','天','技','连','神'][i]}</i>${t}</span><p>${d}</p></div>`).join('')}</div></div>
+      ].map(([t,d],i)=>`<div class="sk ${i===5&&!aw?'lock':''}"><span><i>${['攻','天','技','连','印','神'][i]}</i>${t}</span><p>${d}</p></div>`).join('')}</div></div>
       ${myBonds.length?`<div class="bonds"><h4>มิตรภาพ</h4>${myBonds.map(b=>{const on=b.ids.every(i=>teamIds.includes(i));
         return `<div class="bond ${on?'on':''}"><span>${b.name}: ${b.ids.map(i=>HERO[i].th).join(' ')}</span><em>${on?'✓ ':''}${bondText(b)}</em></div>`}).join('')}</div>`:''}
       ${EVO[id]?`<div class="awk evobox"><h4>ร่างวิวัฒน์</h4>
@@ -3328,6 +3450,8 @@ function openHero(id){
         <div class="evorow">${[0,1,2,3].map(t=>{const cur=evoTier(id,aw), got=own&&t<=cur;
           return `<div class="evo ${got?'got':'lock'} ${own&&t===cur?'cur':''}"><span class="tok ${h.fac}">${portrait(id,false,t)}</span><b>${t?esc(EVO[id][t-1][0]):'ร่างเริ่มต้น'}</b><small>${t?(got?esc(EVO[id][t-1][1]):`ตื่นจิต ${EVO_AW[t-1]}`):esc(h.sk)}</small></div>`}).join('')}</div>
         ${MODEL3D[id]?`<button class="btn v3btn" data-act="view3d" data-id="${id}">◈ ดูร่างวิวัฒน์แบบ 3 มิติ</button>`:''}</div>`:''}
+      ${own&&Object.keys(S.heroes).length>1?`<div class="awk dismbox"><h4>ย่อยขุนพล</h4><p>${dismantleText(id)}</p>
+        <button class="btn ghost" style="width:100%;color:var(--on-parch)" data-act="dismantle" data-id="${id}" ${S.team.includes(id)||isLocked(id)?'disabled':''}>${S.team.includes(id)?'อยู่ในทัพ ย่อยไม่ได้':isLocked(id)?'ล็อกอยู่ ย่อยไม่ได้':UI.disArm===id?'แตะอีกครั้งเพื่อยืนยันการย่อย':'ย่อยขุนพลนี้'}</button></div>`:''}
       ${own?`<div class="awk mechbox"><h4>ร่างจักรกล</h4>
         <p>${aw>=3?'สวมเกราะจักรกลแห่งสามก๊ก ค่า HP และ ATK +12% เปลี่ยนรูปลักษณ์ทั้งในการ์ดและสนามรบ':'ปลดล็อกเมื่อตื่นจิตขั้น 3 แปลงร่างเป็นขุนพลจักรกล HP และ ATK +12%'}</p>
         <div class="mechprev"><span class="tok ${h.fac}">${portrait(id,false)}</span><span>→</span><span class="tok ${h.fac}">${portrait(id,true)}</span></div>
@@ -3373,10 +3497,10 @@ function nextCeleb(){
 
 // ---------- actions ----------
 function doPull(n){
-  const free = n===1 && S.freeDate!==today();
+  const free = n===1 && S.freeDate!==today(), gift = !free && (S.freePulls||0)>=n;
   const cost = n===10?2700:300;
-  if(!free && S.gems<cost) return toast('หยกไม่พอ ผ่านด่านหรือทำภารกิจเพื่อรับเพิ่ม');
-  if(free) S.freeDate=today(); else S.gems-=cost;
+  if(!free && !gift && S.gems<cost) return toast('หยกไม่พอ ผ่านด่านหรือทำภารกิจเพื่อรับเพิ่ม');
+  if(free) S.freeDate=today(); else if(gift) S.freePulls-=n; else S.gems-=cost;
   const got=[];
   for(let i=0;i<n;i++){
     S.pulls++; S.pityS++; S.pitySP++;
@@ -3446,7 +3570,7 @@ function fight(mode='stage', bot=null){
   const res=simulate(A,E,(train?800000+S.train.left:trial?850000:story?300000+bot.c*100+bot.s*10:raid?700000+hashStr(today())%1000:tower?500000+S.tower*1000:arena?900000+S.arena.ref*100:S.stage*1000)+S.battleSeed++);
   save();
   const unitHTML=u=>`<div class="u ${u.side==='e'?'foe':''}" id="u-${u.uid}" data-pid="${u.id}">
-     ${POSES[u.id]&&!(u.side==='p'&&isMech(u.id))?poseTok(u.id,evoTier(u.id,u.aw)):liveTok(u.id,u.side==='p'&&isMech(u.id))}<div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${FAC[HERO[u.id].fac]?`<i class="fd ${HERO[u.id].fac}">${FAC[HERO[u.id].fac].ch}</i>`:''}${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}<span>${esc(HERO[u.id].th)}</span><em>${u.lv}</em></div></div>`;
+     ${POSES[u.id]&&!(u.side==='p'&&isMech(u.id))?poseTok(u.id,evoTier(u.id,u.aw)):liveTok(u.id,u.side==='p'&&isMech(u.id))}<div class="sts"></div><div class="hp"><i style="width:100%"></i></div><div class="rg"><i style="width:0%"></i></div><div class="n">${FAC[HERO[u.id].fac]?`<i class="fd ${HERO[u.id].fac}">${FAC[HERO[u.id].fac].ch}</i>`:''}${A[u.slot]&&u.side==='p'&&A[u.slot].assist?'<b class="tagx">ช่วยสู้</b>':A[u.slot]&&u.side==='p'&&A[u.slot].trial?'<b class="tagx">ทดลอง</b>':''}<span>${esc(HERO[u.id].th)}</span><em>${u.lv}</em></div></div>`;
   // Team plaques: name, power and the faction most of the side belongs to.
   const sidePow=side=>res.start.filter(u=>u.side===side).reduce((x,u)=>x+power(u.id,u.lv,u.star,u.aw),0);
   const mainFac=side=>{const c={}; res.start.filter(u=>u.side===side).forEach(u=>{const f=HERO[u.id].fac; if(FAC[f]) c[f]=(c[f]||0)+1}); return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||'qun'};
@@ -3456,7 +3580,7 @@ function fight(mode='stage', bot=null){
   $('#layer').innerHTML=`<div class="battle" role="dialog" aria-label="การต่อสู้">
     <div class="field sc-${bfOf(raid?'raid':tower?'tower':arena?'arena':'stage')}">${battleBg(raid?'raid':tower?'tower':arena?'arena':'stage')}${sceneFX(bfOf(raid?'raid':tower?'tower':arena?'arena':'stage'))}
       <div class="bcry" aria-hidden="true"><b>ประจัญบาน!</b></div>
-      <div class="bhead2">${plaque('p',esc(S.pname||'ท่านเจ้าเมือง'))}<span class="rnd" id="rnd">รอบ 1/20</span>${plaque('e',foeName)}</div>
+      <div class="bhead2">${plaque('p',esc(S.pname||'ท่านเจ้าเมือง'))}<span class="rnd" id="rnd">รอบ 1/${MAX_ROUNDS}</span>${plaque('e',foeName)}</div>
       <div class="bctl">${UI.autoplay?`<button class="btn ghost aptag" data-act="apstop">■ ออโต้</button>`:''}<button class="bc" data-act="speed" id="spd">x1</button><button class="bc" data-act="skip">ข้าม</button></div>
       <div class="lanes"><div class="side ps"><div class="line back">${by('p',[3,4,5])}</div><div class="line front">${by('p',[0,1,2])}</div></div>
       <div class="side es"><div class="line front">${by('e',[0,1,2])}</div><div class="line back">${by('e',[3,4,5])}</div></div></div>
@@ -3497,13 +3621,18 @@ function fly(fromEl, toEl, cls, ms){
   if(p.animate) p.animate([{transform:`translate(${x0}px,${y0}px) rotate(${ang}deg)`},{transform:`translate(${x1}px,${y1}px) rotate(${ang}deg)`}],{duration:ms,easing:'ease-in'});
   setTimeout(()=>p.remove(),ms);
 }
+const ST_IC={burn:['燃','เผาไหม้'], stun:['晕','มึนงง'], shield:['盾','โล่'], up:['攻','โจมตีขึ้น'], down:['弱','อ่อนแรง']};
+const FX_TXT={burn:v=>`เผาไหม้`, stun:()=>'มึนงง!', shield:v=>`โล่ +${fmt(v)}`, up:()=>'โจมตี ▲', down:()=>'อ่อนแรง ▼', drain:v=>`โทสะ -${v}`, rage:v=>`โทสะ +${v}`};
 function applyHits(a, animate){
+  if(a.sts) for(const [uid,l] of Object.entries(a.sts)){ const box=$('#u-'+uid)?.querySelector?.('.sts'); if(box) box.innerHTML=l.map(k=>`<i class="st-${k}" title="${ST_IC[k][1]}">${ST_IC[k][0]}</i>`).join('') }
+  let fxk=0;
   for(const h of a.hits){
     const el=$('#u-'+h.tgt); if(!el) continue;
     el.querySelector('.hp i').style.width=(h.hp/B.max[h.tgt]*100)+'%';
+    if(h.fx){ if(animate){ const n=document.createElement('span'); n.className='num stx st-'+h.fx; n.style.setProperty?.('--sy',(fxk++%3)*16+'px'); n.textContent=FX_TXT[h.fx](h.v); el.appendChild(n); setTimeout(()=>n.remove(),1100) } continue }
     if(animate){
       const n=document.createElement('span'); n.className='num'+(h.heal?' heal':h.crit?' crit':''); n.style.setProperty?.('--jx',((hashStr(h.tgt+B.i)%40)-20)+'px');
-      n.textContent=h.heal?(h.divine?'จิตเทวะ +':'+')+fmt(h.heal):(h.combo?'คอมโบ ':h.crit?'คริ ':'')+fmt(h.dmg)+(h.adv>1?' ▲':''); el.appendChild(n); setTimeout(()=>n.remove(),900);
+      n.textContent=h.heal?(h.divine?'จิตเทวะ +':'+')+fmt(h.heal):(h.burn?'🔥 ':h.combo?'คอมโบ ':h.crit?'คริ ':'')+fmt(h.dmg)+(h.adv>1?' ▲':'')+(h.sh?` (โล่ ${fmt(h.sh)})`:''); if(h.burn) n.classList?.add('burnt'); el.appendChild(n); setTimeout(()=>n.remove(),900);
       if(!h.heal){el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'),360); if(!h.dead && !poseHurt(el,'hit')) poseBlock(el); if(h.crit) fxImg(el,'burst',0,.8)}
       if(h.divine){ poseHurt(el,'rise'); fxImg(el,'dome',0,1.2) }
     }
@@ -3511,7 +3640,7 @@ function applyHits(a, animate){
   }
   for(const [uid,r] of Object.entries(a.rage)){ const el=$('#u-'+uid); if(el) el.querySelector('.rg i').style.width=r+'%'; const sk=$('#sk-'+uid); if(sk){ sk.style.setProperty?.('--r',r); sk.classList.toggle('full',r>=100) } }
   for(const h of a.hits) if(h.dead) $('#sk-'+h.tgt)?.classList.add('dead');
-  const rn=$('#rnd'); if(rn) rn.textContent=`รอบ ${a.round}/20`;
+  const rn=$('#rnd'); if(rn) rn.textContent=`รอบ ${a.round}/${MAX_ROUNDS}`;
 }
 function step(){
   if(!B||B.done) return;
@@ -3523,6 +3652,11 @@ function step(){
     return;
   }
   const a=B.res.actions[B.i++], src=$('#u-'+a.src), dt=700/B.speed;
+  if(a.tick||a.stunned){
+    if(a.tick){ fxImg(src,'burst',0,.6); sfx('crit') } else { src?.classList?.add('dazed'); setTimeout(()=>src?.classList?.remove('dazed'),dt*0.8) }
+    applyHits(a,true); if(a.stunned&&src){ const n=document.createElement('span'); n.className='num stx st-stun'; n.textContent='มึนงง ข้ามเทิร์น'; src.appendChild(n); setTimeout(()=>n.remove(),1000) }
+    B.timer=setTimeout(step, dt*0.6); return;
+  }
   poseAttack(src, a.skill?dt*1.3:dt);
   if(src){ src.classList.remove('lunge-up','lunge-down'); void src.offsetWidth; src.style.setProperty?.('--d',Math.round(dt*0.85)+'ms'); src.classList.add(a.src[0]==='p'?'lunge-up':'lunge-down'); setTimeout(()=>src.classList.remove('lunge-up','lunge-down'),dt*0.85) }
   const su=B.units[a.src], role=su?ROLE&&HERO[su.id].role:'war';
@@ -3534,14 +3668,14 @@ function step(){
   }
   // visual effects per role: arrows and orbs fly, blades slash, healers glow
   for(const h of a.hits){
-    const t=$('#u-'+h.tgt); if(!t) continue;
+    const t=$('#u-'+h.tgt); if(!t||h.fx) continue;
     if(h.heal!==undefined){ setTimeout(()=>{ fx(t, h.divine?'divine':'healfx'); if(a.skill&&!h.divine) fxImg(t,'lotus',0,.9) }, dt*0.25); continue }
     if(a.skill){ const up=a.src[0]==='p', nm=SKILL_FX(su.id, su.aw); setTimeout(()=>fxImg(t, nm, nm.startsWith('thrust')?(up?0:180):(up?0:180), 1.1), dt*0.28) }
     if(role==='arch'){ fly(src,t,'arrow',dt*0.3); setTimeout(()=>fx(t,'pierce'),dt*0.3) }
     else if(role==='strat'){ fly(src,t,a.skill?'fireball':'orb',dt*0.3); setTimeout(()=>fx(t,a.skill?'burst':'spark'),dt*0.3) }
     else setTimeout(()=>fx(t, a.skill?'slash big':'slash'), dt*0.25);
   }
-  const crit=a.hits.some(h=>h.crit), heal=a.hits.some(h=>h.heal!==undefined);
+  const crit=a.hits.some(h=>h.crit), heal=a.hits.some(h=>h.heal!==undefined&&!h.fx);
   setTimeout(()=>{ if(!B||B.done) return; applyHits(a,true); if(crit||a.skill) hitStop(a.skill?130:80); if(crit&&!a.skill) fieldShake('s') }, dt*0.3);
   if(a.skill) sfx('skill');
   if(!heal&&role==='arch') sfx('arrow'); else if(!heal&&role==='strat') sfx('magic');
@@ -3839,6 +3973,9 @@ document.addEventListener('click',e=>{
       case 'fcancel': UI.fsel=null; render(); return;
       case 'ffac': UI.ffac=act.dataset.k; render(); return;
       case 'view3d': view3d(id); return;
+      case 'dismantle': dismantle(id); return;
+      case 'newbieclaim': { const i=+act.dataset.i, r=NEWBIE[i]; if(!r||S.newbie.got.includes(i)||i>newbieDay()||newbieDay()>=14) return;
+        S.newbie.got.push(i); S.freePulls=(S.freePulls||0)+r.p; if(r.sel) S.bag.selSP=(S.bag.selSP||0)+1; save(); render(); toast(`ได้รับอัญเชิญฟรี ×${r.p}${r.sel?' และหีบเลือกขุนพล S+':''}`); return }
       case 'froster': { const i=S.team.indexOf(id);
         if(i>=0){ if(isLocked(id)) return toast('ขุนพลตัวนี้ล็อกอยู่ ปลดล็อกก่อน'); if(S.team.filter(Boolean).length<=1) return toast('ทัพต้องมีขุนพลอย่างน้อย 1 คน');
           S.team[i]=null; UI.fsel=null; save(); render(); toast(`${HERO[id].th} กลับค่าย`); return }
